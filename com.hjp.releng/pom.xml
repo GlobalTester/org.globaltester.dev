@@ -8,7 +8,25 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.releng</module>
+    <module>../../com.hjp.globaltester.cltone/com.hjp.globaltester.cltone</module>
+    <module>../../com.hjp.globaltester.epassport.certificates/com.hjp.globaltester.epassport.certificates</module>
+    <module>../../com.hjp.globaltester.epassport.datagroups/com.hjp.globaltester.epassport.datagroups</module>
+    <module>../../com.hjp.globaltester.epassport.securemessaging/com.hjp.globaltester.epassport.securemessaging</module>
+    <module>../../com.hjp.globaltester.prove.eac2/com.hjp.globaltester.prove.eac2</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.feature</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.site</module>
+    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.feature</module>
+    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp</module>
+    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.site</module>
+    <module>../../com.hjp.globaltester.prove.pace/com.hjp.globaltester.prove.pace</module>
+    <module>../../com.hjp.globaltester.simulator.applets.epa/com.hjp.globaltester.simulator.applets.epa</module>
+    <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator</module>
+    <module>../../com.hjp.globaltester.tlvmanipulator/com.hjp.globaltester.tlvmanipulator</module>
+    <module>../../org.globaltester.base/org.globaltester.base</module>
+    <module>../../org.globaltester.logging/org.globaltester.logging</module>
+    <module>../../org.globaltester.testeditor/org.globaltester.testeditor</module>
+    <module>../../org.globaltester.testmanager/org.globaltester.testmanager</module>
   </modules>
 
 </project>
