@@ -13,6 +13,8 @@
     <module>../../com.hjp.globaltester.epassport.datagroups/com.hjp.globaltester.epassport.datagroups</module>
     <module>../../com.hjp.globaltester.epassport.securemessaging/com.hjp.globaltester.epassport.securemessaging</module>
     <module>../../com.hjp.globaltester.prove.eac2/com.hjp.globaltester.prove.eac2</module>
+    <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.feature</module>
+    <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.site</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.feature</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.site</module>
