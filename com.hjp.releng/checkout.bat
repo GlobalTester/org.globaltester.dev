@@ -3,14 +3,15 @@ git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.epassport.datagroups
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.epassport.securemessaging
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.eac2
+git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.epa
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.epareader
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.epp
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.pace
-git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.simulator.applets.epa
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.simulator
+git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.simulator.applets.epa
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.tlvmanipulator
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/org.globaltester.base
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/org.globaltester.logging
+git clone ssh://git@tourmaline.intranet.hjp-consulting.com/org.globaltester.parent
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/org.globaltester.testeditor
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/org.globaltester.testmanager
-git clone ssh://git@tourmaline.intranet.hjp-consulting.com/org.globaltester.parent
