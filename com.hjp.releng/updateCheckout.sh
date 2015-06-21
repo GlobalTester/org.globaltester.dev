@@ -15,4 +15,4 @@ sort -u $CHECKOUTSCRIPT -o $CHECKOUTSCRIPT
 # add git clone command for repositories
 sed 's@^@git clone ssh://git\@tourmaline.intranet.hjp-consulting.com/@' -i $CHECKOUTSCRIPT
 
-cat $CHECKOUTSCRIPT
+#cat $CHECKOUTSCRIPT

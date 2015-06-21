@@ -6,6 +6,7 @@ git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.epa
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.epareader
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.epp
+git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.is
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.prove.pace
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.simulator
 git clone ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.globaltester.simulator.applets.epa

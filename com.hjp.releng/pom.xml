@@ -21,6 +21,9 @@
     <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.feature</module>
     <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp</module>
     <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.site</module>
+    <module>../../com.hjp.globaltester.prove.is/com.hjp.globaltester.prove.is.feature</module>
+    <module>../../com.hjp.globaltester.prove.is/com.hjp.globaltester.prove.is</module>
+    <module>../../com.hjp.globaltester.prove.is/com.hjp.globaltester.prove.is.site</module>
     <module>../../com.hjp.globaltester.prove.pace/com.hjp.globaltester.prove.pace</module>
     <module>../../com.hjp.globaltester.simulator.applets.epa/com.hjp.globaltester.simulator.applets.epa</module>
     <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator</module>
