@@ -12,5 +12,5 @@ This should work for all *.releng projects that build the specific products. The
 
 If you followed the instructions above you can easily import all projects in your Eclipse workspace. Just select "Import... > General > Existing Projects into Workspace". Follow the wizzard, you can select the root directory you cloned repositories to, this will detect all relevant projects. Make sure not to copy them, this will allow eGit to operate on your exisitng repository clone.
 
-
+If new projects where added, projects where removed or renamed pom.xml and checkout.bat need to be updated. In order to do this change into the directory com.hjp.releng/con.hjp.releng and call update.sh. This script will dig through your directories, extract projects from pom files and build the correct checkout script.
 
