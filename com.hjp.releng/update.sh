@@ -5,9 +5,9 @@
 # 
 
 POM=pom.xml
-POMHEAD=pom.head
-POMMODULES=pom.modules
-POMTAIL=pom.tail
+POMHEAD=`mktemp`
+POMMODULES=`mktemp`
+POMTAIL=`mktemp`
 CHECKOUTSCRIPT=checkout.bat
 
 
