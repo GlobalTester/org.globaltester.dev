@@ -1,10 +1,12 @@
 In order to setup a fresh build area create an empty directory and cd into it.
 From there clone com.hjp.releng:
-git clone  ssh://git@tourmaline.intranet.hjp-consulting.com/com.hjp.releng
+git clone git@git.hjp-consulting.com:com.hjp.releng
 
-Now execute the checkout script (this script is shell/OS independent as long as you have git on your PATH)
+From the same directory execute the checkout script(s) appropriate for you.
 ./com.hjp.releng/com.hjp.releng/checkout/<project>.bat
-You will find several different checkout scripts within that folder, please select the one(s) appropriate for you. If you uses scripts for products you are not a member of you won't be able to clone all required repositories. 
+If you uses scripts for products you are not a member of you won't be able to clone all required repositories.
+These scripts are shell/OS independent as long as you have git on your PATH.
+
 Depending on your connectivity to the providing servers this might take some time.
 Gratulations, your have a complete workingcopy.
 
