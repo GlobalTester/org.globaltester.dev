@@ -8,7 +8,7 @@ POM=pom.xml
 POMHEAD=`mktemp`
 POMMODULES=`mktemp`
 POMTAIL=`mktemp`
-CHECKOUTSCRIPT=checkout.bat
+CHECKOUTSCRIPT=checkout/all.bat
 
 
 # extract all module references from aggregator poms
