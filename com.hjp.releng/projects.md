@@ -10,9 +10,9 @@ GlobalTester projects are not yet moved to this server but will be added as soon
 PersoSim
 --------
 PersoSim the open source eID simulator. See [http://www.persosim.de] for more details.
-Development entrypoint is the Eclipse Rich Client Platform project 'de.persosim.rcp'. Inside of that repository you will find a releng project wich contains a maven aggregator build definition which build the product to an executbale. Within your Eclipse workspace you can open the product definition file in 'de.persosim.rcp.product' and create/launch a new launch configuration from there.
+Development entrypoint is the Eclipse Rich Client Platform project 'de.persosim.rcp'. Inside of that repository you will find a releng project which contains a maven aggregator build definition which build the product to an executable. Within your Eclipse workspace you can open the product definition file in 'de.persosim.rcp.product' and create/launch a new launch configuration from there.
 
 POSeIDAS
 --------
-POSeIDAS implements features of ersoSim the open source eID simulator. See [http://www.persosim.de] for more details.
-Start development/exploration in the repository 'com.hjp.poseidas'. Inside of that repository you will find a releng project wich contains a maven aggregator build definition which build the product to an executable. Within your Eclipse workspace you can open the product definition file in 'com.hjp.poseidas.product' and create/launch a new launch configuration from there.
+POSeIDAS implements features of PersoSim, the open source eID simulator. See [http://www.persosim.de] for more details.
+Start development/exploration in the repository 'com.hjp.poseidas'. Inside of that repository you will find a releng project which contains a maven aggregator build definition which build the product to an executable. Within your Eclipse workspace you can open the product definition file in 'com.hjp.poseidas.product' and create/launch a new launch configuration from there.
