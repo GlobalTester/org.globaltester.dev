@@ -15,4 +15,4 @@ Development entrypoint is the Eclipse Rich Client Platform project 'de.persosim.
 POSeIDAS
 --------
 POSeIDAS implements features of PersoSim, the open source eID simulator. See [http://www.persosim.de] for more details.
-Start development/exploration in the repository 'com.hjp.poseidas'. Inside of that repository you will find a releng project which contains a maven aggregator build definition which build the product to an executable. Within your Eclipse workspace you can open the product definition file in 'com.hjp.poseidas.product' and create/launch a new launch configuration from there.
+Start development/exploration in the repository 'com.hjp.poseidas'. Inside of that repository you will find a releng project which contains a maven aggregator build definition which builds the product to an executable. Within your Eclipse workspace you can open the product definition file in 'com.hjp.poseidas.product' and create/launch a new launch configuration from there.

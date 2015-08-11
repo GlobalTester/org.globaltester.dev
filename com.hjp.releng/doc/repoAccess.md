@@ -4,12 +4,12 @@ We use gitolite to serve our git repositories. It is located at git.hjp-consulti
 
 Getting access
 --------------
-When you read this you allready have some kind of acces ;-)
-In order to get acces a server admin needs to register a ssh public key and associate it with appropriate acces rights. Contact us if you feel you need different acces or another key.
+When you read this you allready have some kind of access ;-)
+In order to get access a server admin needs to register a ssh public key and associate it with appropriate access rights. Contact us if you feel you need different access or another key.
 
 Determine access
 ----------------
-When you have acces you will be able to execute the following command
+When you have access you will be able to execute the following command
 'ssh git@git.hjp-consulting.com info'
 It will give you an output like this:
 
@@ -21,13 +21,13 @@ It will give you an output like this:
 
 From the second word in the first line you can see the user name associated with your key (you might need that later)
 
-The later lines show you which repositories are available (visible) to you. For a detailed 
+The later lines show you which repositories are available (visible) to you. 
 
 Access rights
 -------------
 Gitolite only restricts writing access. This means if you can read a repository you can see all branches in it. This implies when you publish a user branch (see below) you must be aware that everybody (with read acces on that repo) can see it.
 
-Write acces in our configuration generally means you are allowed to manage your own user branches.
+Write access in our configuration generally means you are allowed to manage your own user branches.
 User branches have the form /usr/<username>/whateveryoulike. You may create, delete, push any of your own user branches, even non-fastforward pushes are allowed on your own user branches.
 So you can do any development you wish on your own branches. In order to get them merged easily try to create seperate branches for different features.
 
