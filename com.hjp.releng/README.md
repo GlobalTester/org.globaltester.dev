@@ -9,4 +9,5 @@ Here is a list of interesting entrypoints for the documentation folder:
 * [doc/setupEnv.md] describes how to setup your local development environment
 * [doc/repoAccess.md] describes the different types of access on the provided repositories
 * [doc/devWorkflow.md] describes the development workflow and how to get your changes merged into master
+* [doc/release.md] describes the overall release process
 
