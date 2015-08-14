@@ -60,7 +60,7 @@ echo "org.globaltester.parent" >> $CHECKOUTSCRIPT
 sort -u $CHECKOUTSCRIPT -o $CHECKOUTSCRIPT
 
 # add git clone command for repositories
-sed 's@^@git clone ssh://git\@tourmaline.intranet.hjp-consulting.com/@' -i $CHECKOUTSCRIPT
+sed 's@^@git clone git\@git.hjp-consulting.com:@' -i $CHECKOUTSCRIPT
 
 #display final result
 #cat $POM
