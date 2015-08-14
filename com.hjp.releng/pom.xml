@@ -8,10 +8,37 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>../../com.hjp.globaltester.cltone/com.hjp.globaltester.cltone</module>
+    <module>../../com.hjp.globaltester.epassport.certificates/com.hjp.globaltester.epassport.certificates</module>
+    <module>../../com.hjp.globaltester.epassport.datagroups/com.hjp.globaltester.epassport.datagroups</module>
+    <module>../../com.hjp.globaltester.epassport.securemessaging/com.hjp.globaltester.epassport.securemessaging</module>
+    <module>../../com.hjp.globaltester.prove.eac2/com.hjp.globaltester.prove.eac2</module>
+    <module>../../com.hjp.globaltester.prove.eidclient/com.hjp.globaltester.prove.eidclient.feature</module>
+    <module>../../com.hjp.globaltester.prove.eidclient/com.hjp.globaltester.prove.eidclient</module>
+    <module>../../com.hjp.globaltester.prove.eidclient/com.hjp.globaltester.prove.eidclient.site</module>
+    <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.feature</module>
+    <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.site</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.feature</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.site</module>
+    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.feature</module>
+    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp</module>
+    <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.site</module>
+    <module>../../com.hjp.globaltester.prove.is/com.hjp.globaltester.prove.is.feature</module>
+    <module>../../com.hjp.globaltester.prove.is/com.hjp.globaltester.prove.is</module>
+    <module>../../com.hjp.globaltester.prove.is/com.hjp.globaltester.prove.is.site</module>
+    <module>../../com.hjp.globaltester.prove.pace/com.hjp.globaltester.prove.pace</module>
+    <module>../../com.hjp.globaltester.simulator.applets.epa/com.hjp.globaltester.simulator.applets.epa</module>
+    <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator</module>
+    <module>../../com.hjp.globaltester.tlvmanipulator/com.hjp.globaltester.tlvmanipulator</module>
+    <module>../../com.hjp.osgi.remotecontrol/com.hjp.osgi.remotecontrol</module>
+    <module>../../com.hjp.osgi.remotecontrol.soap/com.hjp.osgi.remotecontrol.soap</module>
+    <module>../../com.hjp.persosim.simulator/com.hjp.persosim.simulator</module>
     <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3</module>
     <module>../../com.hjp.persosim.simulator.protocols.ps/com.hjp.persosim.simulator.protocols.ps</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.feature</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.product</module>
+    <module>../../com.hjp.simulator/com.hjp.simulator</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector.ui</module>
     <module>../../de.persosim.rcp/de.persosim.rcp.feature</module>
@@ -20,12 +47,16 @@
     <module>../../de.persosim.simulator/de.persosim.simulator.adapter.socket</module>
     <module>../../de.persosim.simulator/de.persosim.simulator</module>
     <module>../../de.persosim.simulator/de.persosim.simulator.ui</module>
+    <module>../../org.globaltester.base/org.globaltester.base</module>
     <module>../../org.globaltester.cryptoprovider/org.globaltester.cryptoprovider.bc</module>
     <module>../../org.globaltester.cryptoprovider/org.globaltester.cryptoprovider</module>
     <module>../../org.globaltester.cryptoprovider/org.globaltester.cryptoprovider.sc</module>
+    <module>../../org.globaltester.logging.legacy/org.globaltester.logging.legacy</module>
     <module>../../org.globaltester.logging/org.globaltester.logging.consoleLogger</module>
     <module>../../org.globaltester.logging/org.globaltester.logging.fileLogger</module>
     <module>../../org.globaltester.logging/org.globaltester.logging</module>
+    <module>../../org.globaltester.testeditor/org.globaltester.testeditor</module>
+    <module>../../org.globaltester.testmanager/org.globaltester.testmanager</module>
   </modules>
 
 </project>
