@@ -4,7 +4,7 @@ We use gitolite to serve our git repositories. It is located at git.hjp-consulti
 
 Getting access
 --------------
-When you read this you allready have some kind of access ;-)
+When you read this you already have some kind of access ;-)
 In order to get access a server admin needs to register a ssh public key and associate it with appropriate access rights. Contact us if you feel you need different access or another key.
 
 Determine access
