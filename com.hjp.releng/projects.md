@@ -5,7 +5,7 @@ It focuses on the relevant top level projects describe their scope and developme
 
 GlobalTester
 ------------
-GlobalTester projects are not yet moved to this server but will be added as soon as they are.
+GlobalTester is an Open Source test tool for conformance testing and analysis of smart cards, such as electronic identification cards (eID) and electronic passports (ePassports) as well as related document readers.
 
 PersoSim
 --------
