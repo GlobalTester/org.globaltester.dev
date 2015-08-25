@@ -22,7 +22,7 @@ This should work for all *.releng projects that build the specific products. The
 
 Setup Eclipse
 -------------
-If you followed the instructions above you can easily import all projects in your Eclipse workspace. Just select "Import... > General > Existing Projects into Workspace". Follow the wizzard, you can select the root directory you cloned repositories to, this will detect all relevant projects. Make sure not to copy them, this will allow eGit to operate on your exisitng repository clone.
+If you followed the instructions above you can easily import all projects in your Eclipse workspace. Just select "Import... > General > Existing Projects into Workspace". Follow the wizard, you can select the root directory you cloned repositories to, this will detect all relevant projects. Make sure not to copy them, this will allow eGit to operate on your existing repository clone.
 
 We were used to use Eclipse Standard and moved to Eclipse IDE for Eclipse Committers, but you can use any edition you like. Here`s a list of features you might want to have installed in order to use full integration.
 - Java Development Tools, as most projects are Java projects

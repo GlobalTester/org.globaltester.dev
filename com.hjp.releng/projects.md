@@ -1,7 +1,7 @@
 Projects overview
 ===
-This file fives an gives you an overview of the projects available on this server (and accessible from this releng repository). 
-It focuses on the relevant top level projects describe their scope and development entrypoint. It will *not* descripe each single project repository, for that information look in the README files provided within these repositories and contained projects.
+This file gives you an overview of the projects available on this server (and accessible from this releng repository). 
+It focuses on the relevant top level projects describe their scope and development entrypoint. It will *not* describe each single project repository, for that information look in the README files provided within these repositories and contained projects.
 
 GlobalTester
 ------------
