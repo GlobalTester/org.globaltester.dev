@@ -25,12 +25,12 @@ The later lines show you which repositories are available (visible) to you.
 
 Access rights
 -------------
-Gitolite only restricts writing access. This means if you can read a repository you can see all branches in it. This implies when you publish a user branch (see below) you must be aware that everybody (with read acces on that repo) can see it.
+Gitolite only restricts writing access. This means if you can read a repository you can see all branches in it. This implies when you publish a user branch (see below) you must be aware that everybody (with read access on that repo) can see it.
 
 Write access in our configuration generally means you are allowed to manage your own user branches.
 User branches have the form /usr/<username>/whateveryoulike. You may create, delete, push any of your own user branches, even non-fastforward pushes are allowed on your own user branches.
-So you can do any development you wish on your own branches. In order to get them merged easily try to create seperate branches for different features.
+So you can do any development you wish on your own branches. In order to get them merged easily try to create separate branches for different features.
 
-HJP developers have a little more rights and are allowed to push (fast-forward) commits on all available branches. This allows them to put review commit even on other users branches (without the otherwise needed detour throug their own user branch) and to merge branches into master.
+HJP developers have a little more rights and are allowed to push (fast-forward) commits on all available branches. This allows them to put review commit even on other users branches (without the otherwise needed detour through their own user branch) and to merge branches into master.
 
 Any other access will require the help of a server admin.
