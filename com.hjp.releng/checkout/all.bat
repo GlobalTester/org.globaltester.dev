@@ -27,5 +27,6 @@ git clone git@git.hjp-consulting.com:org.globaltester.cryptoprovider
 git clone git@git.hjp-consulting.com:org.globaltester.logging
 git clone git@git.hjp-consulting.com:org.globaltester.logging.legacy
 git clone git@git.hjp-consulting.com:org.globaltester.parent
+git clone git@git.hjp-consulting.com:org.globaltester.simulator
 git clone git@git.hjp-consulting.com:org.globaltester.testeditor
 git clone git@git.hjp-consulting.com:org.globaltester.testmanager
