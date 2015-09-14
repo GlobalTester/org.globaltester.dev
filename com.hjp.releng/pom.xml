@@ -17,6 +17,7 @@
     <module>../../com.hjp.globaltester.prove.eidclient/com.hjp.globaltester.prove.eidclient</module>
     <module>../../com.hjp.globaltester.prove.eidclient/com.hjp.globaltester.prove.eidclient.site</module>
     <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.feature</module>
+    <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa</module>
     <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.site</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.feature</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
