@@ -6,6 +6,8 @@ Check repository states
 -----------------------
 Before starting the release build it is wise to perform some basic check on the projects included in the build:
 
+1. __Check open branches__  
+Ensure that all required branches are merged (and removed on the remotes)
 1. __Check version numbers__  
 According to the changes integrated in the new release make sure that a new proper version number is set. It should represent how extensive the changes are (bugfixes, new features etc.).
 1. __Check documentation__  
