@@ -34,8 +34,10 @@
     <module>../../com.hjp.globaltester.tlvmanipulator/com.hjp.globaltester.tlvmanipulator</module>
     <module>../../com.hjp.osgi.remotecontrol/com.hjp.osgi.remotecontrol</module>
     <module>../../com.hjp.osgi.remotecontrol.soap/com.hjp.osgi.remotecontrol.soap</module>
+    <module>../../com.hjp.persosim.profiletool/com.hjp.persosim.profiletool</module>
     <module>../../com.hjp.persosim.simulator/com.hjp.persosim.simulator</module>
     <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3</module>
+    <module>../../com.hjp.persosim.simulator.protocols.pace/com.hjp.persosim.simulator.protocols.pace</module>
     <module>../../com.hjp.persosim.simulator.protocols.ps/com.hjp.persosim.simulator.protocols.ps</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.feature</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.product</module>
