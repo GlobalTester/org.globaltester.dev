@@ -16,8 +16,10 @@ git clone git@git.hjp-consulting.com:com.hjp.globaltester.tlvmanipulator
 git clone git@git.hjp-consulting.com:com.hjp.internal
 git clone git@git.hjp-consulting.com:com.hjp.osgi.remotecontrol
 git clone git@git.hjp-consulting.com:com.hjp.osgi.remotecontrol.soap
+git clone git@git.hjp-consulting.com:com.hjp.persosim.profiletool
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ca3
+git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.pace
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ps
 git clone git@git.hjp-consulting.com:com.hjp.poseidas
 git clone git@git.hjp-consulting.com:com.hjp.simulator
