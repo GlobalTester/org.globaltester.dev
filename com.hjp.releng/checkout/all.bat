@@ -1,3 +1,4 @@
+git clone git@git.hjp-consulting.com:com.hjp.cvcerts
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.cltone
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.certificates
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.datagroups
@@ -5,6 +6,7 @@ git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.securemessag
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.eac2
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.eidclient
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epa
+git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epa.poseidas
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epareader
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epp
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.is
@@ -19,7 +21,9 @@ git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ca3
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.pace
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ps
+git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ta
 git clone git@git.hjp-consulting.com:com.hjp.poseidas
+git clone git@git.hjp-consulting.com:com.hjp.protocols.pace.chip
 git clone git@git.hjp-consulting.com:com.hjp.simulator
 git clone git@git.hjp-consulting.com:de.persosim.driver.connector
 git clone git@git.hjp-consulting.com:de.persosim.rcp
