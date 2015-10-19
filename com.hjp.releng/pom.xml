@@ -8,6 +8,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>../../com.hjp.cvcerts/com.hjp.cvcerts</module>
     <module>../../com.hjp.globaltester.cltone/com.hjp.globaltester.cltone</module>
     <module>../../com.hjp.globaltester.epassport.certificates/com.hjp.globaltester.epassport.certificates</module>
     <module>../../com.hjp.globaltester.epassport.datagroups/com.hjp.globaltester.epassport.datagroups</module>
@@ -19,6 +20,9 @@
     <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.feature</module>
     <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa</module>
     <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.site</module>
+    <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas.feature</module>
+    <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas</module>
+    <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas.site</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.feature</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.site</module>
@@ -39,8 +43,11 @@
     <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3</module>
     <module>../../com.hjp.persosim.simulator.protocols.pace/com.hjp.persosim.simulator.protocols.pace</module>
     <module>../../com.hjp.persosim.simulator.protocols.ps/com.hjp.persosim.simulator.protocols.ps</module>
+    <module>../../com.hjp.persosim.simulator.protocols.ta/com.hjp.persosim.simulator.protocols.ta</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.feature</module>
+    <module>../../com.hjp.poseidas/com.hjp.poseidas</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.product</module>
+    <module>../../com.hjp.protocols.pace.chip/com.hjp.protocols.pace.chip</module>
     <module>../../com.hjp.simulator/com.hjp.simulator</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector.ui</module>
