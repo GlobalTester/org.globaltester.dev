@@ -1,4 +1,3 @@
-
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.cltone
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.certificates
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.datagroups
@@ -6,6 +5,7 @@ git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.securemessag
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.eac2
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.eidclient
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.pace
+git clone git@git.hjp-consulting.com:com.hjp.globaltester.scripts
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.simulator
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.simulator.applets.epa
 git clone git@git.hjp-consulting.com:com.hjp.osgi.remotecontrol

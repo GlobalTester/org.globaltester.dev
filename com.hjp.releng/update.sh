@@ -10,25 +10,27 @@ POMMODULES=`mktemp`
 POMTAIL=`mktemp`
 CHECKOUTSCRIPT=checkout/all.bat
 
-
 # extract all module references from aggregator poms
 MODULES=`find ../../ -name $POM -exec grep "<module>" {} \;`
 
+#remove leading whitespace
+MODULES=`printf '%s\n' "${MODULES[@]}" | sed -e 's/^[ \t]*//'`
+
 # sort and remove duplicates
-MODULES=`echo $MODULES | tr " " "\n" | sort -u`
+MODULES=`printf '%s\n' "${MODULES[@]}" | sort -u`
 
 # remove releng projects
-MODULES=`echo $MODULES | tr " " "\n" | grep -v "\.releng<"`
+MODULES=`printf '%s\n' "${MODULES[@]}" | grep -v "\.releng<"`
 
 # resolve local relative paths for projects within same repository
-MODULES=`echo $MODULES | tr " " "\n" | sed 's@>\.\./\(\(com.*\)\.\(feature\|site\)\)<@>../../\2/\1<@'` #known subprojects
-MODULES=`echo $MODULES | tr " " "\n" | sed 's@>\.\./\(com.*\)<@>../../\1/\1<@'` #projects named exactly as the repo
+MODULES=`printf '%s\n' "${MODULES[@]}" | sed 's@>\.\./\(\(com.*\)\.\(feature\|site\|scripts\)\)<@>../../\2/\1<@'` #known subprojects
+MODULES=`printf '%s\n' "${MODULES[@]}" | sed 's@>\.\./\(com.*\)<@>../../\1/\1<@'` #projects named exactly as the repo
 
 # sort and remove duplicates
-MODULES=`echo $MODULES | tr " " "\n" | sort -u`
+MODULES=`printf '%s\n' "${MODULES[@]}" | sort -u`
 
 #dump module list to intermediate file
-echo $MODULES | tr " " "\n    " > $POMMODULES
+printf '%s\n' "${MODULES[@]}" > $POMMODULES
 
 #indent modules
 sed -i "s/^/    /" $POMMODULES

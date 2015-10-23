@@ -11,9 +11,11 @@ git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epareader
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epp
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.is
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.pace
+git clone git@git.hjp-consulting.com:com.hjp.globaltester.scripts
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.simulator
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.simulator.applets.epa
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.tlvmanipulator
+git clone git@git.hjp-consulting.com:com.hjp.internal
 git clone git@git.hjp-consulting.com:com.hjp.osgi.remotecontrol
 git clone git@git.hjp-consulting.com:com.hjp.osgi.remotecontrol.soap
 git clone git@git.hjp-consulting.com:com.hjp.persosim.profiletool

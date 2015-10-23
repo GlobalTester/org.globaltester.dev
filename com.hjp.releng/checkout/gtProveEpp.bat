@@ -3,6 +3,7 @@ git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.datagroups
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.epassport.securemessaging
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.epp
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.prove.pace
+git clone git@git.hjp-consulting.com:com.hjp.globaltester.scripts
 git clone git@git.hjp-consulting.com:com.hjp.globaltester.tlvmanipulator
 git clone git@git.hjp-consulting.com:de.persosim.simulator
 git clone git@git.hjp-consulting.com:org.globaltester.base
