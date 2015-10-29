@@ -9,6 +9,7 @@
 
   <modules>
     <module>../../com.hjp.cvcerts/com.hjp.cvcerts</module>
+    <module>../../com.hjp.cvcerts/com.hjp.cvcerts.test</module>
     <module>../../com.hjp.globaltester.cltone/com.hjp.globaltester.cltone</module>
     <module>../../com.hjp.globaltester.epassport.certificates/com.hjp.globaltester.epassport.certificates</module>
     <module>../../com.hjp.globaltester.epassport.datagroups/com.hjp.globaltester.epassport.datagroups</module>
@@ -29,6 +30,7 @@
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.scripts</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.site</module>
+    <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.test</module>
     <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.feature</module>
     <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp</module>
     <module>../../com.hjp.globaltester.prove.epp/com.hjp.globaltester.prove.epp.scripts</module>
@@ -50,30 +52,40 @@
     <module>../../com.hjp.globaltester.scripts/GT Scripts IS SAC BSI AFNOR</module>
     <module>../../com.hjp.globaltester.simulator.applets.epa/com.hjp.globaltester.simulator.applets.epa</module>
     <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator</module>
+    <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator.test</module>
     <module>../../com.hjp.globaltester.tlvmanipulator/com.hjp.globaltester.tlvmanipulator</module>
     <module>../../com.hjp.internal/com.hjp.internal.scripts</module>
     <module>../../com.hjp.osgi.remotecontrol/com.hjp.osgi.remotecontrol</module>
     <module>../../com.hjp.osgi.remotecontrol.soap/com.hjp.osgi.remotecontrol.soap</module>
     <module>../../com.hjp.persosim.profiletool/com.hjp.persosim.profiletool</module>
+    <module>../../com.hjp.persosim.profiletool/com.hjp.persosim.profiletool.test</module>
     <module>../../com.hjp.persosim.simulator/com.hjp.persosim.simulator</module>
     <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3</module>
+    <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3.test</module>
     <module>../../com.hjp.persosim.simulator.protocols.pace/com.hjp.persosim.simulator.protocols.pace</module>
+    <module>../../com.hjp.persosim.simulator.protocols.pace/com.hjp.persosim.simulator.protocols.pace.test</module>
     <module>../../com.hjp.persosim.simulator.protocols.ps/com.hjp.persosim.simulator.protocols.ps</module>
+    <module>../../com.hjp.persosim.simulator.protocols.ps/com.hjp.persosim.simulator.protocols.ps.test</module>
     <module>../../com.hjp.persosim.simulator.protocols.ta/com.hjp.persosim.simulator.protocols.ta</module>
+    <module>../../com.hjp.persosim.simulator.protocols.ta/com.hjp.persosim.simulator.protocols.ta.test</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.feature</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.product</module>
     <module>../../com.hjp.protocols.pace.chip/com.hjp.protocols.pace.chip</module>
     <module>../../com.hjp.simulator/com.hjp.simulator</module>
+    <module>../../com.hjp.simulator/com.hjp.simulator.test</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector</module>
+    <module>../../de.persosim.driver.connector/de.persosim.driver.connector.test</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector.ui</module>
     <module>../../de.persosim.rcp/de.persosim.rcp.feature</module>
     <module>../../de.persosim.rcp/de.persosim.rcp</module>
     <module>../../de.persosim.rcp/de.persosim.rcp.product</module>
     <module>../../de.persosim.simulator/de.persosim.simulator.adapter.socket</module>
     <module>../../de.persosim.simulator/de.persosim.simulator</module>
+    <module>../../de.persosim.simulator/de.persosim.simulator.test</module>
     <module>../../de.persosim.simulator/de.persosim.simulator.ui</module>
     <module>../../org.globaltester.base/org.globaltester.base</module>
+    <module>../../org.globaltester.base/org.globaltester.base.test</module>
     <module>../../org.globaltester.cryptoprovider/org.globaltester.cryptoprovider.bc</module>
     <module>../../org.globaltester.cryptoprovider/org.globaltester.cryptoprovider</module>
     <module>../../org.globaltester.cryptoprovider/org.globaltester.cryptoprovider.sc</module>
