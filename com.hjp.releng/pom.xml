@@ -50,6 +50,7 @@
     <module>../../com.hjp.globaltester.scripts/GT Scripts HJP</module>
     <module>../../com.hjp.globaltester.scripts/GT Scripts IS EAC BSI</module>
     <module>../../com.hjp.globaltester.scripts/GT Scripts IS SAC BSI AFNOR</module>
+    <module>../../com.hjp.globaltester.scripts/GT Scripts TR3105 Part5.3</module>
     <module>../../com.hjp.globaltester.simulator.applets.epa/com.hjp.globaltester.simulator.applets.epa</module>
     <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator</module>
     <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator.test</module>
