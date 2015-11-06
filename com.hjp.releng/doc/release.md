@@ -16,8 +16,8 @@ Ensure that all required branches are merged (and removed on the remotes)
 Make sure that the newly introduced features are properly documented in the code (via Javadoc) and readme files.
 
 1. __Check/assign version numbers__  
-According to the changes integrated in the new release make sure that a new proper version numbers are set. It should represent how extensive the changes are (bugfixes, new features etc.).
-For code bundles they are defined in the respecitve MANIFEST.MF files (and mirrored in the pom.xml). For script bundles they are primarily maintained within the Readme.txt and copied from there to all places where they need to be consistent (e.g. testcases or manifest files), see the following section for more details.
+According to the changes integrated into the new release make sure that a new proper version number is set. It should represent how extensive the changes are (bugfixes, new features etc.).
+For code bundles they are defined in the respective MANIFEST.MF files (and mirrored in the pom.xml). For script bundles they are primarily maintained within the Readme.txt and copied from there to all places where they need to be consistent (e.g. testcases or manifest files), see the following section for more details.
 
 1. __Derive dependent artifacts__  
 Currently some build artifacts depend on others and are synchronized manually. At the moment this is mostly related to script bundles.
@@ -68,7 +68,7 @@ In order to document the release (and its tests in the following section) we lik
 
 Build the product(s)
 --------------------
-Call 'mvn clean verify' within the appropriate releng project. This will generate the product artifacts in the appropriate target folders. We provide several releng projects (at least one for every single product and an overall com.hjp.releng project), depending on which products you have access to you won`t be able to build all of them.
+Call 'mvn clean verify' within the appropriate releng project. This will generate the product artifacts in the appropriate target folders. We provide several releng projects (at least one for every single product and an overall com.hjp.releng project), depending on which products you have access to you will not be able to build all of them.
 
 		# build the product(s)
 		cd <releng project>
@@ -82,6 +82,6 @@ Test it
 -------
 Ensure that all product artifacts can be used as intended. Each project may define integration tests within their specific releaseTest.md files, so check those and make sure to cover all the tests mentioned there.
 
-If building releases to be published make sure to perform the tests on different supported platforms (operating system, Java version, Eclipse version). As most products tests rely on other products this can be simplified by doing cross tests in different combinations.
+If building releases to be published make sure to perform the tests on different supported platforms (operating system, Java version, Eclipse version). As most product tests rely on other products this can be simplified by doing cross tests in different combinations.
 
 <p style="page-break-after: always"/>
