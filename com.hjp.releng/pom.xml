@@ -72,6 +72,9 @@
     <module>../../com.hjp.poseidas/com.hjp.poseidas.feature</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas</module>
     <module>../../com.hjp.poseidas/com.hjp.poseidas.product</module>
+    <module>../../com.hjp.poseidas/com.hjp.poseidas.test</module>
+    <module>../../com.hjp.protocols.era.chip/com.hjp.protocols.era.chip</module>
+    <module>../../com.hjp.protocols.era.chip/com.hjp.protocols.era.chip.test</module>
     <module>../../com.hjp.protocols.pace.chip/com.hjp.protocols.pace.chip</module>
     <module>../../com.hjp.simulator/com.hjp.simulator</module>
     <module>../../com.hjp.simulator/com.hjp.simulator.test</module>
