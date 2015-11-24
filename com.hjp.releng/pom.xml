@@ -25,6 +25,7 @@
     <module>../../com.hjp.globaltester.prove.epa/com.hjp.globaltester.prove.epa.site</module>
     <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas.feature</module>
     <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas</module>
+    <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas.scripts</module>
     <module>../../com.hjp.globaltester.prove.epa.poseidas/com.hjp.globaltester.prove.epa.poseidas.site</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader.feature</module>
     <module>../../com.hjp.globaltester.prove.epareader/com.hjp.globaltester.prove.epareader</module>
@@ -50,6 +51,7 @@
     <module>../../com.hjp.globaltester.scripts/GT Scripts HJP</module>
     <module>../../com.hjp.globaltester.scripts/GT Scripts IS EAC BSI</module>
     <module>../../com.hjp.globaltester.scripts/GT Scripts IS SAC BSI AFNOR</module>
+    <module>../../com.hjp.globaltester.scripts/GT Scripts POSeIDAS</module>
     <module>../../com.hjp.globaltester.scripts/GT Scripts TR03105 Part5.3</module>
     <module>../../com.hjp.globaltester.simulator.applets.epa/com.hjp.globaltester.simulator.applets.epa</module>
     <module>../../com.hjp.globaltester.simulator/com.hjp.globaltester.simulator</module>
@@ -58,9 +60,12 @@
     <module>../../com.hjp.internal/com.hjp.internal.scripts</module>
     <module>../../com.hjp.osgi.remotecontrol/com.hjp.osgi.remotecontrol</module>
     <module>../../com.hjp.osgi.remotecontrol.soap/com.hjp.osgi.remotecontrol.soap</module>
+    <module>../../com.hjp.osgi.remotecontrol.soap/com.hjp.osgi.remotecontrol.soap.sample</module>
     <module>../../com.hjp.persosim.profiletool/com.hjp.persosim.profiletool</module>
     <module>../../com.hjp.persosim.profiletool/com.hjp.persosim.profiletool.test</module>
+    <module>../../com.hjp.persosim.profiletool/com.hjp.persosim.profiletool.ui</module>
     <module>../../com.hjp.persosim.simulator/com.hjp.persosim.simulator</module>
+    <module>../../com.hjp.persosim.simulator/com.hjp.persosim.simulator.test</module>
     <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3</module>
     <module>../../com.hjp.persosim.simulator.protocols.ca3/com.hjp.persosim.simulator.protocols.ca3.test</module>
     <module>../../com.hjp.persosim.simulator.protocols.pace/com.hjp.persosim.simulator.protocols.pace</module>
@@ -77,9 +82,11 @@
     <module>../../com.hjp.protocols.era.chip/com.hjp.protocols.era.chip.test</module>
     <module>../../com.hjp.protocols.isodata.chip/com.hjp.protocols.isodata.chip</module>
     <module>../../com.hjp.protocols.isodata.chip/com.hjp.protocols.isodata.chip.test</module>
+    <module>../../com.hjp.protocols.pace.chip/com.hjp.protocols.pace.chip</module>
+    <module>../../com.hjp.protocols.puo.chip/com.hjp.protocols.puo.chip</module>
+    <module>../../com.hjp.protocols.puo.chip/com.hjp.protocols.puo.chip.test</module>
     <module>../../com.hjp.protocols.sessioncontext.chip/com.hjp.protocols.sessioncontext.chip</module>
     <module>../../com.hjp.protocols.sessioncontext.chip/com.hjp.protocols.sessioncontext.chip.test</module>
-    <module>../../com.hjp.protocols.pace.chip/com.hjp.protocols.pace.chip</module>
     <module>../../com.hjp.simulator/com.hjp.simulator</module>
     <module>../../com.hjp.simulator/com.hjp.simulator.test</module>
     <module>../../de.persosim.driver.connector/de.persosim.driver.connector</module>
@@ -101,6 +108,8 @@
     <module>../../org.globaltester.logging/org.globaltester.logging.consoleLogger</module>
     <module>../../org.globaltester.logging/org.globaltester.logging.fileLogger</module>
     <module>../../org.globaltester.logging/org.globaltester.logging</module>
+    <module>../../org.globaltester.parent/org.globaltester.parent</module>
+    <module>../../org.globaltester.parent/org.globaltester.parent.test</module>
     <module>../../org.globaltester.simulator/org.globaltester.simulator</module>
     <module>../../org.globaltester.testeditor/org.globaltester.testeditor</module>
     <module>../../org.globaltester.testmanager/org.globaltester.testmanager</module>

@@ -26,7 +26,10 @@ git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ps
 git clone git@git.hjp-consulting.com:com.hjp.persosim.simulator.protocols.ta
 git clone git@git.hjp-consulting.com:com.hjp.poseidas
 git clone git@git.hjp-consulting.com:com.hjp.protocols.era.chip
+git clone git@git.hjp-consulting.com:com.hjp.protocols.isodata.chip
 git clone git@git.hjp-consulting.com:com.hjp.protocols.pace.chip
+git clone git@git.hjp-consulting.com:com.hjp.protocols.puo.chip
+git clone git@git.hjp-consulting.com:com.hjp.protocols.sessioncontext.chip
 git clone git@git.hjp-consulting.com:com.hjp.simulator
 git clone git@git.hjp-consulting.com:de.persosim.driver.connector
 git clone git@git.hjp-consulting.com:de.persosim.rcp
