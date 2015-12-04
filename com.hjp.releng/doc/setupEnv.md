@@ -2,10 +2,10 @@ Setup development environment
 =============================
 In order to setup a fresh build area create an empty directory and cd into it.
 From there clone com.hjp.releng:
-git clone git@git.hjp-consulting.com:com.hjp.releng
+`git clone git@git.hjp-consulting.com:com.hjp.releng`
 
 From the same directory execute the checkout script(s) appropriate for you.
-'./com.hjp.releng/com.hjp.releng/checkout/<project>.bat'
+`./com.hjp.releng/com.hjp.releng/checkout/<project>.bat`
 If you use scripts for products you are not a member of access to some of the repositories might be denied.
 These scripts are shell/OS independent as long as you have git on your PATH.
 
