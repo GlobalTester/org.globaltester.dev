@@ -10,7 +10,7 @@ If you use scripts for products you are not a member of access to some of the re
 These scripts are shell/OS independent as long as you have git on your PATH.
 
 Depending on your connectivity to the providing servers this might take some time.
-Gratulations, your have a complete workingcopy.
+Congratulations, your have a complete working copy.
 
 
 Building products
@@ -18,7 +18,7 @@ Building products
 We use Maven as primary build tool so you will find a maven POM file within almost every project.
 In order to build specific projects change to the appropriate directory and build them with
 `mvn clean verify`
-This should work for all `*.releng` projects that build the specific products. The project `com.hjp.releng` builds all products in one build (but is only appropriate if you really have access to all products, which you most probable won`t have unless you work at HJP).
+This should work for all `*.releng` projects that build the specific products. The project `com.hjp.releng` builds all products in one build (but is only appropriate if you really have access to all products, which you most probable won't have unless you work at HJP).
 
 Setup Eclipse
 -------------
