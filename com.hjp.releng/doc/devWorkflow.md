@@ -11,21 +11,27 @@ To keep the process as consistent as possible we developed a single workflow flo
                        '-----'               |
                           |                  |
                           |                  |
+                          v                  |
+                    .----------.             |
+                    | Proposed |---------.   |
+                    '----------'          \  |
+                          |                \ |
+                          |                 \|
                           v                  v
-                      .-------.        .----------.
-                      | Draft |------->| Rejected |
-                      '-------'        '----------'
+                    .----------.       .----------.
+                    | Approved |------>| Rejected |
+                    '----------'       '----------'
                           |                  ^
                           |                  |
                           v                  |
                       .-------.              |
-                      | Ready |--------------'
-                      '-------'
-                          |
-                          |
-                          v
-                   .-------------.
-          .--------| In progress |
+                      | Ready |--------------|
+                      '-------'              |
+                          |                  |
+                          |                  |
+                          v                  |
+                   .-------------.           |
+          .--------| In progress |-----------'
           |        '-------------'
           |         ^     |
           |        /      |
@@ -47,7 +53,7 @@ To keep the process as consistent as possible we developed a single workflow flo
                      '--------'        '----------'
 
 
-This describes the most frequently used paths through the workflow (of course we are able to deviate from this but it shouldn't be necessary). In general issues start in the **New** state, where the original author can keep and edit them until he feels comfortable that it meets our [Definition of Ready][DoR]. From the **New** state an issue moves over to **Draft** when it is peer reviewed and the author and reviewer agree that all ready criteria are met beside the point estimation. Issues in the **Draft** state will be considered during sprint planing and estimated by all developers, which allows them to transition to the **Ready** state. Also during sprint planning all issues in the **Ready** state will be considered for the upcoming sprint, prioritized and maybe postponed for a later sprint. When the sprint begins all issues for that sprint should be at least n **Ready** state.
+This describes the most frequently used paths through the workflow (of course we are able to deviate from this but it shouldn't be necessary). In general issues start in the **New** state, where the original author can keep and edit them until he feels comfortable that it meets our [Definition of Ready][DoR]. When the author feels the ticket is appropriate he moves it from the **New** state to **Proposed**. A reviewer pulls an issue from **Proposed** to **Approved** when the [Definition of Ready][DoR] is met except for the estimation. If the [Definition of Ready][DoR] is not met the reviewer and author should work together to get the issue to the **Approved** state. Issues in the **Approved** state will be considered during sprint planing and estimated by all developers, which allows them to transition to the **Ready** state. Also during sprint planning all issues in the **Ready** state will be considered for the upcoming sprint, prioritized and maybe postponed for a later sprint. When the sprint begins all issues for that sprint should be at least n **Ready** state.
 
 Whoever begins to work on an issue assigns it to himself and moves it to the **In progress** state. While an issue is in progress blockers may arise (e.g. required responses from third parties) the assignee moves the ticket to **Feedback** than and documents the reason for that in the ticket. An issue in **Feedback** state is still assigned to the person who initially worked on it and this person is responsible tho collect the required feedback and restarts work on that ticket as soon as the possible. When all required work on an issue is completed and it matches our [Definition of Done][DoD] the assignees transitions the ticket to state **Done**.
 
@@ -64,10 +70,10 @@ In order to differentiate between different types of issues we defined the follo
 
 
 1. __Feature__  
-A Feature describes a new piece of functionality that was not present in the product before. It implements the most complete set of ticket status and is the core ticket type for product advancement. The author is responsible for the ticket until it reaches ready state. This means the author tries to fulfill the [Definition of Ready][DoR], finds a reviewer who promotes the issue to state **Draft** and presents the issue in the upcoming sprint planing in order to get it to state **Ready**. From there the team is responsible an whoever begins working on the issue assigns it to himself and takes responsibility from that point on until the issue is closed.
+A Feature describes a new piece of functionality that was not present in the product before. It implements the most complete set of ticket status and is the core ticket type for product advancement. The author is responsible for the ticket until it reaches ready state. This means the author tries to fulfill the [Definition of Ready][DoR] , ensures that it is reviewed and promoted to **Approved**  state and presents the issue in the upcoming sprint planing in order to get it to state **Ready**. From there the team is responsible an whoever begins working on the issue assigns it to himself and takes responsibility from that point on until the issue is closed.
 
 1. __Bug__  
-A Bug describes a piece of broken functionality that needs to be fixed. It generally also implements the whole set of ticket status but allows for some shortcuts for quick processing. Most of the time these issues pop up during sprints and sometimes need immediate care. To allow them to be handled immediately (e.g. within the running sprint) they need to pass the initial stages until ready relatively fast. Therefore the author of a Bug tries to fulfill the [Definition of Ready][DoR] as soon as possible and may (if the author expects the bug to be of high priority) try to get a prioritization and estimate from the consent of available developers immediately. If the Bug is not expected to be of high priority it will be handled similar to a Feature and will be discussed in the upcoming sprint planning meetings. 
+A Bug describes a piece of broken functionality that needs to be fixed. It generally also implements the whole set of ticket status but allows for some shortcuts for quick processing. Most of the time these issues pop up during sprints and sometimes need immediate care. To allow them to be handled immediately (e.g. within the running sprint) they need to pass the initial stages until **Ready** relatively fast. Therefore the author of a Bug tries to fulfill the [Definition of Ready][DoR] as soon as possible and may (if the author expects the bug to be of high priority) try to get a prioritization and estimate from the consent of available developers immediately (while skipping other issue states). If the Bug is not expected to be of high priority it will be handled similar to a Feature and will be discussed in the upcoming sprint planning meetings. 
 
 1. __Hotfix__  
 A Hotfix describes a change that is not large enough to justify a Bug or Feature. While implementing other issues we sometimes come across things that can be fixed relatively easy but are not covered by existing issues and don't justify the overhead of creating a new Bug or Feature, e. g. code maintenance. The issues can be created either in status **In progress** or in status **Done**. They are created by the author who is immediately the assignee and describes his reasoning for that change. They should cover only a very small effort and don't generate to much overhead. 
