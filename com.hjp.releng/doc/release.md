@@ -2,6 +2,10 @@ Release process
 ===============
 This document describes the steps necessary to create product releases.
 
+In general the overall development process shall ensure that the current master branch of all repositories is in a consistent state to be built and released at any time. But for a publicly released official version of our products a few extra steps still need to be taken in order to ensure the desired quality.
+
+When all desired features are merged into the master a release can be prepared. Release preparation includes some quality and consistency checks and the assignment of version numbers for all relevant artifacts (depending on included changes). The release build is essentially the same build as during development. Before the build results can be published as official release extensive tests are performed on all artifacts to ensure that they work as expected.
+
 Prepare the build
 -----------------
 Before starting the release build some basic checks and final touches should be performed on the projects included in the build:
