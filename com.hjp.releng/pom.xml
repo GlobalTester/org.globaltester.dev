@@ -83,6 +83,9 @@
     <module>../../com.hjp.protocols.isodata.chip/com.hjp.protocols.isodata.chip</module>
     <module>../../com.hjp.protocols.isodata.chip/com.hjp.protocols.isodata.chip.test</module>
     <module>../../com.hjp.protocols.pace.chip/com.hjp.protocols.pace.chip</module>
+    <module>../../com.hjp.protocols.ca2.chip/com.hjp.protocols.ca2.chip</module>
+    <module>../../com.hjp.protocols.ca2.chip/com.hjp.protocols.ca2.chip.test</module>
+    <module>../../com.hjp.protocols.chip/com.hjp.protocols.chip</module>
     <module>../../com.hjp.protocols.puo.chip/com.hjp.protocols.puo.chip</module>
     <module>../../com.hjp.protocols.puo.chip/com.hjp.protocols.puo.chip.test</module>
     <module>../../com.hjp.protocols.sessioncontext.chip/com.hjp.protocols.sessioncontext.chip</module>
