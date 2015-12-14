@@ -1,24 +1,22 @@
 Setup development environment
 =============================
 In order to setup a fresh build area create an empty directory and cd into it.
-From there clone com.hjp.releng:
-`git clone git@git.hjp-consulting.com:com.hjp.releng`
 
-From the same directory execute the checkout script(s) appropriate for you.
-`./com.hjp.releng/com.hjp.releng/checkout/<project>.bat`
-If you use scripts for products you are not a member of access to some of the repositories might be denied.
-These scripts are shell/OS independent as long as you have git on your PATH.
+The repositories needed to build can be checked out manually or assisted by a script in this repository. 
+
+Manual checkout means that you will have to clone a product repository (the names can be found in the `org.globaltester.dev.projects.md` file in this repository) and use the pom.xml file of the contained *.releng folder to manually find and checkout all needed repositories for this product.
+
+Script assisted checkout can be done by using the scripts found in `org.globaltester.dev.tools` in this repository. The checkout script runs under unix alike systems (Cygwin and several Linux distributions have been tested) and was developed to be executed in a bash shell. It takes the product repository and source to be used as parameters and automatically checks out all needed repositories.
 
 Depending on your connectivity to the providing servers this might take some time.
-Congratulations, your have a complete working copy.
-
+Congratulations, you have a complete working copy.
 
 Building products
 -----------------
 We use Maven as primary build tool so you will find a maven POM file within almost every project.
 In order to build specific projects change to the appropriate directory and build them with
 `mvn clean verify`
-This should work for all `*.releng` projects that build the specific products. The project `com.hjp.releng` builds all products in one build (but is only appropriate if you really have access to all products, which you most probable won't have unless you work at HJP).
+This should work for all `*.releng` projects that build the specific products. The project `com.hjp.internal.releng` builds all products in one build (but is only appropriate if you really have access to all products, which you most probable won't have unless you work at HJP).
 
 Setup Eclipse
 -------------

@@ -9,8 +9,8 @@ In order to get access a server admin needs to register an ssh public key and as
 
 Determine access
 ----------------
-When you have access you will be able to execute the following command
-'ssh git@git.hjp-consulting.com info'
+Github repositories are generally readable to everyone. When you have access to git.hjp-consulting.com you will be able to execute the command
+'ssh git@git.hjp-consulting.com info' to retrieve repositories accessible with your key.
 It will give you an output like this:
 
 >hello amay
