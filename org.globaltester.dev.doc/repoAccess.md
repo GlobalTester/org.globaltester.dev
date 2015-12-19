@@ -1,21 +1,21 @@
 Repository access
 =================
-We use gitolite to serve our git repositories. It is located at git.hjp-consulting.com. This document describes how to use it to retrieve repositories and publish own changes.
+We use gitolite to serve our own git repositories. It is located at git.hjp-consulting.com. Some parts of our software are additionally available as Github repositories. This document describes how to use it to retrieve repositories and publish own changes.
 
 Getting access
 --------------
 When you read this you already have some kind of access ;-)
-In order to get access a server admin needs to register an ssh public key and associate it with appropriate access rights. Contact us if you feel you need different access or another key.
+In order to get access to git.hjp-consulting.com a server admin needs to register an ssh public key and associate it with appropriate access rights. Contact us if you feel you need different access or another key.
 
 Determine access
 ----------------
-When you have access you will be able to execute the following command
-'ssh git@git.hjp-consulting.com info'
+Github repositories are generally readable to everyone. When you have access to git.hjp-consulting.com you will be able to execute the command
+'ssh git@git.hjp-consulting.com info' to retrieve repositories accessible with your key.
 It will give you an output like this:
 
 >hello amay
 >
-> R W	com.hjp.releng
+> R W	org.globaltester.dev
 > R W	de.persosim.rcp
 > R W	de.persosim.simulator
 
