@@ -20,8 +20,17 @@ OLD_CHANGELOG=`mktemp`
 cd $REPOSITORY
 
 LAST_TAG=`git tag --list release/$PRODUCT/* --sort=version:refname | sed -e '$!d'`
-LAST_TAGGED_COMMIT_ID=`git rev-parse $LAST_TAG`
-LAST_TAGGED_COMMIT_RANGE=$LAST_TAGGED_COMMIT_ID..
+
+if [ -z "$LAST_TAG" ]
+then
+	echo No tagged commit found, using the full history
+	LAST_TAGGED_COMMIT_ID=
+	LAST_TAGGED_COMMIT_RANGE=
+else
+	LAST_TAGGED_COMMIT_ID=`git rev-parse $LAST_TAG`
+	LAST_TAGGED_COMMIT_RANGE=$LAST_TAGGED_COMMIT_ID..
+fi
+
 
 if [ -e $CHANGELOG_FILE_NAME ]
 then
