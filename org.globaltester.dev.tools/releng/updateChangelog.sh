@@ -3,9 +3,7 @@
 
 CHANGELOG_FILE_NAME="CHANGELOG"
 REPOSITORY=$1
-
-#TODO find last version tagged state of the repository
-LAST_TAGGED_COMMIT_RANGE=b12f5df..
+PRODUCT=$2
 
 function cleanup {
 	if [ ! -z "$TEMPFILE" ]
@@ -19,8 +17,11 @@ trap cleanup EXIT
 PREPARED_CHANGELOG=`mktemp`
 OLD_CHANGELOG=`mktemp`
 
-
 cd $REPOSITORY
+
+LAST_TAG=`git tag --list release/$PRODUCT/* --sort=version:refname | sed -e '$!d'`
+LAST_TAGGED_COMMIT_ID=`git rev-parse $LAST_TAG`
+LAST_TAGGED_COMMIT_RANGE=$LAST_TAGGED_COMMIT_ID..
 
 if [ -e $CHANGELOG_FILE_NAME ]
 then
