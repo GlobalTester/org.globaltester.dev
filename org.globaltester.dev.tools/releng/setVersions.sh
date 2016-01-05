@@ -6,7 +6,16 @@
 function replacePom {
 	if [ ! -e $1 ] ;then return; fi;
 	#<version>0.0.1-SNAPSHOT</version>
-	sed -i -e "s|\(<version>\)[0-9]\{1,\}\.[0-9]\{1,\}\..*\(</version>\)|\1$2\2|" $1
+	
+	if [ `cat $1 | grep '</parent>' | wc -l` -gt 0 ]
+	then
+		DETECT='\(.*<parent>.*</parent>.*<version>\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^<]*\(</version>\)'
+	else
+		DETECT='\(<version>\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^<]*\(</version>\)'
+	fi
+	REPLACE="\1$2\2"
+	sed -i -b -n -e "1h;1!H;\${;g;s|$DETECT|$REPLACE|;p;}" $1
+	
 }
 function replaceManifest {
 	if [ ! -e $1 ] ;then return; fi;
@@ -20,13 +29,18 @@ function replaceFeature {
 	#      label="PersoSim RCP"
 	#      version="0.7.0"
 	#      provider-name="HJP Consulting GmbH">
-	sed -i -e "s|<\(feature.*version=\"\)[0-9]\{1,\}\.[0-9]\{1,\}\..*\)\(\".*</feature>\)|\1$2\2|" $1
+	
+	DETECT='\(<feature[^<]*version="\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^"]*\(".*\)'
+	REPLACE="\1$2\2"
+	sed -i -b -n -e "1h;1!H;\${;g;s|$DETECT|$REPLACE|;p;}" $1
 }
 function replaceProduct {
 	if [ ! -e $1 ] ;then return; fi;
 	#<product name="PersoSim RCP" uid="de.persosim.rcp.product" id="de.persosim.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="0.7.0" useFeatures="true" includeLaunchers="true">
 
-	sed -e "s|<\(product.*version=\"\)[0-9]\{1,\}\.[0-9]\{1,\}\..*\)\(\".*</product>\)|\1$2\2|" $1
+	DETECT='\(<product[^<]*version="\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^"]*\(".*\)'
+	REPLACE="\1$2\2"
+	sed -i -b -n -e "1h;1!H;\${;g;s|$DETECT|$REPLACE|;p;}" $1
 }
 
 
@@ -36,8 +50,7 @@ CHANGELOG_FILE_NAME="CHANGELOG"
 
 
 VERSION=
-
-
+REPOSITORY=$1
 
 while read CURRENT_LINE; do
 	VERSION=`echo $CURRENT_LINE | sed -e 's|Version \([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\) ([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\})|\1|g'`
@@ -46,17 +59,18 @@ while read CURRENT_LINE; do
 		echo $VERSION will be set for all files in this repository
 		break
 	fi
-done < $CHANGELOG_FILE_NAME
+done < $REPOSITORY/$CHANGELOG_FILE_NAME
 
+VERSION=1.1.1
 
+echo Modifying repository: $REPOSITORY
 
-for CURRENT_PROJECT in */
+for CURRENT_PROJECT in $REPOSITORY/*/
 do
-	echo $CURRENT_PROJECT
+	echo Currently modifying: $CURRENT_PROJECT
 	replacePom ${CURRENT_PROJECT}pom.xml $VERSION
-	replaceManifest ${CURRENT_PROJECT}META_INF/MANIFEST.MF $VERSION
+	replaceManifest ${CURRENT_PROJECT}META-INF/MANIFEST.MF $VERSION
 	replaceFeature ${CURRENT_PROJECT}feature.xml $VERSION
-	replaceProduct ${CURRENT_PROJECT}*product.xml $VERSION
+	replaceProduct ${CURRENT_PROJECT}*.product	$VERSION
 done
-
 
