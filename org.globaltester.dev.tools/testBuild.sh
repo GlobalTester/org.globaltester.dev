@@ -65,7 +65,6 @@ do
 			echo "-f | --folder       sets the project folder name for the build               defaults to $FOLDER"
 			echo "-m | --maven        sets maven arguments to be used                          defaults to $MAVEN"
 			echo "-g | --generate-pom update the pom.xml file of the chosen product folder"
-			echo "-s | --script       sets checkout scripts to be used                         defaults to $CHECKOUT_SCRIPT"
 			echo "-i | --inspect      open a shell to inspect the build directory"
 			echo "-h | --help         display this help"
 			if [ -e $CHECKOUT_SCRIPT ]
