@@ -3,6 +3,8 @@
 
 #   [0-9]\{1,\}
 
+. org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
+
 function replacePom {
 	if [ ! -e $1 ] ;then return; fi;
 	#<version>0.0.1-SNAPSHOT</version>
@@ -49,25 +51,15 @@ CHANGELOG_FILE_NAME="CHANGELOG"
 
 
 
-VERSION=
 REPOSITORY=$1
 
-while read CURRENT_LINE; do
-	VERSION=`echo $CURRENT_LINE | sed -e 's|Version \([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\) ([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\})|\1|g'`
-	if [ ! -z "$VERSION" ]
-	then
-		echo $VERSION will be set for all files in this repository
-		break
-	fi
-done < $REPOSITORY/$CHANGELOG_FILE_NAME
-
-VERSION=1.1.1
+VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
 
 echo Modifying repository: $REPOSITORY
 
 for CURRENT_PROJECT in $REPOSITORY/*/
 do
-	echo Currently modifying: $CURRENT_PROJECT
+	echo Currently updating file in $CURRENT_PROJECT
 	replacePom ${CURRENT_PROJECT}pom.xml $VERSION
 	replaceManifest ${CURRENT_PROJECT}META-INF/MANIFEST.MF $VERSION
 	replaceFeature ${CURRENT_PROJECT}feature.xml $VERSION
