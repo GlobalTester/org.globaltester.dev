@@ -7,6 +7,9 @@
 
 function replacePom {
 	if [ ! -e $1 ] ;then return; fi;
+	
+	echo "  $1"
+	
 	#<version>0.0.1-SNAPSHOT</version>
 	
 	if [ `cat $1 | grep '</parent>' | wc -l` -gt 0 ]
@@ -19,13 +22,21 @@ function replacePom {
 	sed -i -b -n -e "1h;1!H;\${;g;s|$DETECT|$REPLACE|;p;}" $1
 	
 }
+
 function replaceManifest {
 	if [ ! -e $1 ] ;then return; fi;
+	
+	echo "  $1"
+	
 	#Bundle-Version: 0.7.0
 	sed -i -e "s|\(Bundle-Version: \)[0-9]\{1,\}\.[0-9]\{1,\}\..*|\1$2|" $1
 }
+
 function replaceFeature {
 	if [ ! -e $1 ] ;then return; fi;
+	
+	echo "  $1"
+	
 	#<feature
 	#      id="de.persosim.rcp.feature"
 	#      label="PersoSim RCP"
@@ -36,8 +47,12 @@ function replaceFeature {
 	REPLACE="\1$2\2"
 	sed -i -b -n -e "1h;1!H;\${;g;s|$DETECT|$REPLACE|;p;}" $1
 }
+
 function replaceProduct {
 	if [ ! -e $1 ] ;then return; fi;
+	
+	echo "  $1"
+	
 	#<product name="PersoSim RCP" uid="de.persosim.rcp.product" id="de.persosim.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="0.7.0" useFeatures="true" includeLaunchers="true">
 
 	DETECT='\(<product[^<]*version="\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^"]*\(".*\)'
