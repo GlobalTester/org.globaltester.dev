@@ -1,4 +1,15 @@
 #!/bin/sh
+SPACER="  "
+ONE_OR_MORE_DECIMALS_REGEXP="[0-9]\{1,\}"
+VERSION_REGEXP_NO_PATCH_LEVEL="$ONE_OR_MORE_DECIMALS_REGEXP\.$ONE_OR_MORE_DECIMALS_REGEXP\."
+VERSION_REGEXP_PATCH_LEVEL_EVERYTHING="$VERSION_REGEXP_NO_PATCH_LEVEL.*"
+VERSION_REGEXP_PATCH_LEVEL_NO_WHITESPACE="$VERSION_REGEXP_NO_PATCH_LEVEL[^\s]*"
+DATE_REGEXP="(${ONE_OR_MORE_DECIMALS_REGEXP}\.${ONE_OR_MORE_DECIMALS_REGEXP}\.${ONE_OR_MORE_DECIMALS_REGEXP})"
+CHANGELOG_VERSION_REGEXP="Version ${VERSION_REGEXP_NO_PATCH_LEVEL}.* $DATE_REGEXP"
+DUMMY_VERSION="x.y.z"
+LOG_MESSAGE_DIVIDER=`echo -e "\xe2\x9c\x96"`
+
+
 function getLastTag {
 	#$1 tag type, e.g. release
 	#$2 type qualifier, e.g. de.persosim.rcp for products
@@ -18,7 +29,6 @@ function getLastTagRange {
 	LAST_TAG=`getLastTag $1 $2`
 	if [ -z "$LAST_TAG" ]
 	then
-		echo No tagged commit found, using the full history
 		LAST_TAGGED_COMMIT_ID=
 		LAST_TAGGED_COMMIT_RANGE=
 	else
@@ -59,6 +69,41 @@ function getChangeLogSinceVersion {
 	rm $RESULT
 }
 
+function extractLinesFromDiff {
+	FIRSTLINE=$1
+	LASTLINE=$2
+	DIFF=$3
+	LINES=$(( $LASTLINE - $FIRSTLINE ))
+
+	cat $DIFF | head -n $LASTLINE | tail -n $LINES
+}
+
+function getFirstLineNumberContaining {
+	REGEXP=$1
+	FILE=$2
+	echo $((`cat $FILE | grep "$REGEXP" -n | head -n 1 | cut -d : -f 1` - 1))
+}
+
+function getSecondLineNumberContaining {
+	REGEXP=$1
+	FILE=$2
+	cat $FILE | grep "$REGEXP" -n | head -n 2 | tail -n 1 | cut -d : -f 1
+}
+
+function getLastLineNumberContaining {
+	REGEXP=$1
+	FILE=$2
+	echo $((`cat $FILE | grep "$REGEXP" -n | tail -n 1 | cut -d : -f 1` - 1))
+}
+
+function extractGitDiffSinceCommit {
+	COMMIT=$1
+	FILENAME=$2
+	RESULT_FILE=$3
+	
+	git diff --ignore-space-at-eol $LAST_TAG $CHANGELOG_FILE_NAME > $GIT_DIFF
+}
+
 function getRepositoriesFromAggregator {
 	POM_FILE=$1
 	REPOSITORY=$2
@@ -67,7 +112,7 @@ function getRepositoriesFromAggregator {
 	then
 		GREP_COMMAND="| grep -v $REPOSITORY"
 	fi
-	
+	#TODO replace eval with safer alternative
 	eval "cat $POM_FILE | grep '<module>' $GREP_COMMAND | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u"
 }
 
