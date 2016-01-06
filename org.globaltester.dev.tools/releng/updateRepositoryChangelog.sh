@@ -1,6 +1,8 @@
 #!/bin/sh
 # must be called from root directory for all repos
 
+. org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
+
 CHANGELOG_FILE_NAME="CHANGELOG"
 REPOSITORY=$1
 PRODUCT=$2
@@ -19,18 +21,7 @@ OLD_CHANGELOG=`mktemp`
 
 cd $REPOSITORY
 
-LAST_TAG=`git tag --list release/$PRODUCT/* --sort=version:refname | sed -e '$!d'`
-
-if [ -z "$LAST_TAG" ]
-then
-	echo No tagged commit found, using the full history
-	LAST_TAGGED_COMMIT_ID=
-	LAST_TAGGED_COMMIT_RANGE=
-else
-	LAST_TAGGED_COMMIT_ID=`git rev-parse $LAST_TAG`
-	LAST_TAGGED_COMMIT_RANGE=$LAST_TAGGED_COMMIT_ID..
-fi
-
+LAST_TAGGED_COMMIT_RANGE=`getLastTagRange release $REPOSITORY`
 
 if [ -e $CHANGELOG_FILE_NAME ]
 then
