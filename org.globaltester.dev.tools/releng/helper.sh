@@ -59,6 +59,18 @@ function getChangeLogSinceVersion {
 	rm $RESULT
 }
 
+function getRepositoriesFromAggregator {
+	POM_FILE=$1
+	REPOSITORY=$2
+	GREP_COMMAND=
+	if [ ! -z "$REPOSITORY" ]
+	then
+		GREP_COMMAND="| grep -v $REPOSITORY"
+	fi
+	
+	eval "cat $POM_FILE | grep '<module>' $GREP_COMMAND | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u"
+}
+
 function whereAmI {
 	echo `dirname "$(readlink -f "$0")"`
 }
