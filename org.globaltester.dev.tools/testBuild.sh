@@ -188,7 +188,7 @@ then
 	then 
 		POM=pom.xml
 		sed -i ':a;N;$!ba;s/<modules>.*/<modules>/g' $POM
-		find ../.. -maxdepth 2 -mindepth 2 -type d ! -name ".*" | grep -E -v $PATTERN | sed -e "s/\(.*\)/    <module>\1<\/module>/" | sort -d >> $POM
+		find ../.. -maxdepth 2 -mindepth 2 -type d ! -name ".*" | grep -E -v $PATTERN | sort -d | sed -e "s/\(.*\)/    <module>\1<\/module>/" >> $POM
 		echo -e "  </modules>\n\n</project>" >> $POM	
 	fi
 	
