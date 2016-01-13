@@ -21,7 +21,7 @@ Make sure that the newly introduced features are properly documented in the code
 
 1. __Check/assign version numbers__  
 According to the changes integrated into the new release make sure that a new proper version number is set. It should represent how extensive the changes are (bugfixes, new features etc.).
-For code bundles they are defined in the respective MANIFEST.MF files (and mirrored in the pom.xml). For script bundles they are primarily maintained within the Readme.txt and copied from there to all places where they need to be consistent (e.g. testcases or manifest files), see the following section for more details.
+Version numbers are assigned per repository and must be mirrored to the respective MANIFEST.MF and pom.xml files (also all eclipse relevant files containing version numbers). This version is maintained in the CHANGELOG file in each repository and used for tagging when releasing. For scripts they need to be copied from there to all places where they need to be consistent (e.g. testcases or manifest files), see the following section for more details. To guide this process there is a workflow helper script in org.globaltester.dev.tools/releng, that facilitates versioning and change log creation.
 
 1. __Derive dependent artifacts__  
 Currently some build artifacts depend on others and are synchronized manually. At the moment this is mostly related to script bundles.
