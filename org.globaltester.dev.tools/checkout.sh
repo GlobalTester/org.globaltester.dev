@@ -3,10 +3,7 @@
 # Checkout all repos accessible with the given private key and build the product.
 #
 
-PATTERN='(\.releng|\.integrationtest|\.scripts)($|\/)'
-
 #set default values
-
 REPOSITORY=org.globaltester.demo
 FOLDER=org.globaltester.demo.releng
 DESTINATION=
@@ -28,7 +25,6 @@ do
 			echo "                         to <value>.releng"
 			echo "-f  | --folder          sets the project folder name for the build             defaults to $FOLDER"
 			echo "-d  | --destination     sets the destination folder name for the checkout      defaults to $DESTINATION"
-			echo "-p  | --pattern         the pattern inversely matched to exclude folder        defaults to $PATTERN"
 			echo "-b  | --branch          the branch to be checked out"
 			echo "-s  | --source          the source to be used                                  defaults to $SOURCE"
 			echo "-i  | --ignore          ignores existing repository folders"
@@ -36,15 +32,6 @@ do
 			echo "-ni | --non-interactive assume answers needed to proceed"
 			echo "-h  | --help            display this help"
 			exit 1
-		;;
-		"-p"|"--pattern")
-			if [[ -z "$2" ]]
-			then
-				echo "Pattern is missing!"
-				exit 1
-			fi
-			PATTERN=$2
-			shift 2
 		;;
 		"-f"|"--folder")
 			if [[ -z "$2" || $2 == "-"* ]]
