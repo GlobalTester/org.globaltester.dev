@@ -57,7 +57,7 @@ LINES=$(( $LASTLINE - $FIRSTLINE ))
 
 if [ $LINES -eq 0 ]
 then
-	echo -e "Version $DUMMY_VERSION (`date +%d.%m.%Y`)\n" > $CHANGELOG_HEADER
+	echo -e "Version $DUMMY_VERSION (`getCurrentDate`)\n" > $CHANGELOG_HEADER
 	GIT_DIFF=`mktemp`
 	extractGitDiffSinceCommit HEAD $CHANGELOG_FILE_NAME $GIT_DIFF
 	LASTLINE_IN_DIFF=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`	
@@ -141,7 +141,7 @@ sed -i -e '/^#/d;' $PREPARED_CHANGELOG
 sed -i -e '/./,$!d' $PREPARED_CHANGELOG
 # Delete empty lines at end of file
 sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $PREPARED_CHANGELOG
-sed -i -e "s|Version .*\..*\..* $DATE_REGEXP|&\n|" $PREPARED_CHANGELOG
+sed -i -e "s|Version .*\..*\..* ($DATE_REGEXP)|&\n|" $PREPARED_CHANGELOG
 
 if [ `head -n 1 "$PREPARED_CHANGELOG" | grep "$CHANGELOG_VERSION_REGEXP" | wc -l` -eq 0 ]
 then

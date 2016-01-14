@@ -19,7 +19,7 @@ do
 	
 	cd $CURRENT_REPO
 
-	echo git tag -a -m "$TAG_MESSAGE" "$TYPE/$REPOSITORY/$REPO_VERSION"
+	git tag -a -m "$TAG_MESSAGE" "$TYPE/$REPOSITORY/$REPO_VERSION"
 
 	cd ..
 done

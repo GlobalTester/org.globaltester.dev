@@ -82,7 +82,7 @@ fi
 
 if [ $VERSION_NEEDED -eq 1 ]
 then
-	echo -e "Version $DUMMY_VERSION (`date +%d.%m.%Y`)\n" > $CHANGELOG_HEADER
+	echo -e "Version $DUMMY_VERSION (`getCurrentDate`)\n" > $CHANGELOG_HEADER
 fi
 
 git log --format="* %<|(85)%s $LOG_MESSAGE_DIVIDER %h %an" $LAST_TAGGED_COMMIT_RANGE >> $CHANGELOG_CONTENT
