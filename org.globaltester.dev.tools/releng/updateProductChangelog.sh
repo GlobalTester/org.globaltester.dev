@@ -104,7 +104,7 @@ do
 					echo \* $CURRENT_REPO updated to version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
 				fi
 							
-				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" | sed -e "/^ *$/d;/^$/d;s|[^#].*|$SPACER&|" >> $CHANGELOG_CONTENT
+				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;" -e "s|[^#].*|$SPACER&|" >> $CHANGELOG_CONTENT
 				echo >> $CHANGELOG_CONTENT
 			else
 				echo No diff found, skipping
@@ -113,7 +113,7 @@ do
 			rm $GIT_DIFF
 		else
 			echo \* $CURRENT_REPO contained in version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
-			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;s|.*|$SPACER&|"  >> $CHANGELOG_CONTENT
+			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;s|[^#].*|$SPACER&|"  >> $CHANGELOG_CONTENT
 			echo >> $CHANGELOG_CONTENT
 		fi
 		cd ..
