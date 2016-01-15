@@ -116,6 +116,3 @@ fi
 
 cd ..
 
-#TODO version Version when no correct version can be parsed
-#TODO missing new line between repos
-#TODO version comment not removed after editing

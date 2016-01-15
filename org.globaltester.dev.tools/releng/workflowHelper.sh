@@ -35,7 +35,7 @@ function askUser {
 			esac
 }
 
-while [ $# -gt 0 -a $OWN_PARAMETERS_CHECKED -ne 1 ]
+while [ $# -gt 0 ]
 do
 	case "$1" in
 		"-h"|"--help") echo -en "Usage:\n\n"
@@ -112,7 +112,7 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_REPO in */
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/setVersions.sh $CURRENT_REPO `getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/stampFiles.sh $CURRENT_REPO `getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
 	done
 fi
 # Build/Test

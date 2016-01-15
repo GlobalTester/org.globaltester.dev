@@ -51,8 +51,8 @@ fi
 
 cd $REPOSITORY
 
-FIRSTLINE=`cat $CHANGELOG_FILE_NAME | grep Version -n | head -n 1 | cut -d : -f 1`
-LASTLINE=`cat $CHANGELOG_FILE_NAME | grep Version -n | head -n 2 | tail -n 1 | cut -d : -f 1`
+FIRSTLINE=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" $CHANGELOG_FILE_NAME`
+LASTLINE=`getSecondLineNumberContaining "$CHANGELOG_VERSION_REGEXP" $CHANGELOG_FILE_NAME`
 LINES=$(( $LASTLINE - $FIRSTLINE ))
 
 if [ $LINES -eq 0 ]
