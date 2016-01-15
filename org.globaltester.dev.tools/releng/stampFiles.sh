@@ -3,7 +3,6 @@
 
 #   [0-9]\{1,\}
 
-set -e
 . org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
 
 function replacePom {
@@ -131,7 +130,7 @@ fi
 echo $DATE | grep -q "$DATE_REGEXP"
 if [ $? -ne 0 ]
 then
-	echo WARNING: parameter date $VERSION is invalid
+	echo WARNING: parameter date $DATE is invalid
 fi
 
 

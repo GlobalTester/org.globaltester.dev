@@ -65,6 +65,7 @@ do
 			echo "-f | --folder       sets the project folder name for the build               defaults to $FOLDER"
 			echo "-m | --maven        sets maven arguments to be used                          defaults to $MAVEN"
 			echo "-g | --generate-pom update the pom.xml file of the chosen product folder"
+			echo "-p | --pattern      the pattern inversely matched to exclude folder          defaults to $PATTERN"
 			echo "-i | --inspect      open a shell to inspect the build directory"
 			echo "-h | --help         display this help"
 			if [ -e $CHECKOUT_SCRIPT ]
@@ -118,6 +119,15 @@ do
 			MAVEN=$2
 			shift 2
 		;;
+		"-p"|"--pattern")
+			if [[ -z "$2" ]]
+			then
+				echo "Pattern is missing!"
+				exit 1
+			fi
+			PATTERN=$2
+			shift 2
+		;;
 		"-g"|"--generate-pom")
 			KEEP_POM=0
 			shift 1
@@ -161,7 +171,7 @@ fi
 DIR=`mktemp -d`
 cd $DIR
 
-CHECKOUT_SCRIPT_PARAMS="-f $FOLDER -r $REPOSITORY -s hjp -ni -d $DIR -p $PATTERN $@"
+CHECKOUT_SCRIPT_PARAMS="-f $FOLDER -r $REPOSITORY -s hjp -ni -d $DIR $@"
 echo "Calling checkout script with parameters: $CHECKOUT_SCRIPT_PARAMS"
 
 CLONERESULT=0
@@ -177,7 +187,7 @@ then
 	then 
 		POM=pom.xml
 		sed -i ':a;N;$!ba;s/<modules>.*/<modules>/g' $POM
-		find ../.. -maxdepth 2 -mindepth 2 -type d ! -name ".*" | grep -E -v $PATTERN | sed -e "s/\(.*\)/    <module>\1<\/module>/" | sort -d >> $POM
+		find ../.. -maxdepth 2 -mindepth 2 -type d ! -name ".*" | grep -E -v "$PATTERN" | sort -d | sed -e "s/\(.*\)/    <module>\1<\/module>/" >> $POM
 		echo -e "  </modules>\n\n</project>" >> $POM	
 	fi
 	

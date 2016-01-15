@@ -1,2 +1,3 @@
 #vi backup files
 .*.swp
+target/
