@@ -60,11 +60,11 @@ then
 	echo -e "Version $DUMMY_VERSION (`getCurrentDate`)\n" > $CHANGELOG_HEADER
 	GIT_DIFF=`mktemp`
 	extractGitDiffSinceCommit HEAD $CHANGELOG_FILE_NAME $GIT_DIFF
-	LASTLINE_IN_DIFF=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`	
-	FIRSTLINE_IN_DIFF=$(( `getFirstLineNumberContaining "@@.*@@" "$GIT_DIFF"` + 1))
+	LASTLINE_IN_DIFF=$((`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"` - 1))
+	FIRSTLINE_IN_DIFF=$(( `getFirstLineNumberContaining "@@.*@@" "$GIT_DIFF"`))
 	extractLinesFromDiff $FIRSTLINE_IN_DIFF $LASTLINE_IN_DIFF $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|$CHANGELOG_VERSION_REGEXP|# &|" | sed -e "/^ *$/d;/^$/d" >> $CHANGELOG_HEADER
 else
-	cat $OLD_CHANGELOG | head -n $(($LASTLINE -1)) | tail -n $LINES > $CHANGELOG_HEADER
+	cat $OLD_CHANGELOG | head -n $(($LASTLINE - 1)) | tail -n $LINES > $CHANGELOG_HEADER
 fi
 
 cat $OLD_CHANGELOG | tail -n $((`cat $OLD_CHANGELOG | sed -e '$a\' | wc -l` - $LASTLINE + 1 )) > $CHANGELOG_FOOTER
@@ -113,7 +113,7 @@ do
 			rm $GIT_DIFF
 		else
 			echo \* $CURRENT_REPO contained in version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
-			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;s|[^#].*|$SPACER&|"  >> $CHANGELOG_CONTENT
+			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^\s*$/d;/^$/d;s|[^#].*|$SPACER&|"  >> $CHANGELOG_CONTENT
 			echo >> $CHANGELOG_CONTENT
 		fi
 		cd ..
@@ -131,8 +131,6 @@ cat $CHANGELOG_CONTENT >> $PREPARED_CHANGELOG
 
 $EDITOR "$PREPARED_CHANGELOG"
 
-
-echo asdf
 cat $PREPARED_CHANGELOG
 
 # Delete comments

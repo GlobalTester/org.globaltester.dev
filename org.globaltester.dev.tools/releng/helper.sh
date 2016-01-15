@@ -82,7 +82,7 @@ function extractLinesFromDiff {
 function getFirstLineNumberContaining {
 	REGEXP=$1
 	FILE=$2
-	echo $((`cat $FILE | grep "$REGEXP" -n | head -n 1 | cut -d : -f 1` - 1))
+	cat $FILE | grep "$REGEXP" -n | head -n 1 | cut -d : -f 1
 }
 
 function getSecondLineNumberContaining {
@@ -94,7 +94,7 @@ function getSecondLineNumberContaining {
 function getLastLineNumberContaining {
 	REGEXP=$1
 	FILE=$2
-	echo $((`cat $FILE | grep "$REGEXP" -n | tail -n 1 | cut -d : -f 1` - 1))
+	cat $FILE | grep "$REGEXP" -n | tail -n 1 | cut -d : -f 1
 }
 
 function extractGitDiffSinceCommit {
