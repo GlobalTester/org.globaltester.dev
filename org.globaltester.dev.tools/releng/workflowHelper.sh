@@ -79,6 +79,9 @@ then
 fi
 
 # Build a list of products
+echo \# Modify the product list > $RELENG_REPOSITORIES
+echo \# Comments and empty lines are ignored >> $RELENG_REPOSITORIES
+
 for CURRENT_REPO in */
 do
 	CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
@@ -89,12 +92,13 @@ do
 	fi
 done
 
-cat $RELENG_REPOSITORIES
-
 askUser "modification of product list"
 if [ $? -eq $CONTINUE ]
 then
 	$EDITOR $RELENG_REPOSITORIES
+	removeLeadingAndTrailingEmptyLines $RELENG_REPOSITORIES
+	removeComments $RELENG_REPOSITORIES
+	removeTrailingWhitespace $RELENG_REPOSITORIES
 fi
 
 askUser "updating all product changelogs"
@@ -153,6 +157,6 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh "$CURRENT_REPO" "$CURRENT_REPO.releng"
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh "$CURRENT_LINE" "$CURRENT_LINE.releng"
 	done
 fi

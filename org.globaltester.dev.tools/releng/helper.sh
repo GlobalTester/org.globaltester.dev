@@ -130,6 +130,10 @@ function removeComments {
 	sed -i -e "s|\s*$LOG_MESSAGE_DIVIDER.*||" $1
 }
 
+function removeTrailingWhitespace {
+	sed -i -e "s|\s*&||" $1
+}
+
 function getCurrentDate {
 	date +%d.%m.%Y
 }
