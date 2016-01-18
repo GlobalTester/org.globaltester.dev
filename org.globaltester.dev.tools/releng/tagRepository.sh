@@ -4,10 +4,15 @@ set -e
 . org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
 
 REPOSITORY=$1
-CHANGELOG_FILE_NAME=CHANGELOG
 
 REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
 TAG_MESSAGE="Version bump to $REPO_VERSION"
+
+if [ ! -e "$REPOSITORY/$CHANGELOG_FILE_NAME" ]
+then
+	echo Did not tag repository due to missing changelog file
+	return
+fi
 
 cd $REPOSITORY
 

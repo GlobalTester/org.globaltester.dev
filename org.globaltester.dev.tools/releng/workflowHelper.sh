@@ -20,7 +20,6 @@ trap cleanup EXIT
 
 function askUser {
 	NEXT_STEP=$1
-	echo -e "\n\n\n\n\n"
 	read -p "Next step is $NEXT_STEP. Do you want to continue? y/N/s " REMOVE_DIR
 			case "$REMOVE_DIR" in
 				Yes|yes|Y|y)
@@ -145,14 +144,15 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_REPO in */
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagRepository.sh $CURRENT_REPO
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagRepository.sh "$CURRENT_REPO"
 	done
 fi
 
 askUser "tagging all products"
 if [ $? -eq $CONTINUE ]
 then
-	while read CURRENT_LINE; do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh $CURRENT_REPO $CURRENT_REPO.releng
-	done < $RELENG_REPOSITORIES
+	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
+	do
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh "$CURRENT_REPO" "$CURRENT_REPO.releng"
+	done
 fi
