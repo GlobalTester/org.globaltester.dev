@@ -113,14 +113,15 @@ do
 			rm $GIT_DIFF
 		else
 			echo \* $CURRENT_REPO contained in version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
-			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^\s*$/d;/^$/d;s|[^#].*|$SPACER&|"  >> $CHANGELOG_CONTENT
+			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "s|[^#].*|$SPACER&|" -e "/^\s*$/d"  >> $CHANGELOG_CONTENT
+			removeLeadingAndTrailingEmptyLines $CHANGELOG_CONTENT
 			echo >> $CHANGELOG_CONTENT
 		fi
 		cd ..
 	fi
 done
 
-sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $CHANGELOG_HEADER
+removeLeadingAndTrailingEmptyLines $CHANGELOG_HEADER
 
 echo \# Condense downstream changes for product $REPOSITORY > $PREPARED_CHANGELOG
 echo \# Comments and empty lines at the end will be ignored >> $PREPARED_CHANGELOG
@@ -131,15 +132,9 @@ cat $CHANGELOG_CONTENT >> $PREPARED_CHANGELOG
 
 $EDITOR "$PREPARED_CHANGELOG"
 
-cat $PREPARED_CHANGELOG
+removeComments "$PREPARED_CHANGELOG"
+removeLeadingAndTrailingEmptyLines "$PREPARED_CHANGELOG"
 
-# Delete comments
-sed -i -e '/^#/d;' $PREPARED_CHANGELOG
-# Delete empty lines at begin of file
-sed -i -e '/./,$!d' $PREPARED_CHANGELOG
-# Delete empty lines at end of file
-sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $PREPARED_CHANGELOG
-sed -i -e "s|Version .*\..*\..* ($DATE_REGEXP)|&\n|" $PREPARED_CHANGELOG
 
 if [ `head -n 1 "$PREPARED_CHANGELOG" | grep "$CHANGELOG_VERSION_REGEXP" | wc -l` -eq 0 ]
 then

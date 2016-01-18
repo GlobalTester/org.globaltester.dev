@@ -117,6 +117,19 @@ function getRepositoriesFromAggregator {
 	eval "cat $POM_FILE | grep '<module>' $GREP_COMMAND | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u"
 }
 
+function removeLeadingAndTrailingEmptyLines {
+	# Delete empty lines at begin of file
+	sed -i -e '/./,$!d' $1
+	# Delete empty lines at end of file
+	sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $1
+}
+
+function removeComments {
+	# Delete comments
+	sed -i -e '/^#/d;' $1
+	sed -i -e "s|\s*$LOG_MESSAGE_DIVIDER.*||" $1
+}
+
 function getCurrentDate {
 	date +%d.%m.%Y
 }
