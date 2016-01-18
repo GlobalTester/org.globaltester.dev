@@ -10,6 +10,8 @@ function replacePom {
 	FILE=$2
 	FULLPATH=$PROJECT$FILE
 	DATA=$3
+	
+	if [ -z "$DATA" ]; then return; fi;	
 	if [ ! -e $FULLPATH ] ;then return; fi;
 	echo "  $FULLPATH"
 	
@@ -32,6 +34,8 @@ function replaceManifest {
 	FILE=$2
 	FULLPATH=$PROJECT$FILE
 	DATA=$3
+	
+	if [ -z "$DATA" ]; then return; fi;
 	if [ ! -e $FULLPATH ] ;then return; fi;
 	echo "  $FULLPATH"
 	
@@ -44,6 +48,8 @@ function replaceFeature {
 	FILE=$2
 	FULLPATH=$PROJECT$FILE
 	DATA=$3
+	
+	if [ -z "$DATA" ]; then return; fi;
 	if [ ! -e $FULLPATH ] ;then return; fi;
 	echo "  $FULLPATH"
 	
@@ -63,6 +69,8 @@ function replaceProduct {
 	FILE=$2
 	FULLPATH=$PROJECT$FILE
 	DATA=$3
+	
+	if [ -z "$DATA" ]; then return; fi;
 	if [ ! -e $FULLPATH ] ;then return; fi;
 	echo "  $FULLPATH"
 	
@@ -78,6 +86,8 @@ function replaceTestScriptsVersion {
 	FILE=$2
 	FULLPATH=$PROJECT$FILE
 	DATA=$3
+	
+	if [ -z "$DATA" ]; then return; fi;
 	if [ ! -e $FULLPATH ] ;then return; fi;
 	echo "  $FULLPATH"
 	
@@ -107,6 +117,8 @@ function replaceTestScriptsDate {
 	FILE=$2
 	FULLPATH=$PROJECT$FILE
 	DATA=$3
+	
+	if [ -z "$DATA" ]; then return; fi;
 	if [ ! -e $FULLPATH ] ;then return; fi;
 	echo "  $FULLPATH"
 	
@@ -114,6 +126,21 @@ function replaceTestScriptsDate {
 	REPLACE="\1 $DATA \2"
 	
 	find $PROJECT -name "*.xml" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
+}
+
+function stampTestScripts {
+	PROJECT=$1
+	FILE=$2
+	FULLPATH=$PROJECT$FILE
+	VERSION=$3
+	DATE=$4
+	
+	if [ -z "$DATA" -o -z "$VERSION" ]; then return; fi;
+	if [ ! -e $FULLPATH ] ;then return; fi;
+	echo "  $FULLPATH"
+		
+	replaceTestScriptsVersion "$CURRENT_PROJECT" TestSuites "$VERSION"
+	replaceTestScriptsDate "$CURRENT_PROJECT" TestSuites "$DATE"
 }
 
 
@@ -144,7 +171,6 @@ do
 	replaceManifest "$CURRENT_PROJECT" META-INF/MANIFEST.MF "$VERSION"
 	replaceFeature "$CURRENT_PROJECT" feature.xml "$VERSION"
 	replaceProduct "$CURRENT_PROJECT" *.product "$VERSION"
-	replaceTestScriptsVersion "$CURRENT_PROJECT" TestSuites "$VERSION"
-	replaceTestScriptsDate "$CURRENT_PROJECT" TestSuites "$DATE"
+	stampTestScripts "$CURRENT_PROJECT" TestSuites "$VERSION" "$DATE"
 done
 

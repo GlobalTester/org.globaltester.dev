@@ -114,7 +114,7 @@ then
 	do
 		CURRENT_DATE=`getCurrentDate`
 		CUURENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/stampFiles.sh $CURRENT_REPO $CURRENT_VERSION $CURRENT_DATE
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
 	done
 fi
 # Build/Test
