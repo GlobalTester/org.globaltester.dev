@@ -102,7 +102,9 @@ then
 
 	$EDITOR $PREPARED_CHANGELOG
 
-	sed -i -e '/^#/d; s|#.*||' -e "s|$LOG_MESSAGE_DIVIDER.*||" -e 's|\s*$||' -e "/^$/d" -e "s|$CHANGELOG_VERSION_REGEXP|&\n|" $PREPARED_CHANGELOG
+	
+	removeComments "$PREPARED_CHANGELOG"
+	removeLeadingAndTrailingEmptyLines "$PREPARED_CHANGELOG"
 	
 	if [ ! -z "`cat $PREPARED_CHANGELOG`" ]
 	then

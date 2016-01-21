@@ -20,7 +20,6 @@ trap cleanup EXIT
 
 function askUser {
 	NEXT_STEP=$1
-	echo -e "\n\n\n\n\n"
 	read -p "Next step is $NEXT_STEP. Do you want to continue? y/N/s " REMOVE_DIR
 			case "$REMOVE_DIR" in
 				Yes|yes|Y|y)
@@ -80,6 +79,9 @@ then
 fi
 
 # Build a list of products
+echo \# Modify the product list > $RELENG_REPOSITORIES
+echo \# Comments and empty lines are ignored >> $RELENG_REPOSITORIES
+
 for CURRENT_REPO in */
 do
 	CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
@@ -90,12 +92,13 @@ do
 	fi
 done
 
-cat $RELENG_REPOSITORIES
-
 askUser "modification of product list"
 if [ $? -eq $CONTINUE ]
 then
 	$EDITOR $RELENG_REPOSITORIES
+	removeLeadingAndTrailingEmptyLines $RELENG_REPOSITORIES
+	removeComments $RELENG_REPOSITORIES
+	removeTrailingWhitespace $RELENG_REPOSITORIES
 fi
 
 askUser "updating all product changelogs"
@@ -112,7 +115,9 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_REPO in */
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/stampFiles.sh $CURRENT_REPO `getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+		CURRENT_DATE=`getCurrentDate`
+		CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
 	done
 fi
 # Build/Test
@@ -143,14 +148,15 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_REPO in */
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagRepository.sh $CURRENT_REPO
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagRepository.sh "$CURRENT_REPO"
 	done
 fi
 
 askUser "tagging all products"
 if [ $? -eq $CONTINUE ]
 then
-	while read CURRENT_LINE; do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh $CURRENT_REPO $CURRENT_REPO.releng
-	done < $RELENG_REPOSITORIES
+	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
+	do
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh "$CURRENT_LINE" "$CURRENT_LINE.releng"
+	done
 fi

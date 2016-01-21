@@ -9,7 +9,7 @@ DATE_REGEXP="${ONE_OR_MORE_DECIMALS_REGEXP}\.${ONE_OR_MORE_DECIMALS_REGEXP}\.${O
 CHANGELOG_VERSION_REGEXP="Version ${VERSION_REGEXP_NO_PATCH_LEVEL}.* ($DATE_REGEXP)"
 DUMMY_VERSION="x.y.z"
 LOG_MESSAGE_DIVIDER=`echo -e "\xe2\x9c\x96"`
-
+CHANGELOG_FILE_NAME=CHANGELOG
 
 function getLastTag {
 	#$1 tag type, e.g. release
@@ -82,7 +82,7 @@ function extractLinesFromDiff {
 function getFirstLineNumberContaining {
 	REGEXP=$1
 	FILE=$2
-	echo $((`cat $FILE | grep "$REGEXP" -n | head -n 1 | cut -d : -f 1` - 1))
+	cat $FILE | grep "$REGEXP" -n | head -n 1 | cut -d : -f 1
 }
 
 function getSecondLineNumberContaining {
@@ -94,7 +94,7 @@ function getSecondLineNumberContaining {
 function getLastLineNumberContaining {
 	REGEXP=$1
 	FILE=$2
-	echo $((`cat $FILE | grep "$REGEXP" -n | tail -n 1 | cut -d : -f 1` - 1))
+	cat $FILE | grep "$REGEXP" -n | tail -n 1 | cut -d : -f 1
 }
 
 function extractGitDiffSinceCommit {
@@ -115,6 +115,23 @@ function getRepositoriesFromAggregator {
 	fi
 	#TODO replace eval with safer alternative
 	eval "cat $POM_FILE | grep '<module>' $GREP_COMMAND | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u"
+}
+
+function removeLeadingAndTrailingEmptyLines {
+	# Delete empty lines at begin of file
+	sed -i -e '/./,$!d' $1
+	# Delete empty lines at end of file
+	sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $1
+}
+
+function removeComments {
+	# Delete comments
+	sed -i -e '/^#/d;' $1
+	sed -i -e "s|\s*$LOG_MESSAGE_DIVIDER.*||" $1
+}
+
+function removeTrailingWhitespace {
+	sed -i -e "s|\s*&||" $1
 }
 
 function getCurrentDate {

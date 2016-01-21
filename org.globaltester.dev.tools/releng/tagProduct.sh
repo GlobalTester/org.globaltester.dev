@@ -8,6 +8,18 @@ RELENG=$2
 TYPE=release
 CHANGELOG_FILE_NAME=CHANGELOG
 
+if [ ! -e "$REPOSITORY/$CHANGELOG_FILE_NAME" ]
+then
+	echo Did not tag product $REPOSITORY due to missing changelog file
+	exit
+fi
+
+if [ ! -e "$REPOSITORY/$CHANGELOG_FILE_NAME" ]
+then
+	echo Did not tag product $REPOSITORY due to missing releng file
+	exit
+fi
+
 REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
 TAG_MESSAGE="Product version bump to $REPO_VERSION"
 

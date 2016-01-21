@@ -60,11 +60,11 @@ then
 	echo -e "Version $DUMMY_VERSION (`getCurrentDate`)\n" > $CHANGELOG_HEADER
 	GIT_DIFF=`mktemp`
 	extractGitDiffSinceCommit HEAD $CHANGELOG_FILE_NAME $GIT_DIFF
-	LASTLINE_IN_DIFF=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`	
-	FIRSTLINE_IN_DIFF=$(( `getFirstLineNumberContaining "@@.*@@" "$GIT_DIFF"` + 1))
+	LASTLINE_IN_DIFF=$((`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"` - 1))
+	FIRSTLINE_IN_DIFF=$(( `getFirstLineNumberContaining "@@.*@@" "$GIT_DIFF"`))
 	extractLinesFromDiff $FIRSTLINE_IN_DIFF $LASTLINE_IN_DIFF $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|$CHANGELOG_VERSION_REGEXP|# &|" | sed -e "/^ *$/d;/^$/d" >> $CHANGELOG_HEADER
 else
-	cat $OLD_CHANGELOG | head -n $(($LASTLINE -1)) | tail -n $LINES > $CHANGELOG_HEADER
+	cat $OLD_CHANGELOG | head -n $(($LASTLINE - 1)) | tail -n $LINES > $CHANGELOG_HEADER
 fi
 
 cat $OLD_CHANGELOG | tail -n $((`cat $OLD_CHANGELOG | sed -e '$a\' | wc -l` - $LASTLINE + 1 )) > $CHANGELOG_FOOTER
@@ -104,7 +104,7 @@ do
 					echo \* $CURRENT_REPO updated to version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
 				fi
 							
-				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" | sed -e "/^ *$/d;/^$/d;s|[^#].*|$SPACER&|" >> $CHANGELOG_CONTENT
+				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;" -e "s|[^#].*|$SPACER&|" >> $CHANGELOG_CONTENT
 				echo >> $CHANGELOG_CONTENT
 			else
 				echo No diff found, skipping
@@ -113,14 +113,15 @@ do
 			rm $GIT_DIFF
 		else
 			echo \* $CURRENT_REPO contained in version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
-			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;s|.*|$SPACER&|"  >> $CHANGELOG_CONTENT
+			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "s|[^#].*|$SPACER&|" -e "/^\s*$/d"  >> $CHANGELOG_CONTENT
+			removeLeadingAndTrailingEmptyLines $CHANGELOG_CONTENT
 			echo >> $CHANGELOG_CONTENT
 		fi
 		cd ..
 	fi
 done
 
-sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $CHANGELOG_HEADER
+removeLeadingAndTrailingEmptyLines $CHANGELOG_HEADER
 
 echo \# Condense downstream changes for product $REPOSITORY > $PREPARED_CHANGELOG
 echo \# Comments and empty lines at the end will be ignored >> $PREPARED_CHANGELOG
@@ -131,17 +132,9 @@ cat $CHANGELOG_CONTENT >> $PREPARED_CHANGELOG
 
 $EDITOR "$PREPARED_CHANGELOG"
 
+removeComments "$PREPARED_CHANGELOG"
+removeLeadingAndTrailingEmptyLines "$PREPARED_CHANGELOG"
 
-echo asdf
-cat $PREPARED_CHANGELOG
-
-# Delete comments
-sed -i -e '/^#/d;' $PREPARED_CHANGELOG
-# Delete empty lines at begin of file
-sed -i -e '/./,$!d' $PREPARED_CHANGELOG
-# Delete empty lines at end of file
-sed -i -e :a -e '/./,$!d;/^\n*$/{$d;N;};/\n$/ba' $PREPARED_CHANGELOG
-sed -i -e "s|Version .*\..*\..* ($DATE_REGEXP)|&\n|" $PREPARED_CHANGELOG
 
 if [ `head -n 1 "$PREPARED_CHANGELOG" | grep "$CHANGELOG_VERSION_REGEXP" | wc -l` -eq 0 ]
 then
