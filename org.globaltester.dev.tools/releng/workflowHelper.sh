@@ -157,6 +157,6 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh "$CURRENT_LINE" "$CURRENT_LINE.releng"
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh -r "$CURRENT_LINE"
 	done
 fi
