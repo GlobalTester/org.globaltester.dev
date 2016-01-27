@@ -2,8 +2,9 @@
 # must be called from root directory for all repos
 
 #   [0-9]\{1,\}
-
-. org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
+set -e
+. org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
+set +e
 
 function replacePom {
 	PROJECT=$1

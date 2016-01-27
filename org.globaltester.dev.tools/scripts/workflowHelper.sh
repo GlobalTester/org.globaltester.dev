@@ -1,6 +1,6 @@
 #!/bin/bash
 # must be called from root directory
-. org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
+. org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
 
 SKIP=1
 CONTINUE=0
@@ -59,7 +59,7 @@ then
 	for CURRENT_REPO in */
 	do
 		CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/updateRepositoryChangelog.sh $CURRENT_REPO
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
 	done
 fi
 
@@ -106,7 +106,7 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/updateProductChangelog.sh "$CURRENT_LINE"
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateProductChangelog.sh "$CURRENT_LINE"
 	done
 fi
 
@@ -117,7 +117,7 @@ then
 	do
 		CURRENT_DATE=`getCurrentDate`
 		CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
 	done
 fi
 # Build/Test
@@ -148,7 +148,7 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_REPO in */
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagRepository.sh "$CURRENT_REPO"
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
 	done
 fi
 
@@ -157,6 +157,6 @@ if [ $? -eq $CONTINUE ]
 then
 	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
 	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/releng/tagProduct.sh -r "$CURRENT_LINE"
+		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagProduct.sh -r "$CURRENT_LINE"
 	done
 fi
