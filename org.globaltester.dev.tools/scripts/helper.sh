@@ -21,7 +21,7 @@ function getLastTag {
 		FILTER="$1/$2/*"
 	fi
 	
-	echo `git tag --list $FILTER --sort=version:refname | sed -e '$!d'`
+	echo `git tag --list $FILTER | sort -V | sed -e '$!d'`
 }
 
 function getLastTagRange {
@@ -74,7 +74,7 @@ function extractLinesFromDiff {
 	FIRSTLINE=$1
 	LASTLINE=$2
 	DIFF=$3
-	LINES=$(( $LASTLINE - $FIRSTLINE ))
+	LINES=$(( $LASTLINE - $FIRSTLINE + 1))
 
 	cat $DIFF | head -n $LASTLINE | tail -n $LINES
 }
@@ -102,7 +102,7 @@ function extractGitDiffSinceCommit {
 	FILENAME=$2
 	RESULT_FILE=$3
 	
-	git diff --ignore-space-at-eol $LAST_TAG $CHANGELOG_FILE_NAME > $GIT_DIFF
+	git diff -U0 --ignore-space-at-eol $LAST_TAG $CHANGELOG_FILE_NAME > $GIT_DIFF
 }
 
 function getRepositoriesFromAggregator {

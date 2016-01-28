@@ -67,10 +67,10 @@ then
 	then
 		FIRSTLINE=$(( `getFirstLineNumberContaining "@@.*@@" "$GIT_DIFF"` + 1))
 		FIRSTLINE_WITH_VERSION=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`
-		LASTLINE=`getLastLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`
+		LASTLINE=`wc -l $GIT_DIFF` 
 		
-		if [ $LASTLINE == $FIRSTLINE_WITH_VERSION ]
-		then
+		if [ $FIRSTLINE == $FIRSTLINE_WITH_VERSION ]
+		then #version suggestion present in CHANGELOG
 			VERSION_NEEDED=0
 		fi
 		
