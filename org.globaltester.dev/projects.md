@@ -8,6 +8,7 @@ GlobalTester
 Product release engineering repositories:  
 `com.hjp.globaltester.prove.eidclient`  
 `com.hjp.globaltester.prove.epa`  
+`com.hjp.globaltester.prove.epa.poseidas`  
 `com.hjp.globaltester.prove.epareader`  
 `com.hjp.globaltester.prove.epp`  
 `com.hjp.globaltester.prove.is`  
