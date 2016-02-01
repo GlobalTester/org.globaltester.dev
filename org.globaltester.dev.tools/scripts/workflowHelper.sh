@@ -7,8 +7,8 @@ CONTINUE=0
 ABORT=2
 
 CHANGELOG_FILE_NAME=CHANGELOG
-BASH_OPTIONS="-x"
-#BASH_OPTIONS=""
+#BASH_OPTIONS="-x"
+BASH_OPTIONS=""
 
 function cleanup {
 	if [ -e "$RELENG_REPOSITORIES" ]
@@ -34,12 +34,14 @@ function askUser {
 			esac
 }
 
+# parameter handling
 while [ $# -gt 0 ]
 do
 	case "$1" in
-		"-h"|"--help") echo -en "Usage:\n\n"
-			echo -en "`basename $0`"
-			echo -en "This must be called from the root of all checked out HJP repositories."
+		"-h"|"--help") 
+			echo -e "Usage:\n"
+			echo -e "`basename $0`\n"
+			echo -e "This must be called from the root of all checked out HJP repositories."
 			exit 1
 		;;
 		*)
@@ -49,36 +51,8 @@ do
 	esac
 done
 
-# Repo changelog generation
-
+# build product list
 RELENG_REPOSITORIES=`mktemp`
-
-askUser "updating all repository changelogs"
-if [ $? -eq $CONTINUE ]
-then
-	for CURRENT_REPO in */
-	do
-		CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
-	done
-fi
-
-askUser "commiting the modified repository changelogs"
-if [ $? -eq $CONTINUE ]
-then
-	for CURRENT_REPO in */
-	do
-		cd $CURRENT_REPO
-		if [ -e $CHANGELOG_FILE_NAME ]
-		then
-			git add $CHANGELOG_FILE_NAME
-			git commit -m "Updated the changelog"
-		fi
-		cd ..
-	done
-fi
-
-# Build a list of products
 echo \# Modify the product list > $RELENG_REPOSITORIES
 echo \# Comments and empty lines are ignored >> $RELENG_REPOSITORIES
 
@@ -92,35 +66,224 @@ do
 	fi
 done
 
-askUser "modification of product list"
-if [ $? -eq $CONTINUE ]
-then
-	$EDITOR $RELENG_REPOSITORIES
-	removeLeadingAndTrailingEmptyLines $RELENG_REPOSITORIES
-	removeComments $RELENG_REPOSITORIES
-	removeTrailingWhitespace $RELENG_REPOSITORIES
-fi
+function incrementI() {
+	((i++))
+	if [ $i -eq $NEXT_STEP ]; then
+		echo -en "\e[01m"
+	else
+		echo -en "\e[0m"
+	fi
+}
 
-askUser "updating all product changelogs"
-if [ $? -eq $CONTINUE ]
-then
-	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
-	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateProductChangelog.sh "$CURRENT_LINE"
-	done
-fi
+# main loop
+NEXT_STEP=1
+while true; do
+	echo -e "\n=============\n"
+	echo "Release workflow"
+	i=0
+	incrementI
+	printf "%3d: %s\n" $i "Check open branches";
+	incrementI
+	printf "%3d: %s\n" $i "Consistency checks";
+	incrementI
+	printf "%3d: %s\n" $i "Update repository changelogs";
+	incrementI
+	printf "%3d: %s\n" $i "Check product list";
+	incrementI
+	printf "%3d: %s\n" $i "Update product changelogs";
+	incrementI
+	printf "%3d: %s\n" $i "Transfer version numbers";
+	incrementI
+	printf "%3d: %s\n" $i "Update checksums";
+	incrementI
+	printf "%3d: %s\n" $i "Create consolidated aggregator build";
+	incrementI
+	printf "%3d: %s\n" $i "Update POM versions";
+	incrementI
+	printf "%3d: %s\n" $i "Build the desired products";
+	incrementI
+	printf "%3d: %s\n" $i "Collect build artifacts";
+	incrementI
+	printf "%3d: %s\n" $i "Generate test documentation";
+	incrementI
+	printf "%3d: %s\n" $i "Test the build";
+	incrementI
+	printf "%3d: %s\n" $i "Generate release documentation";
+	incrementI
+	printf "%3d: %s\n" $i "Tag repositories";
+	incrementI
+	printf "%3d: %s\n" $i "Tag products";
+	incrementI
+	printf "%3d: %s\n" $i "Publish release";
+	incrementI
+
+	echo ""
+	printf "%3s: %s\n" "q" "quit"
+	echo -en "\e[0m"
+	printf "%3s: %s\n" "s" "shell"
+	echo ""
+	PROPOSED_STEP=$NEXT_STEP
+	read -p "enter next step ($NEXT_STEP):" INPUT
+	NEXT_STEP=${INPUT:-$NEXT_STEP}
+	echo -e "\n=============\n"
+
+	case $NEXT_STEP in
+		"1") 
+			echo "Check open branches"
+			bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/checkOpenBranches.sh
+			((NEXT_STEP++))
+		;;
+		"2") 
+			echo "Consistency checks"
+			echo "--none implemented yet--"
+
+			((NEXT_STEP++))
+		;;
+		"3") 
+			echo "Update repository changelogs"
+			for CURRENT_REPO in */; do
+				CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
+			done
+
+			read -p "Commit modified changelogs? Y/n " INPUT
+			case $INPUT in
+				"y"|"Y"|"")
+					for CURRENT_REPO in */
+					do
+						cd $CURRENT_REPO
+						if [ -e $CHANGELOG_FILE_NAME ]
+						then
+							git add $CHANGELOG_FILE_NAME
+							git commit -m "Updated the changelog"
+						fi
+						cd ..
+					done
+				;;
+			esac
+			((NEXT_STEP++))
+		;;
+		"4") 
+			echo "Check product list"
+			$EDITOR $RELENG_REPOSITORIES
+			removeLeadingAndTrailingEmptyLines $RELENG_REPOSITORIES
+			removeComments $RELENG_REPOSITORIES
+			removeTrailingWhitespace $RELENG_REPOSITORIES
+			((NEXT_STEP++))
+		;;
+		"5") 
+			echo "updating all product changelogs"
+			for CURRENT_LINE in `cat $RELENG_REPOSITORIES`;	do
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateProductChangelog.sh "$CURRENT_LINE"
+			done
+
+			read -p "Commit modified changelogs? Y/n " INPUT
+			case $INPUT in
+				"y"|"Y"|"")
+					for CURRENT_REPO in */
+					do
+						cd $CURRENT_REPO
+						if [ -e $CHANGELOG_FILE_NAME ]
+						then
+							git add $CHANGELOG_FILE_NAME
+							git commit -m "Updated the changelog"
+						fi
+						cd ..
+					done
+				;;
+			esac
+			((NEXT_STEP++))
+		;;
+		"6") 
+			echo "Transfer version numbers"
+			for CURRENT_REPO in */
+			do
+				CURRENT_DATE=`getCurrentDateFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
+			done
+			((NEXT_STEP++))
+		;;
+		"7")
+			echo "Update checksums"
+			((NEXT_STEP++))
+		;;
+		"8")
+			echo "Create consolidated aggregator build"
+			((NEXT_STEP++))
+		;;
+		"9")
+			echo "Update POM versions"
+	#	mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
+			((NEXT_STEP++))
+		;;
+		"10")
+			echo "Build the desired products"
+			((NEXT_STEP++))
+		;;
+		"11")
+			echo "Collect build artifacts"
+			((NEXT_STEP++))
+		;;
+		"12")
+			echo "Generate test documentation"
+			((NEXT_STEP++))
+		;;
+		"13")
+			echo "Test the build"
+			((NEXT_STEP++))
+		;;
+		"14")
+			echo "Generate release documentation"
+			((NEXT_STEP++))
+		;;
+		"15")
+			echo "Tag repositories"
+			((NEXT_STEP++))
+		;;
+		"16")
+			echo "Tag products"
+			((NEXT_STEP++))
+		;;
+		"17")
+			echo "Publish release"
+		;;
+		"q"|"Q"|"quit") 
+			exit 0
+		;;
+		"s"|"S"|"shell") 
+			bash $BASH_OPTIONS 
+			NEXT_STEP=$PROPOSED_STEP
+		;;
+		*)
+			echo "unknown step, try again"
+			continue;
+		;;
+	esac
+done 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Repo changelog generation
+
+
+
+
 
 askUser "setting version in relevant files"
 if [ $? -eq $CONTINUE ]
 then
-	for CURRENT_REPO in */
-	do
-		CURRENT_DATE=`getCurrentDate`
-		CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
-		# Apply changes to pom files and dependencies/parents
-		mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
-	done
 fi
 # Build/Test
 
