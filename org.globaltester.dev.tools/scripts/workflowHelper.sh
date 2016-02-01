@@ -118,6 +118,8 @@ then
 		CURRENT_DATE=`getCurrentDate`
 		CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
 		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
+		# Apply changes to pom files and dependencies/parents
+		mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
 	done
 fi
 # Build/Test

@@ -6,30 +6,6 @@ set -e
 . org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
 set +e
 
-function replacePom {
-	PROJECT=$1
-	FILE=$2
-	FULLPATH=$PROJECT$FILE
-	DATA=$3
-	
-	if [ -z "$DATA" ]; then return; fi;	
-	if [ ! -e $FULLPATH ] ;then return; fi;
-	echo "  $FULLPATH"
-	
-	
-	#<version>0.0.1-SNAPSHOT</version>
-	
-	if [ `cat $FULLPATH | grep '</parent>' | wc -l` -gt 0 ]
-	then
-		DETECT='\(.*<parent>.*</parent>.*<version>\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^<]*\(</version>\)'
-	else
-		DETECT='\(<version>\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^<]*\(</version>\)'
-	fi
-	REPLACE="\1$DATA\2"
-	sed -i -b -n -e "1h;1!H;\${;g;s|$DETECT|$REPLACE|;p;}" $FULLPATH
-	
-}
-
 function replaceManifest {
 	PROJECT=$1
 	FILE=$2
@@ -168,7 +144,6 @@ for CURRENT_PROJECT in $REPOSITORY/*/
 do
 	echo Currently updating file in $CURRENT_PROJECT
 	
-	replacePom "$CURRENT_PROJECT" pom.xml "$VERSION"
 	replaceManifest "$CURRENT_PROJECT" META-INF/MANIFEST.MF "$VERSION"
 	replaceFeature "$CURRENT_PROJECT" feature.xml "$VERSION"
 	replaceProduct "$CURRENT_PROJECT" *.product "$VERSION"
