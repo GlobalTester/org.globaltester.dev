@@ -124,6 +124,12 @@ done
 removeLeadingAndTrailingEmptyLines $CHANGELOG_HEADER
 
 echo \# Condense downstream changes for product $REPOSITORY > $PREPARED_CHANGELOG
+if [ ! -z "$LAST_TAGGED_PRODUCT_VERSION" ]
+then
+	echo \# The base tag for this update is $LAST_TAGGED_PRODUCT_VERSION >> $PREPARED_CHANGELOG
+else
+	echo \# The product was not version tagged before >> $PREPARED_CHANGELOG
+fi
 echo \# Comments and empty lines at the end will be ignored >> $PREPARED_CHANGELOG
 echo \# ---------------------------------------- >> $PREPARED_CHANGELOG
 cat $CHANGELOG_HEADER >> $PREPARED_CHANGELOG
