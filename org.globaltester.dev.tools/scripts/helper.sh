@@ -38,6 +38,18 @@ function getLastTagRange {
 	fi
 }
 
+function getCurrentDateFromChangeLog {
+	CHANGELOG_FILE=$1
+	while read CURRENT_LINE; do
+		VERSION=`echo $CURRENT_LINE | sed -e 's|Version \([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\) (\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\))|\2|g'`
+		if [ ! -z "$VERSION" ]
+		then
+			echo $VERSION
+			break
+		fi
+	done < $CHANGELOG_FILE
+}
+
 function getCurrentVersionFromChangeLog {
 	CHANGELOG_FILE=$1
 	while read CURRENT_LINE; do
