@@ -226,7 +226,8 @@ while true; do
 
 			#aggregator header
 			mkdir $BUILDDIR/aggregator
-			POM=$BUILDDIR/aggregator/pom.xml
+			AGGREGATOR=$BUILDDIR/aggregator
+			POM=$AGGREGATOR/pom.xml
 			echo -e '<?xml version="1.0" encoding="UTF-8"?>' > $POM
 			echo -e '<project' > $POM
 			echo -e 'xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"' >> $POM
@@ -255,7 +256,9 @@ while true; do
 		;;
 		"9")
 			echo "Update POM versions"
-	#	mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
+			cd $AGGREGATOR
+			mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
+			cd ../..
 			((NEXT_STEP++))
 		;;
 		"10")
