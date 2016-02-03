@@ -289,10 +289,18 @@ while true; do
 		;;
 		"15")
 			echo "Tag repositories"
+			for CURRENT_REPO in */
+			do
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
+			done
 			((NEXT_STEP++))
 		;;
 		"16")
 			echo "Tag products"
+			for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
+			do
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagProduct.sh -r "$CURRENT_LINE"
+			done
 			((NEXT_STEP++))
 		;;
 		"17")
@@ -312,45 +320,3 @@ while true; do
 	esac
 done 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Repo changelog generation
-
-
-
-
-
-askUser "building and testing. This will open a shell for build execution. When all build processes have been executed leave the shell to proceed with the release workflow"
-if [ $? -eq $CONTINUE ]
-then
-	bash $BASH_OPTIONS 
-fi
-
-askUser "tagging all versions"
-if [ $? -eq $CONTINUE ]
-then
-	for CURRENT_REPO in */
-	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
-	done
-fi
-
-askUser "tagging all products"
-if [ $? -eq $CONTINUE ]
-then
-	for CURRENT_LINE in `cat $RELENG_REPOSITORIES`
-	do
-		bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagProduct.sh -r "$CURRENT_LINE"
-	done
-fi
