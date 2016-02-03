@@ -270,6 +270,9 @@ while true; do
 		;;
 		"11")
 			echo "Collect build artifacts"
+			TARGET=$BUILDDIR/target
+			mkdir $TARGET
+			find . \( -name *site*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip -o -name *releasetests*.zip \)  -exec cp {} $TARGET \;
 			((NEXT_STEP++))
 		;;
 		"12")
