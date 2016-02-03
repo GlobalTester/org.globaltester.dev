@@ -281,6 +281,11 @@ while true; do
 		;;
 		"13")
 			echo "Test the build"
+			echo
+			echo "All artifacts are generated in $TARGET"
+			echo "Install the products and perform the tests described in the test documentation generated in the step before."
+			echo
+			read -p "press enter when finished" INPUT 
 			((NEXT_STEP++))
 		;;
 		"14")
@@ -305,6 +310,18 @@ while true; do
 		;;
 		"17")
 			echo "Publish release"
+			echo
+			echo "Congratulations! You just created a complete release."
+			echo
+			echo "Now you need to publish the results."
+			echo "Final artifacts are located in $TARGET"
+			echo 
+			echo "This step is not yet supported by the workflow script but should include:"
+			echo "* pushing release commits and tags to relevant repos (HJP servers, GitHub)"
+			echo "* uploading the release to website"
+			echo "* informing customers about the new version (the CHANGELOG files are a great basis for this)"
+			echo
+			read -p "press enter when finished" INPUT 
 		;;
 		"q"|"Q"|"quit") 
 			exit 0
