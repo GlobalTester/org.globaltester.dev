@@ -222,6 +222,8 @@ while true; do
 			echo "Create consolidated aggregator build"
 			DATE_STAMP=`date +%Y_%m_%d`
 			BUILDDIR=`mktemp -d builddir_${DATE_STAMP}_XXX`
+			BUILDDIR=`readlink -f "$BUILDDIR"`
+
 			echo "Created BUILDDIR in $BUILDDIR"
 
 			#aggregator header
@@ -277,6 +279,21 @@ while true; do
 		;;
 		"12")
 			echo "Generate test documentation"
+
+			# aggregate all releaseTest.md files and generate html
+			MDFILE=$BUILDDIR/testDocumentation.md
+			echo -n > $MDFILE
+			for CURRENT_REPO in `getRepositoriesFromAggregator $POM`
+			do
+				find $CURRENT_REPO -name releaseTests.md -exec cat {} >> $MDFILE \;
+			done
+
+			# generate and display printable html
+			HTMLFILE=$BUILDDIR/testDocumentation.html
+			markdown $MDFILE > $HTMLFILE
+			echo "open test documentation file $HTMLFILE"
+			firefox --new-window $HTMLFILE
+
 			((NEXT_STEP++))
 		;;
 		"13")
@@ -290,6 +307,54 @@ while true; do
 		;;
 		"14")
 			echo "Generate release documentation"
+
+			# init release documentation file
+			MDFILE=$BUILDDIR/releaseDocumentation.md
+			echo -e "Release overview\n================"> $MDFILE
+
+			# add environment information
+			echo -e "Environment information\n-----------------">> $MDFILE
+			echo -e "Date: \`" `date  +%Y-%m-%d` "\`  ">> $MDFILE
+			echo -e "Executed by: \`" `id -u -n` "\`  " >> $MDFILE
+			echo -e "Machine: \`" `uname -a` "\`  " >> $MDFILE
+			echo -e "Java: \`" `java -version 2>&1 | grep build` "\`  " >> $MDFILE
+			echo -e "Build directory: \`$BUILDDIR\`" >> $MDFILE
+			echo -e "\n" >> $MDFILE
+
+			# add product list
+			echo -e "Products released\n-----------------">> $MDFILE
+			for CURRENT_REPO in `cat $RELENG_REPOSITORIES`
+			do
+				VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+				VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
+				HASH=`cd $CURRENT_REPO; git log -n1 --format=%H`
+				HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
+				printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> $MDFILE
+			done
+
+			# add bundle list
+			echo -e "Bundle versions\n-----------------">> $MDFILE
+			for CURRENT_REPO in *
+			do
+				if [ ! -e "$CURRENT_REPO/$CHANGELOG_FILE_NAME" ]
+				then
+					continue;
+				fi
+
+				VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+				VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
+				HASH=`cd $CURRENT_REPO; git log -n1 --format=%H`
+				HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
+				printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> $MDFILE
+			done
+
+			# generate and display printable html
+			HTMLFILE=$BUILDDIR/releaseDocumentation.html
+			markdown $MDFILE > $HTMLFILE
+			echo "open release documentation file $HTMLFILE"
+			firefox --new-window $HTMLFILE
+
+
 			((NEXT_STEP++))
 		;;
 		"15")
