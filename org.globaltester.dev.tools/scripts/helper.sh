@@ -11,6 +11,10 @@ DUMMY_VERSION="x.y.z"
 LOG_MESSAGE_DIVIDER=`echo -e "\xe2\x9c\x96"`
 CHANGELOG_FILE_NAME=CHANGELOG
 
+#BASH_OPTIONS="-x"
+BASH_OPTIONS=""
+
+
 function getLastTag {
 	#$1 tag type, e.g. release
 	#$2 type qualifier, e.g. de.persosim.rcp for products
@@ -148,8 +152,4 @@ function removeTrailingWhitespace {
 
 function getCurrentDate {
 	date +%d.%m.%Y
-}
-
-function whereAmI {
-	echo `dirname "$(readlink -f "$0")"`
 }
