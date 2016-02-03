@@ -263,6 +263,9 @@ while true; do
 		;;
 		"10")
 			echo "Build the desired products"
+			cd $AGGREGATOR
+			mvn clean verify -T 2C
+			cd ../..
 			((NEXT_STEP++))
 		;;
 		"11")
