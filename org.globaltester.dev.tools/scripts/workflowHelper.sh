@@ -206,6 +206,18 @@ while true; do
 		;;
 		"7")
 			echo "Update checksums"
+			for CURRENT_PROJECT in `find . -name filelist.a32`
+			do
+				CURRENT_PROJECT=`dirname $CURRENT_PROJECT`
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateChecksums.sh $CURRENT_PROJECT
+				if [ $? -ne 0 ]; then
+					echo
+					echo "Failed to create checksum for $CURRENT_PROJECT"
+					echo "Fix the problem and try again"
+					((NEXT_STEP--))
+					break;
+				fi
+			done
 			((NEXT_STEP++))
 		;;
 		"8")
