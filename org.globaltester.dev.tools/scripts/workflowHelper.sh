@@ -220,6 +220,37 @@ while true; do
 		;;
 		"8")
 			echo "Create consolidated aggregator build"
+			DATE_STAMP=`date +%Y_%m_%d`
+			BUILDDIR=`mktemp -d builddir_${DATE_STAMP}_XXX`
+			echo "Created BUILDDIR in $BUILDDIR"
+
+			#aggregator header
+			mkdir $BUILDDIR/aggregator
+			POM=$BUILDDIR/aggregator/pom.xml
+			echo -e '<?xml version="1.0" encoding="UTF-8"?>' > $POM
+			echo -e '<project' > $POM
+			echo -e 'xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"' >> $POM
+			echo -e 'xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' >> $POM
+			echo -e '  <modelVersion>4.0.0</modelVersion>' >> $POM
+			echo -e '  <groupId>com.hjp</groupId>' >> $POM
+			echo -e '  <artifactId>com.hjp.releng</artifactId>' >> $POM
+			echo -e '  <version>0.0.1</version>' >> $POM
+			echo -e '  <packaging>pom</packaging>' >> $POM
+			echo -e '  <modules>' >> $POM
+
+			#generate aggregator module list
+			MODULELIST=`mktemp`
+			for CURRENT_REPO in `cat $RELENG_REPOSITORIES`
+			do
+				grep "<module>" $CURRENT_REPO/$CURRENT_REPO.releng/pom.xml >> $MODULELIST
+			done
+			cat $MODULELIST | sed -e 's/.*<module>//; s/<\/module>.*$//' | sort -d -u | sed -e "s/\(.*\)/    <module>\1<\/module>/" >> $POM
+			rm $MODULELIST;
+
+			#aggregator footer
+			echo -e "  </modules>\n\n</project>" >> $POM
+
+
 			((NEXT_STEP++))
 		;;
 		"9")
@@ -290,27 +321,6 @@ done
 
 
 
-
-askUser "setting version in relevant files"
-if [ $? -eq $CONTINUE ]
-then
-fi
-# Build/Test
-
-askUser "commiting the modified files"
-if [ $? -eq $CONTINUE ]
-then
-	for CURRENT_REPO in */
-	do
-		cd $CURRENT_REPO
-		if [ -e $CHANGELOG_FILE_NAME ]
-		then
-			git add .
-			git commit -m "Updated the product changelog and all versions"
-		fi
-		cd ..
-	done
-fi
 
 askUser "building and testing. This will open a shell for build execution. When all build processes have been executed leave the shell to proceed with the release workflow"
 if [ $? -eq $CONTINUE ]
