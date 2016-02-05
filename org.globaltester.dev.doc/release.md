@@ -6,86 +6,62 @@ In general the overall development process shall ensure that the current master 
 
 When all desired features are merged into the master a release can be prepared. Release preparation includes some quality and consistency checks and the assignment of version numbers for all relevant artifacts (depending on included changes). The release build is essentially the same build as during development. Before the build results can be published as official release extensive tests are performed on all artifacts to ensure that they work as expected.
 
-Prepare the build
------------------
-Before starting the release build some basic checks and final touches should be performed on the projects included in the build:
+The whole process is implemented in a workflow helper script. That script navigates the user through every step of the process and automates most of the steps. The process description below focuses on the overall process, describes what every step does and provides some hints for manual actions needed by the user. Although theoretically possible it is not advisable to build a release based only on the description below without the workflow script.
 
 1. __Check open branches__  
 Ensure that all required branches are merged (and removed on the remotes)
 
-		#find branches that are not merged into current branch
-		curDir=`pwd`; for curProj in */; do cd "$curProj";echo -en "\e[36m" ; pwd; echo -en "\e[0m"; git branch -al --no-merged ; cd $curDir; done
+1. __Consistency checks__  
+Not yet implemented. In the near future we will add some checks that ensure consistent naming of projects, bundles etc.
+Also we do handle some cloned testscripts for different customer groups and plan to implement a script that checks for mutual changes to ensure that both products contain all relevant bugfixes. 
 
-1. __Check documentation__  
-Make sure that the newly introduced features are properly documented in the code (via Javadoc) and readme files.
+1. __Update repository changelogs__  
+The CHANGELOG files in each repository reflect the latest changes to each repo. Their content is manually condensed from the git commit history. In general remove all "maintenance" commits and combine the remaining ones to a concise bullet list. The workflow helper will present a preformated list with all commit messages so it can be easily condensed.  
+According to the changes integrated into the new release make sure that a new proper version number is set in the first line of the CHANGELOG. It should represent how extensive the changes are (bugfixes, new features etc.). This version will be used throughout the later process to ensure that all relevant files are adjusted correctly.  
+The workflow helper will provide the option to commit the prepared changelogs to ensure that no further changes during the build will break the results of this tedious task. Unless you have a very good reason to not commit them just stay with the default.
 
-1. __Check/assign version numbers__  
-According to the changes integrated into the new release make sure that a new proper version number is set. It should represent how extensive the changes are (bugfixes, new features etc.).
-Version numbers are assigned per repository and must be mirrored to the respective MANIFEST.MF and pom.xml files (also all eclipse relevant files containing version numbers). This version is maintained in the CHANGELOG file in each repository and used for tagging when releasing. For scripts they need to be copied from there to all places where they need to be consistent (e.g. testcases or manifest files), see the following section for more details. To guide this process there is a workflow helper script in org.globaltester.dev.tools/releng, that facilitates versioning and change log creation.
+1. __Update product changelogs__  
+The product changelog is essentially the CHANGELOG file of the repository that contains the product defining bundle. As such it already was updated in the earlier step. But as the product contains more bundles the significant changes of downstream bundles shall be integrated into the product changelog as well.  
+The workflow helper again generates complete list, based on the CHANGELOG contents of the included bundles. This needs to be condensed manually, e.g. changes not related to the product at hand shall be removed.
+Again you are prompted to commit those changes and shall do so unless you have very good reasons not to.
 
-1. __Derive dependent artifacts__  
-Currently some build artifacts depend on others and are synchronized manually. At the moment this is mostly related to script bundles.
-First to mention are script packages that are mostly a subset of others (e.g. GT Scripts eID client). These are present in the repositories and contain their own metadata. In order to update these with the full content you need to execute the appropriate executable class from Build Scripts GT.
-Although not strictly required for working script bundles but essential for consistent artifacts there is a second step to go in order to build completely correct script bundles: synchronize version numbers, release dates and integrity checksums between all relevant files. As mentioned in the section before these values are maintained within the readme files and synchronized from there. within `Build scripts GT` exists an ANT build file that handles all this synchronization tasks for all script projects. The result can be used for the build and later be added and committed to the repository.
+1. __Transfer version numbers__  
+The version numbers assigned in the repository CHANGELOG must be mirrored to the several Eclipse relevant files (e.g. MANIFEST.MF, feature.xml and *.product). For GlobalTester scripts they even need to be copied to every single testcase (together with the release date).
 
-Build the release documentation
--------------------------------
-In order to document the release (and its tests in the following section) we like to generate an overview of what we just did and a checklist for the following tests:
+1. __Update checksums__  
+GlobalTester test script projects contain a checksum that ensures that they are genuine. This checksums need to be updated for every release right after updating version and date information within the testcases. The process to do this is completely automated.
 
+1. __Update POM versions__  
+The new version numbers assigned in the previous steps need to be populated to the different pom.xml files in order to achieve a consistent maven build. This requires updating the POM files for every project and additionally updating the version constraints in pom dependencies. This can be handled by Tycho, which unfortunately implies a significant overhead caused by the Tycho dependency resolution process. The impact of this drawback can be reduced a little by considering every bundle only once within the common aggregator.
+		mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
+1. __Build the desired products__  
+If you followed the steps above this step simply boils down to a maven build of the consolidated aggregator in your temporary build dir.
 
-		# collect version information
-		VERSIONTMP=`mktemp`
-		BUNDLEVERSIONS=`mktemp`
-		VERSIONFILE="com.hjp.releng/com.hjp.releng/versions.md"
-		
-		#collect and format bundle versions
-		grep -h -E "Bundle-((Symb)|(Vers))" ./*/*/META-INF/MANIFEST.MF | paste - - | sed -e "s/Bundle-SymbolicName:\s*//;s/Bundle-Version:\s*//;s/;singleton:=true//;s/^/\t\t/" > $VERSIONTMP
-		while read LINE; do   printf  "%-60s %s\n" $LINE; done < $VERSIONTMP >$BUNDLEVERSIONS
-		sort -o $BUNDLEVERSIONS $BUNDLEVERSIONS
-		cat $BUNDLEVERSIONS | tr " " "-" > $VERSIONTMP
-		cp $VERSIONTMP $BUNDLEVERSIONS
-		sed -i -e "s/\([^-]\)-/\1 /;s/-\([^-]\)/ \1/" $BUNDLEVERSIONS
-		
-		#concat all parts of version information
-		echo -e "Bundle versions\n---------------"> $VERSIONFILE
-		sed -e "s/^/\t\t/" $BUNDLEVERSIONS >> $VERSIONFILE
-		echo -e "\n<p style=\"page-break-after: always\"/>" >> $VERSIONFILE
-		
-		# aggregate all files and generate html
-		MDFILE=`mktemp`
-		echo -e "Release overview\n================"> $MDFILE
-		echo -e "Environment information\n-----------------"> $MDFILE
-		echo -e "Date: \`" `date  +%Y-%m-%d` "\`  ">> $MDFILE
-		echo -e "Executed by: \`" `id -u -n` "\`  " >> $MDFILE
-		echo -e "Machine: \`" `uname -a` "\`  " >> $MDFILE
-		echo -e "Java: \`" `java -version 2>&1 | grep build` "\`  " >> $MDFILE
-		echo -e "\n" >> $MDFILE
-		cat $VERSIONFILE >> $MDFILE
-		find ./ -name releaseTests.md -exec cat {} >> $MDFILE \;
-		cat com.hjp.internal/com.hjp.internal.releng/samples/*.md >> $MDFILE
-		
-		# generate printable html 
-		HTMLFILE=`mktemp`
-		markdown $MDFILE > $HTMLFILE
-		firefox --new-window $HTMLFILE
+1. __Collect build artifacts__  
+The maven build generates several artifacts in the target folders of the respective modules. All these artifacts need to be collected into a subfolder of your builddir. This allows easier access to the needed artifacts for testing and publishing later.
 
+1. __Generate test documentation__  
+Beside the automated tests that were already executed as part of the build every product and bundle can define their own manual test steps to be performed on the final product. To document the test process the releaseTest.md files are structured in a way to be used as easy check lists. Consolidate all releaseTest.md files from all projects included in the build into one file, generate html and print a copy. The printed checklist assists while executing the tests and can later be attached to the release documentation.
 
-Build the product(s)
---------------------
-Call 'mvn clean verify' within the appropriate releng project. This will generate the product artifacts in the appropriate target folders. We provide several releng projects (at least one for every single product and an overall com.hjp.releng project), depending on which products you have access to you will not be able to build all of them.
-
-		# build the product(s)
-		cd <releng project>
-		mvn clean verify
-		
-		#collect build artifacts and push them to shared/public
-		find . \( -name *site*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip \)  -exec cp {} ~/tmp/releasetest \;
-		
-
-Test it
--------
-Ensure that all product artifacts can be used as intended. Each project may define integration tests within their specific releaseTest.md files, so check those and make sure to cover all the tests mentioned there.
-
+1. __Test the build__  
+Ensure that all product artifacts can be used as intended. Each project may define integration tests within their specific releaseTest.md files, so check those and make sure to cover all the tests mentioned there.  
 If building releases to be published make sure to perform the tests on different supported platforms (operating system, Java version, Eclipse version). As most product tests rely on other products this can be simplified by doing cross tests in different combinations.
+
+1. __Generate release documentation__  
+In order to be able to look back a few releases it is a good think to document the release process and results. This step generates a short overview of the Ws about the release (e.g. Who, When, What). This overview shall be printed and archived together with the latest test documentation
+
+1. __Tag repositories__  
+As all bundles are finally tested all repositorys shall be version tagged according to the new version defined in the earlier steps.
+
+1. __Tag products__  
+As all products are finally tested all the products (and all included projects) shall be version tagged according to the product versions just released. This allows for every product to go back to the consistent state to repeat a build or incorporate hotfixes etc.
+
+1. __Publish release__  
+Finally the release is completely done. Not quite! Until now we have not actually released anything. So release the new artifacts into the public.  
+This step is not yet covered by the workflow script but should include:
+    * uploading the release to public repos/website etc.
+    * informing customers about the new version (the CHANGELOG files are a great basis for this)
+    * pushing release commits and tags to relevant repos (HJP servers, GitHub) 
+
 
 <p style="page-break-after: always"/>

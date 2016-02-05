@@ -70,13 +70,19 @@ fi
 cat $OLD_CHANGELOG | tail -n $((`cat $OLD_CHANGELOG | sed -e '$a\' | wc -l` - $LASTLINE + 1 )) > $CHANGELOG_FOOTER
 
 # get all repos to be condensed from product aggregator
-REPOS_TO_INCLUDE=`getRepositoriesFromAggregator $RELENG/pom.xml $REPOSITORY`
+REPOS_TO_INCLUDE=`getRepositoriesFromAggregator $RELENG/pom.xml`
 
 # get overall last tagged product version
 LAST_TAGGED_PRODUCT_VERSION=`getLastTag release $REPOSITORY | sed -e "s|.*/.*/\($VERSION_REGEXP_PATCH_LEVEL_EVERYTHING\)|\1|"`
 cd ..
 for CURRENT_REPO in $REPOS_TO_INCLUDE
 do
+	#ignore the product repo itself
+	if [ "$CURRENT_REPO" == "$REPOSITORY" ]
+	then
+		continue;
+	fi
+
 	if [ -e $CURRENT_REPO/$CHANGELOG_FILE_NAME ]
 	then
 		cd $CURRENT_REPO
@@ -91,25 +97,25 @@ do
 			then
 				FIRSTLINE=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`
 				LASTLINE=`getLastLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`
-				
+
 				if [ $LAST_TAGGED_PRODUCT_VERSION != $PRODUCT_VERSION ]
-				then 
-					echo \# WARNING: Last tagged version for this repository was: $PRODUCT_VERSION but should be $LAST_TAGGED_PRODUCT_VERSION >> $CHANGELOG_CONTENT	
+				then
+					echo \# WARNING: Last tagged version for this repository was: $PRODUCT_VERSION but should be $LAST_TAGGED_PRODUCT_VERSION >> $CHANGELOG_CONTENT
 				fi
-				
+
 				LAST_TAGGED_REPO_VERSION=`cat $GIT_DIFF | head -n $(($LASTLINE + 1)) | tail -n 1 | sed -e "s|Version \($VERSION_REGEXP_PATCH_LEVEL_NO_WHITESPACE\).*|\1|"`
-				
+
 				if [ "$BUNDLE_VERSION" != "$LAST_TAGGED_REPO_VERSION" ]
 				then
 					echo \* $CURRENT_REPO updated to version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
 				fi
-							
+
 				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;" -e "s|[^#].*|$SPACER&|" >> $CHANGELOG_CONTENT
 				echo >> $CHANGELOG_CONTENT
 			else
 				echo No diff found, skipping
 			fi
-			
+
 			rm $GIT_DIFF
 		else
 			echo \* $CURRENT_REPO contained in version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
@@ -124,6 +130,12 @@ done
 removeLeadingAndTrailingEmptyLines $CHANGELOG_HEADER
 
 echo \# Condense downstream changes for product $REPOSITORY > $PREPARED_CHANGELOG
+if [ ! -z "$LAST_TAGGED_PRODUCT_VERSION" ]
+then
+	echo \# The base tag for this update is $LAST_TAGGED_PRODUCT_VERSION >> $PREPARED_CHANGELOG
+else
+	echo \# The product was not version tagged before >> $PREPARED_CHANGELOG
+fi
 echo \# Comments and empty lines at the end will be ignored >> $PREPARED_CHANGELOG
 echo \# ---------------------------------------- >> $PREPARED_CHANGELOG
 cat $CHANGELOG_HEADER >> $PREPARED_CHANGELOG

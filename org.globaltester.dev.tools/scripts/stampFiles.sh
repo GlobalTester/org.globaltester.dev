@@ -71,22 +71,7 @@ function replaceTestScriptsVersion {
 	DETECT="\(<version>\)[^<]*\(</version>\)"
 	REPLACE="\1 $DATA \2"
 	
-	find $PROJECT -name "*.xml" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
-	
-#		<dependency>
-#			<artifactId>com.hjp.globaltester.scripts.is.sac</artifactId>
-#			<groupId>com.hjp.globaltester</groupId>
-#			<version>0.1.0</version>
-#			<classifier>com.hjp.globaltester.scripts.is.sac.assembly</classifier>
-#			<type>zip</type>
-#		</dependency>
-	
-	ID=`echo $PROJECT | sed -e "s|[^/]*/\([^/]*\).*|\1|"`
-	
-	DETECT_DEPENDENCY="\(<version>\).*\(</version>\)"
-	REPLACE_DEPENDENCY="\1$DATA\2"
-	
-	find . -maxdepth 2 -mindepth 2 -name "*.scripts" -exec sed -i -e "/<artifactId>$ID<\/artifactId>/,/<\/dependency>/ s|$DETECT_DEPENDENCY|$REPLACE_DEPENDENCY|" {}/pom.xml \;
+	find $PROJECT -name "*.xml" -a ! -name "pom.xml" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
 }
 
 function replaceTestScriptsDate {

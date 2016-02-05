@@ -11,6 +11,9 @@ DUMMY_VERSION="x.y.z"
 LOG_MESSAGE_DIVIDER=`echo -e "\xe2\x9c\x96"`
 CHANGELOG_FILE_NAME=CHANGELOG
 
+#BASH_OPTIONS="-x"
+BASH_OPTIONS=""
+
 function getLastTag {
 	#$1 tag type, e.g. release
 	#$2 type qualifier, e.g. de.persosim.rcp for products
@@ -20,7 +23,7 @@ function getLastTag {
 	else
 		FILTER="$1/$2/*"
 	fi
-	
+
 	echo `git tag --list $FILTER | sort -V | sed -e '$!d'`
 }
 
@@ -36,6 +39,18 @@ function getLastTagRange {
 		LAST_TAGGED_COMMIT_ID=`git rev-parse $LAST_TAG`
 		echo $LAST_TAGGED_COMMIT_ID..
 	fi
+}
+
+function getCurrentDateFromChangeLog {
+	CHANGELOG_FILE=$1
+	while read CURRENT_LINE; do
+		VERSION=`echo $CURRENT_LINE | sed -e 's|Version \([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\) (\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\))|\2|g'`
+		if [ ! -z "$VERSION" ]
+		then
+			echo $VERSION
+			break
+		fi
+	done < $CHANGELOG_FILE
 }
 
 function getCurrentVersionFromChangeLog {
@@ -101,20 +116,14 @@ function extractGitDiffSinceCommit {
 	COMMIT=$1
 	FILENAME=$2
 	RESULT_FILE=$3
-	
+
 	git diff -U0 --ignore-space-at-eol $LAST_TAG $CHANGELOG_FILE_NAME > $GIT_DIFF
 }
 
 function getRepositoriesFromAggregator {
 	POM_FILE=$1
-	REPOSITORY=$2
-	GREP_COMMAND=
-	if [ ! -z "$REPOSITORY" ]
-	then
-		GREP_COMMAND="| grep -v $REPOSITORY"
-	fi
-	#TODO replace eval with safer alternative
-	eval "cat $POM_FILE | grep '<module>' $GREP_COMMAND | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u"
+
+	cat $POM_FILE | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u
 }
 
 function removeLeadingAndTrailingEmptyLines {
@@ -138,6 +147,13 @@ function getCurrentDate {
 	date +%d.%m.%Y
 }
 
-function whereAmI {
-	echo `dirname "$(readlink -f "$0")"`
+function getAbsolutePath {
+	ABS_PATH=`readlink -f "$1"`
+
+	if command -v cygpath >/dev/null 2>&1
+	then
+		ABS_PATH=`cygpath -w $ABS_PATH`
+	fi
+
+	echo "$ABS_PATH"
 }
