@@ -14,7 +14,6 @@ CHANGELOG_FILE_NAME=CHANGELOG
 #BASH_OPTIONS="-x"
 BASH_OPTIONS=""
 
-
 function getLastTag {
 	#$1 tag type, e.g. release
 	#$2 type qualifier, e.g. de.persosim.rcp for products
@@ -24,7 +23,7 @@ function getLastTag {
 	else
 		FILTER="$1/$2/*"
 	fi
-	
+
 	echo `git tag --list $FILTER | sort -V | sed -e '$!d'`
 }
 
@@ -117,20 +116,14 @@ function extractGitDiffSinceCommit {
 	COMMIT=$1
 	FILENAME=$2
 	RESULT_FILE=$3
-	
+
 	git diff -U0 --ignore-space-at-eol $LAST_TAG $CHANGELOG_FILE_NAME > $GIT_DIFF
 }
 
 function getRepositoriesFromAggregator {
 	POM_FILE=$1
-	REPOSITORY=$2
-	GREP_COMMAND=
-	if [ ! -z "$REPOSITORY" ]
-	then
-		GREP_COMMAND="| grep -v $REPOSITORY"
-	fi
-	#TODO replace eval with safer alternative
-	eval "cat $POM_FILE | grep '<module>' $GREP_COMMAND | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u"
+
+	cat $POM_FILE | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u
 }
 
 function removeLeadingAndTrailingEmptyLines {
@@ -152,4 +145,15 @@ function removeTrailingWhitespace {
 
 function getCurrentDate {
 	date +%d.%m.%Y
+}
+
+function getAbsolutePath {
+	ABS_PATH=`readlink -f "$1"`
+
+	if command -v cygpath >/dev/null 2>&1
+	then
+		ABS_PATH=`cygpath -w $ABS_PATH`
+	fi
+
+	echo "$ABS_PATH"
 }

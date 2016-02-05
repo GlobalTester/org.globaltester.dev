@@ -19,7 +19,7 @@ do
 	esac
 done
 
-PROJECT=`readlink -f "$1"`
+PROJECT=`getAbsolutePath "$1"`
 
 
 # change dir to o.g.d.tools project

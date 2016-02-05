@@ -20,9 +20,6 @@ The CHANGELOG files in each repository reflect the latest changes to each repo. 
 According to the changes integrated into the new release make sure that a new proper version number is set in the first line of the CHANGELOG. It should represent how extensive the changes are (bugfixes, new features etc.). This version will be used throughout the later process to ensure that all relevant files are adjusted correctly.  
 The workflow helper will provide the option to commit the prepared changelogs to ensure that no further changes during the build will break the results of this tedious task. Unless you have a very good reason to not commit them just stay with the default.
 
-1. __Check product list__  
-While the workflow script generates a complete list of available products from the current workspace it is not always required to release all products at once. So ensure that all products you want to release are contained in the presented temporary product list. Products you don't want to release as part of this process can be easily removed and will no longer be considered for that particular run. 
-
 1. __Update product changelogs__  
 The product changelog is essentially the CHANGELOG file of the repository that contains the product defining bundle. As such it already was updated in the earlier step. But as the product contains more bundles the significant changes of downstream bundles shall be integrated into the product changelog as well.  
 The workflow helper again generates complete list, based on the CHANGELOG contents of the included bundles. This needs to be condensed manually, e.g. changes not related to the product at hand shall be removed.
@@ -33,15 +30,6 @@ The version numbers assigned in the repository CHANGELOG must be mirrored to the
 
 1. __Update checksums__  
 GlobalTester test script projects contain a checksum that ensures that they are genuine. This checksums need to be updated for every release right after updating version and date information within the testcases. The process to do this is completely automated.
-
-
-
-
-
-
-1. __Create consolidated aggregator build__  
-To ensure a well documented build we create a temporary build directory next to our existing projects.
-As the following steps need to be repeated for every product and several products rely on similar bundles those would get processed several times. To avoid this it is advisable to perform those steps only once on a consolidated aggregator. This aggregator simply combines all module dependencies of the product aggregators into one large aggregator project, which is stored in the temporary build directory and later used for every exectuion.
 
 1. __Update POM versions__  
 The new version numbers assigned in the previous steps need to be populated to the different pom.xml files in order to achieve a consistent maven build. This requires updating the POM files for every project and additionally updating the version constraints in pom dependencies. This can be handled by Tycho, which unfortunately implies a significant overhead caused by the Tycho dependency resolution process. The impact of this drawback can be reduced a little by considering every bundle only once within the common aggregator.
