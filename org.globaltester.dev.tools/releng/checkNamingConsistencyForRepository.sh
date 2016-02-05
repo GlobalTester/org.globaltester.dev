@@ -1,0 +1,165 @@
+#!/bin/bash
+# must be called from root directory for all repos
+set -e
+. org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
+set +e
+
+METAINFDIR='META-INF'
+MANIFESTFILE='MANIFEST.MF'
+PROJECTFILE='.project'
+
+BUNDLENAMEIDENTIFIER="Bundle-Name"
+BUNDLESYMBOLICNAMEIDENTIFIER="Bundle-SymbolicName"
+BUNDLEVENDORLINEIDENTIFIER="Bundle-Vendor"
+
+EXPECTEDVENDORSTRING="HJP Consulting GmbH"
+
+function extractValue(){
+	FILE=$1
+	IDENTIFIER=$2
+	
+	LINE=`grep $IDENTIFIER $FILE`
+	GREPRESULT=$?
+	
+	if [[ $GREPRESULT != '0' ]]
+		then
+			echo 'ERROR: file' $FILE 'does not contain expected identifier' \"$IDENTIFIER\"
+			return 1
+	fi
+	
+	VALUE=$(echo $LINE | cut -d ':' -f 2- | sed 's|^\s*||')
+	echo 'INFO: value of "'$IDENTIFIER'" is: ' $VALUE
+	
+	return 0
+}
+
+function checkValue(){
+	IDENTIFIER=$1
+	EXPECTEDVALUE=$2
+	RECEIVEDVALUE=$3
+	FILE=$4
+	
+	if [[ "$EXPECTEDVALUE" != "$RECEIVEDVALUE" ]]
+		then
+			echo 'ERROR: expected "'$IDENTIFIER'" to be "'$EXPECTEDVALUE'" but found "'$RECEIVEDVALUE'" in file' $FILE
+			return 1
+	fi
+	
+	return 0
+}
+
+for CURRENT_REPO in */
+	do
+		if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
+			then
+				CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
+				echo "INFO: current repo is: $CURRENT_REPO"
+				cd $CURRENT_REPO
+				CURRENTDIR=$CURRENT_REPO
+				for CURRENT_PROJECT in */
+					do
+						if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
+							then
+								CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
+								echo "INFO: current project is: $CURRENT_PROJECT"
+								cd $CURRENT_PROJECT
+								CURRENTDIR=$CURRENTDIR/$CURRENT_PROJECT
+								
+								REGEXP="^($CURRENT_REPO)(.\w*)*"
+								if [[ "${CURRENT_PROJECT,,}" =~ $REGEXP ]]
+									then
+										echo INFO: project name is ok
+									else
+										echo ERROR: project name is $CURRENT_PROJECT but should start with $CURRENT_REPO
+										exit 1
+								fi
+								
+								if [ -f $PROJECTFILE ]
+									then
+										NAMELINE=`grep -m 1 'name' $PROJECTFILE | sed 's|^\s*||'`
+										NAMEFROMPROJECT=$(echo $NAMELINE | cut -d '>' -f 2- | cut -d '<' -f 1)
+									else
+										echo "ERROR: file $PROJECTFILE NOT found at "$CURRENTDIR
+										exit 1
+								fi
+								
+								if [ -d $METAINFDIR ]
+									then
+										cd $METAINFDIR
+										CURRENTDIR=$CURRENTDIR/$METAINFDIR
+										if [ -f $MANIFESTFILE ]
+											then
+												CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
+												echo "INFO: file $MANIFESTFILE found at "$CURRENTDIR
+												
+												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
+												extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
+												EXTRACTVALUEEXITSTATUS=$?
+												
+												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+													then
+														exit $EXTRACTVALUEEXITSTATUS
+												fi
+												
+												RECEIVEDVENDORSTRING=$VALUE
+												echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
+												
+												checkValue "$BUNDLEVENDORLINEIDENTIFIER" "$EXPECTEDVENDORSTRING" "$RECEIVEDVENDORSTRING" "$CURRENTFILE"
+												CHECKVALUEEXITSTATUS=$?
+												
+												if [[ $CHECKVALUEEXITSTATUS != '0' ]]
+													then
+														exit $CHECKVALUEEXITSTATUS
+												fi
+												
+												# check that Bundle-Name in MANIFEST.MF matches project name from .project
+												extractValue $MANIFESTFILE $BUNDLENAMEIDENTIFIER
+												EXTRACTVALUEEXITSTATUS=$?
+										
+												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+													then
+														exit $EXTRACTVALUEEXITSTATUS
+												fi
+										
+												RECEIVEDNAMESTRING=$VALUE
+												
+												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
+													then
+														echo ERROR: mismatching project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
+														exit 1
+												fi
+												
+												# check that Bundle-SymbolicName in MAINIFEST.MF matches the actual project path
+												extractValue $MANIFESTFILE $BUNDLESYMBOLICNAMEIDENTIFIER
+												EXTRACTVALUEEXITSTATUS=$?
+										
+												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+													then
+														exit $EXTRACTVALUEEXITSTATUS
+												fi
+										
+												RECEIVEDSYMBOLICNAMESTRING=$(echo $VALUE | cut -d ';' -f 1)
+												PROJECTPATH=$CURRENT_PROJECT
+												echo path: $PROJECTPATH
+												if [[ "$PROJECTPATH" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
+													then
+														echo ERROR: mismatching project paths "'$PROJECTPATH'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
+														exit 1
+												fi
+												
+												#continue here
+												
+											else
+												echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
+												exit 1
+										fi	
+										cd ..
+								fi
+								cd ..	
+						fi
+					done
+				cd ..
+		fi
+	done
+
+echo Script finished successfully
