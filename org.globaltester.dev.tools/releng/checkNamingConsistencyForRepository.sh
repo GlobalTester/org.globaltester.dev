@@ -7,6 +7,7 @@ set +e
 METAINFDIR='META-INF'
 MANIFESTFILE='MANIFEST.MF'
 PROJECTFILE='.project'
+GITIGNOREFILE='.gitignore'
 
 BUNDLENAMEIDENTIFIER="Bundle-Name"
 BUNDLESYMBOLICNAMEIDENTIFIER="Bundle-SymbolicName"
@@ -27,7 +28,7 @@ function extractValue(){
 			return 1
 	fi
 	
-	VALUE=$(echo $LINE | cut -d ':' -f 2- | sed 's|^\s*||')
+	VALUE=$(echo $LINE | cut -d ':' -f 2- | cut -d ';' -f 1 | sed 's|^\s*||')
 	echo 'INFO: value of "'$IDENTIFIER'" is: ' $VALUE
 	
 	return 0
@@ -53,24 +54,35 @@ for CURRENT_REPO in */
 		if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 			then
 				CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
-				echo "INFO: current repo is: $CURRENT_REPO"
+				echo INFO: current repo is: $CURRENT_REPO
 				cd $CURRENT_REPO
 				CURRENTDIR=$CURRENT_REPO
+				echo INFO: current dir is: $CURRENTDIR
+				
+				if [ -f $GITIGNOREFILE ]
+					then
+						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR as expected
+					else
+						echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
+						#exit 1
+				fi
+				
 				for CURRENT_PROJECT in */
 					do
 						if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
 							then
 								CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
-								echo "INFO: current project is: $CURRENT_PROJECT"
+								echo INFO: current project is: $CURRENT_PROJECT
 								cd $CURRENT_PROJECT
-								CURRENTDIR=$CURRENTDIR/$CURRENT_PROJECT
+								CURRENTDIR=$CURRENT_REPO/$CURRENT_PROJECT
+								echo INFO: current dir is: $CURRENTDIR
 								
 								REGEXP="^($CURRENT_REPO)(.\w*)*"
 								if [[ "${CURRENT_PROJECT,,}" =~ $REGEXP ]]
 									then
-										echo INFO: project name is ok
+										echo INFO: project path complies with naming guidelines
 									else
-										echo ERROR: project name is $CURRENT_PROJECT but should start with $CURRENT_REPO
+										echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
 										exit 1
 								fi
 								
@@ -79,7 +91,7 @@ for CURRENT_REPO in */
 										NAMELINE=`grep -m 1 'name' $PROJECTFILE | sed 's|^\s*||'`
 										NAMEFROMPROJECT=$(echo $NAMELINE | cut -d '>' -f 2- | cut -d '<' -f 1)
 									else
-										echo "ERROR: file $PROJECTFILE NOT found at "$CURRENTDIR
+										echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
 										exit 1
 								fi
 								
@@ -90,7 +102,7 @@ for CURRENT_REPO in */
 										if [ -f $MANIFESTFILE ]
 											then
 												CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
-												echo "INFO: file $MANIFESTFILE found at "$CURRENTDIR
+												echo INFO: file $MANIFESTFILE found at $CURRENTDIR
 												
 												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
 												extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
@@ -126,7 +138,7 @@ for CURRENT_REPO in */
 												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
 													then
 														echo ERROR: mismatching project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
-														exit 1
+														#exit 1
 												fi
 												
 												# check that Bundle-SymbolicName in MAINIFEST.MF matches the actual project path
@@ -138,13 +150,13 @@ for CURRENT_REPO in */
 														exit $EXTRACTVALUEEXITSTATUS
 												fi
 										
-												RECEIVEDSYMBOLICNAMESTRING=$(echo $VALUE | cut -d ';' -f 1)
+												RECEIVEDSYMBOLICNAMESTRING=$VALUE
 												PROJECTPATH=$CURRENT_PROJECT
 												echo path: $PROJECTPATH
 												if [[ "$PROJECTPATH" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
 													then
 														echo ERROR: mismatching project paths "'$PROJECTPATH'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-														exit 1
+														#exit 1
 												fi
 												
 												#continue here
