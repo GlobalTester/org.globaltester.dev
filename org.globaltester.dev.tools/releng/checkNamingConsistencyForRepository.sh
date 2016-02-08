@@ -30,7 +30,6 @@ function extractValue(){
 	
 	if [[ $GREPRESULT != '0' ]]
 		then
-			echo 'ERROR: file' $FILE 'does not contain expected identifier' \"$IDENTIFIER\"
 			return 1
 	fi
 	
@@ -71,7 +70,7 @@ for CURRENT_REPO in */
 						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR as expected
 					else
 						echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
-						#exit 1
+						exit 1
 				fi
 				
 				for CURRENT_PROJECT in */
@@ -91,7 +90,7 @@ for CURRENT_REPO in */
 										echo INFO: project path complies with naming guidelines
 									else
 										echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
-										exit 1
+										#exit 1
 								fi
 								
 								# check for the presence of a .project file on project level
@@ -119,6 +118,7 @@ for CURRENT_REPO in */
 												
 												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 													then
+														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLEVENDORLINEIDENTIFIER\"
 														exit $EXTRACTVALUEEXITSTATUS
 												fi
 												
@@ -139,6 +139,7 @@ for CURRENT_REPO in */
 										
 												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 													then
+														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLENAMEIDENTIFIER\"
 														exit $EXTRACTVALUEEXITSTATUS
 												fi
 										
@@ -156,6 +157,7 @@ for CURRENT_REPO in */
 										
 												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 													then
+														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLESYMBOLICNAMEIDENTIFIER\"
 														exit $EXTRACTVALUEEXITSTATUS
 												fi
 										
