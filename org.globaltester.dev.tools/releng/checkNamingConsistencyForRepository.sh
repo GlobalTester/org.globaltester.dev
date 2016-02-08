@@ -39,21 +39,6 @@ function extractValue(){
 	return 0
 }
 
-function checkValue(){
-	IDENTIFIER=$1
-	EXPECTEDVALUE=$2
-	RECEIVEDVALUE=$3
-	FILE=$4
-	
-	if [[ "$EXPECTEDVALUE" != "$RECEIVEDVALUE" ]]
-		then
-			echo 'ERROR: expected "'$IDENTIFIER'" to be "'$EXPECTEDVALUE'" but found "'$RECEIVEDVALUE'" in file' $FILE
-			return 1
-	fi
-	
-	return 0
-}
-
 for CURRENT_REPO in */
 	do
 		if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
@@ -90,7 +75,7 @@ for CURRENT_REPO in */
 										echo INFO: project path complies with naming guidelines
 									else
 										echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
-										#exit 1
+										exit 1
 								fi
 								
 								# check for the presence of a .project file on project level
@@ -112,7 +97,7 @@ for CURRENT_REPO in */
 												CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
 												echo INFO: file $MANIFESTFILE found at $CURRENTDIR
 												
-												# check that Bundle-Vendor in MANIFEST.MF is set at all and set to the expected value
+												# check that Bundle-Vendor in MANIFEST.MF is set at all
 												extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
 												EXTRACTVALUEEXITSTATUS=$?
 												
@@ -125,12 +110,11 @@ for CURRENT_REPO in */
 												RECEIVEDVENDORSTRING=$VALUE
 												echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
 												
-												checkValue "$BUNDLEVENDORLINEIDENTIFIER" "$EXPECTEDVENDORSTRING" "$RECEIVEDVENDORSTRING" "$CURRENTFILE"
-												CHECKVALUEEXITSTATUS=$?
-												
-												if [[ $CHECKVALUEEXITSTATUS != '0' ]]
+												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
+												if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
 													then
-														exit $CHECKVALUEEXITSTATUS
+														echo 'ERROR: expected "'$BUNDLEVENDORLINEIDENTIFIER'" to be "'$EXPECTEDVENDORSTRING'" but found "'$RECEIVEDVENDORSTRING'" in file' $CURRENTFILE
+														exit 1
 												fi
 												
 												# check that Bundle-Name in MANIFEST.MF matches project name from .project
@@ -148,7 +132,7 @@ for CURRENT_REPO in */
 												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
 													then
 														echo ERROR: mismatching project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
-														#exit 1
+														exit 1
 												fi
 												
 												# check that Bundle-SymbolicName in MAINIFEST.MF matches the actual project path
@@ -167,7 +151,7 @@ for CURRENT_REPO in */
 												if [[ "$PROJECTPATH" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
 													then
 														echo ERROR: mismatching project paths "'$PROJECTPATH'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-														#exit 1
+														exit 1
 												fi
 												
 											else
