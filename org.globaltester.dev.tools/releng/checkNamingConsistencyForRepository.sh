@@ -7,13 +7,19 @@ set +e
 METAINFDIR='META-INF'
 MANIFESTFILE='MANIFEST.MF'
 PROJECTFILE='.project'
-GITIGNOREFILE='.gitignore'
 
+#<MANIFEST.MF-specific identifier>
 BUNDLENAMEIDENTIFIER="Bundle-Name"
 BUNDLESYMBOLICNAMEIDENTIFIER="Bundle-SymbolicName"
 BUNDLEVENDORLINEIDENTIFIER="Bundle-Vendor"
+#</MANIFEST.MF-specific identifier>
 
 EXPECTEDVENDORSTRING="HJP Consulting GmbH"
+
+#<GIT-specific files>
+GITIGNOREFILE='.gitignore'
+GITATTRIBUTESFILE='.gitattributes'
+#</GIT-specific files>
 
 function extractValue(){
 	FILE=$1
@@ -59,6 +65,7 @@ for CURRENT_REPO in */
 				CURRENTDIR=$CURRENT_REPO
 				echo INFO: current dir is: $CURRENTDIR
 				
+				# check for the presence of a .gitignore file on repository level
 				if [ -f $GITIGNOREFILE ]
 					then
 						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR as expected
@@ -77,6 +84,7 @@ for CURRENT_REPO in */
 								CURRENTDIR=$CURRENT_REPO/$CURRENT_PROJECT
 								echo INFO: current dir is: $CURRENTDIR
 								
+								# check that the project path complies with the naming guidelines
 								REGEXP="^($CURRENT_REPO)(.\w*)*"
 								if [[ "${CURRENT_PROJECT,,}" =~ $REGEXP ]]
 									then
@@ -86,6 +94,7 @@ for CURRENT_REPO in */
 										exit 1
 								fi
 								
+								# check for the presence of a .project file on project level
 								if [ -f $PROJECTFILE ]
 									then
 										NAMELINE=`grep -m 1 'name' $PROJECTFILE | sed 's|^\s*||'`
@@ -104,7 +113,7 @@ for CURRENT_REPO in */
 												CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
 												echo INFO: file $MANIFESTFILE found at $CURRENTDIR
 												
-												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
+												# check that Bundle-Vendor in MANIFEST.MF is set at all and set to the expected value
 												extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
 												EXTRACTVALUEEXITSTATUS=$?
 												
@@ -158,8 +167,6 @@ for CURRENT_REPO in */
 														echo ERROR: mismatching project paths "'$PROJECTPATH'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
 														#exit 1
 												fi
-												
-												#continue here
 												
 											else
 												echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
