@@ -2,7 +2,8 @@ Naming conventions
 ==================
 
 This file documents naming conventions to be observed when creating new or modifying existing repositories, projects or bundles.
-This conventions can be checked using the script checkNamingConsistencyForRepository.sh within org.globaltester.dev\org.globaltester.dev.tools\releng
+This conventions can be checked using the script checkNamingConsistencyForRepository.sh within org.globaltester.dev\org.globaltester.dev.tools\releng.
+Usage: Execute it from your git root directory with "bash -x".
 
 Repository names
 ----------------
