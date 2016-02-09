@@ -141,12 +141,20 @@ then
 	sed -i -e "/^checksum.a32/d" "$LIST_OF_COPY_FILES"	
 	
 	echo Replacements in all files:
-	echo "  \"$COPY_NAME\" with \"$SOURCE_NAME\""
-	echo "  \"$COPY_SYMBOLIC_NAME\" with \"$SOURCE_SYMBOLIC_NAME\""
+	echo "  $COPY_NAME with $SOURCE_NAME"
+	echo "  $COPY_SYMBOLIC_NAME with $SOURCE_SYMBOLIC_NAME"
 	while read -r CURRENT_FILE;
 	do
 		if [[ $CURRENT_FILE =~ $REGEX_TEXTFILES ]]
 		then
+			if grep "\"$SOURCE_NAME\"" "$COPY_DIR/$CURRENT_FILE" > /dev/null
+			then
+				echo Warning: Mirrored file $CURRENT_FILE contains the sources name
+			fi
+			if grep "\"$SOURCE_SYMBOLIC_NAME\"" "$COPY_DIR/$CURRENT_FILE" > /dev/null
+			then
+				echo Warning: Mirrored file $CURRENT_FILE contains the sources symbolic name
+			fi
 			sed -i -e "s|$COPY_NAME|$SOURCE_NAME|g" "$COPY_DIR/$CURRENT_FILE"
 			sed -i -e "s|$COPY_SYMBOLIC_NAME|$SOURCE_SYMBOLIC_NAME|g" "$COPY_DIR/$CURRENT_FILE"
 		fi
