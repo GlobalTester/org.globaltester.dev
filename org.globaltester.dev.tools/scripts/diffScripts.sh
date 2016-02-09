@@ -50,7 +50,7 @@ function cleanup {
 
 DIRECT=0
 SHOW_UNIQUE=0
-REGEX_TEXTFILES='\.js$|\.xml$|\.MF$|\.product$|\.gitignore$|\.properties$'
+REGEX_TEXTFILES='\.js$|\.xml$|\.MF$|\.product$|\.gitignore$|\.properties$|\.project$|\.assembly$'
 
 while [ $# -gt 2 ]
 do
