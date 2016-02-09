@@ -97,7 +97,7 @@ done
 SOURCE_DIR=`readlink -f $1`
 COMPARE_TO_DIR=`readlink -f $2`
 
-DIFF_PARAMETERS="-w -u"
+DIFF_PARAMETERS="-u"
 
 CURRENT_DIR=`pwd`
 
