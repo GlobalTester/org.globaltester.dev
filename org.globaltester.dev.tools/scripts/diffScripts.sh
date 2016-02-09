@@ -52,7 +52,7 @@ DIRECT=0
 SHOW_UNIQUE=0
 REGEX_TEXTFILES='\.js$|\.xml$|\.MF$|\.product$|\.gitignore$|\.properties$|\.project$|\.assembly$'
 
-while [ $# -gt 2 ]
+while [ $# -gt 0 ]
 do
 	case "$1" in
 		"-h"|"--help") echo -en "Usage:\n\n"
@@ -88,14 +88,23 @@ do
 			shift 2
 		;;
 		*)
-			echo "unknown parameter: $1"
-			exit 1;
+			if [ $# -le 2 ]
+			then 
+				if [ -z "$SOURCE_DIR" ]
+				then
+					SOURCE_DIR=`readlink -f $1`
+				elif [ -z "$COMPARE_TO_DIR" ]
+				then
+					COMPARE_TO_DIR=`readlink -f $1`
+				fi
+				shift
+			else
+				echo "unknown parameter: $1"
+				exit 1;
+			fi
 		;;
 	esac
 done
-
-SOURCE_DIR=`readlink -f $1`
-COMPARE_TO_DIR=`readlink -f $2`
 
 DIFF_PARAMETERS="-u"
 
