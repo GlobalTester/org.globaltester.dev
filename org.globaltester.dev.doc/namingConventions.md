@@ -1,7 +1,8 @@
 Naming conventions
 ==================
 
-This file documents naming conventions to be observed when creating new or modifying existing repositories or projects.
+This file documents naming conventions to be observed when creating new or modifying existing repositories, projects or bundles.
+This conventions can be checked using the script checkNamingConsistencyForRepository.sh within org.globaltester.dev\org.globaltester.dev.tools\releng
 
 Repository names
 ----------------
@@ -52,3 +53,18 @@ As with the repository's naming the project path's infix can be selected freely.
 
 The actual name of the project as denoted by the tag "name" in the project's .project file is to resemble the project's purpose while
 still being human readable.
+
+Bundle names
+------------
+
+If a project is to contain a bundle its configuration is stored within the META-INF/MANIFEST.MF file.
+For the MANIFEST.MF the following conventions must be kept:
+* the "Bundle-Name" value must match the name from the .project file
+* the "Bundle-SymbolicName" must match the path of the project
+* the "Bundle-Vendor" must be consistent within all bundles and is supposed to be "HJP Consulting GmbH"
+
+Further conventions
+-------------------
+
+* all repositories are to contain a .gitignore file
+* all repositories are to contain a .gitattributes file
