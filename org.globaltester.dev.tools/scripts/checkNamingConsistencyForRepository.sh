@@ -1,7 +1,7 @@
 #!/bin/bash
 # must be called from root directory for all repos
 set -e
-. org.globaltester.dev/org.globaltester.dev.tools/releng/helper.sh
+. org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
 set +e
 
 METAINFDIR='META-INF'
