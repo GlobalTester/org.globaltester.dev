@@ -46,7 +46,7 @@ function cleanup {
 	fi
 }
 
-#trap cleanup EXIT
+trap cleanup EXIT
 
 DIRECT=0
 SHOW_UNIQUE=0
@@ -56,7 +56,7 @@ while [ $# -gt 0 ]
 do
 	case "$1" in
 		"-h"|"--help") echo -en "Usage:\n\n"
-			echo -en "`basename $0` <options> SOURCE_DIR COPY_DIR\n\n"
+			echo -en "`basename $0` <options> SOURCE_DIR COMPARE_DIR\n\n"
 			echo "   Shows the differences between 2 script bundle file trees. The given directories"
 			echo "   must be GlobalTester script bundles. Expected changes are by default excluded from"
 			echo "   the difference calculation."
@@ -106,6 +106,12 @@ do
 	esac
 done
 
+if [ -z "$SOURCE_DIR" -o -z "$COMPARE_TO_DIR" ] 
+then
+	echo -en "SOURCE_DIR and COMPARE_DIR need to be specified\n\n"
+	exit 1
+fi
+
 DIFF_PARAMETERS="-u"
 
 CURRENT_DIR=`pwd`
@@ -122,15 +128,9 @@ cd $CURRENT_DIR
 
 if [ $DIRECT -eq 0 ]
 then
-	MODIFIED=`mktemp -d`
-	echo copying contents to be compared into temp dir $MODIFIED
-	cp -a $COMPARE_TO_DIR/. $MODIFIED
-	COPY_DIR=$MODIFIED
-	echo done...
-	
 	#extracting project files
 	SOURCE_NAME=`sed -n -e 's|\s*<name>\([^<]*\)</name>|\1|p' $SOURCE_DIR/.project | head -n 1`
-	COPY_NAME=`sed -n -e 's|\s*<name>\([^<]*\)</name>|\1|p' $COPY_DIR/.project | head -n 1`
+	COPY_NAME=`sed -n -e 's|\s*<name>\([^<]*\)</name>|\1|p' $COMPARE_TO_DIR/.project | head -n 1`
 	SOURCE_SYMBOLIC_NAME=`basename $SOURCE_DIR`
 	COPY_SYMBOLIC_NAME=`basename $COMPARE_TO_DIR`
 	if [ -z "$SOURCE_NAME" -o -z "$COPY_NAME" ] 
@@ -139,12 +139,18 @@ then
 		exit 1
 	fi
 	
+	MODIFIED=`mktemp -d`
+	echo copying contents to be compared into temp dir $MODIFIED
+	cp -a $COMPARE_TO_DIR/. $MODIFIED
+	COPY_DIR=$MODIFIED
+	echo done...
+	
 	#do not compare file lists
 	echo removing filelist.a32 from files to be compared
 	sed -i -e "/^filelist.a32/d" "$LIST_OF_SOURCE_FILES"
 	sed -i -e "/^filelist.a32/d" "$LIST_OF_COPY_FILES"	
 	
-	#do not checksum files
+	#do not compare checksum files
 	echo removing checksum.a32 from files to be compared
 	sed -i -e "/^checksum.a32/d" "$LIST_OF_SOURCE_FILES"
 	sed -i -e "/^checksum.a32/d" "$LIST_OF_COPY_FILES"	
@@ -164,8 +170,8 @@ then
 			then
 				echo Warning: Mirrored file $CURRENT_FILE contains the sources symbolic name
 			fi
-			sed -i -e "s|$COPY_NAME|$SOURCE_NAME|g" "$COPY_DIR/$CURRENT_FILE"
-			sed -i -e "s|$COPY_SYMBOLIC_NAME|$SOURCE_SYMBOLIC_NAME|g" "$COPY_DIR/$CURRENT_FILE"
+			sed -i -e "s|$COPY_NAME|$SOURCE_NAME|g" "$MODIFIED/$CURRENT_FILE"
+			sed -i -e "s|$COPY_SYMBOLIC_NAME|$SOURCE_SYMBOLIC_NAME|g" "$MODIFIED/$CURRENT_FILE"
 		fi
 	done <$LIST_OF_COPY_FILES
 	echo done...
