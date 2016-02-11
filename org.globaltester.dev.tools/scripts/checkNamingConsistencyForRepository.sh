@@ -54,9 +54,18 @@ for CURRENT_REPO in */
 				# check for the presence of a .gitignore file on repository level
 				if [ -f $GITIGNOREFILE ]
 					then
-						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR as expected
+						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR "as expected (content currently unchecked)"
 					else
 						echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
+						#exit 1
+				fi
+				
+				# check for the presence of a .gitattributes file on repository level
+				if [ -f $GITATTRIBUTESFILE ]
+					then
+						echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
+					else
+						echo ERROR: file $GITATTRIBUTESFILE NOT found at $CURRENTDIR
 						#exit 1
 				fi
 				
