@@ -24,6 +24,7 @@ GITATTRIBUTESFILE='.gitattributes'
 
 #<HJP-specific identifiers>
 GTIDENTIFIER="GT"
+PERSOSIMIDENTIFIER="PersoSim"
 #</HJP-specific identifiers>
 
 function extractValue(){
@@ -203,7 +204,27 @@ for CURRENT_REPO in */
 																exit 1
 														fi
 													else
-														echo WARNING ALTERNATIVE
+														REGEXP="^(de.persosim)(.\w+)*"
+														if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+															then
+																REGEXP="^($PERSOSIMIDENTIFIER) .+"
+																if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+																	then
+																		echo INFO: this is a $PERSOSIMIDENTIFIER bundle
+																	else
+																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
+																		exit 1
+																fi
+															else
+																REGEXP="^(com.hjp)(.\w+)*"
+																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+																	then
+																		echo INFO: this is an HJP bundle
+																	else
+																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
+																		exit 1
+																fi
+														fi
 												fi
 												
 											else
