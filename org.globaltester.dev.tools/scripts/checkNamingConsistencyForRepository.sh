@@ -15,6 +15,7 @@ BUNDLEVENDORLINEIDENTIFIER="Bundle-Vendor"
 #</MANIFEST.MF-specific identifier>
 
 EXPECTEDVENDORSTRING="HJP Consulting GmbH"
+TESTSCRIPTSIDENTIFIER="testscripts"
 
 #<GIT-specific files>
 GITIGNOREFILE='.gitignore'
@@ -137,11 +138,34 @@ for CURRENT_REPO in */
 												fi
 												
 												# check that Bundle-SymbolicName in MANIFEST.MF matches project name from .project
-												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
+												extractValue $MANIFESTFILE $BUNDLENAMEIDENTIFIER
+												EXTRACTVALUEEXITSTATUS=$?
+										
+												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 													then
-														echo ERROR: mismatching project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-														#exit 1
+														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLENAMEIDENTIFIER\"
+														exit $EXTRACTVALUEEXITSTATUS
 												fi
+										
+												RECEIVEDNAMESTRING=$VALUE
+												
+												DEBUG=`echo "$PROJECTPATH" | grep "$TESTSCRIPTSIDENTIFIER"`
+												GREPRESULT=$?
+												
+												if [[ $GREPRESULT == '0' ]]
+													then
+														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
+															then
+																echo ERROR: mismatching script project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
+																#exit 1
+														fi
+													else
+														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
+															then
+																echo ERROR: mismatching code project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
+																#exit 1
+														fi
+												fi	
 												
 											else
 												echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
