@@ -224,18 +224,29 @@ for CURRENT_REPO in */
 																		REGEXP="^(com.hjp.globaltester)(.\w+)*"
 																		if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																			then
-																				REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER$GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
+																				REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
 																				if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																					then
-																						echo INFO: this is a known com.hjp.globaltester bundle
+																						echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.globaltester bundle
 																					else
-																						echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: foo
+																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.globaltester bundle
 																						exit 1
 																				fi
 																			else
-																				#echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
-																				#exit 1
-																				echo WARNING: no com.hjp.globaltester bundle
+																				REGEXP="^(com.hjp.persosim)(.\w+)*"
+																				if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+																					then
+																						REGEXP="^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
+																						if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+																							then
+																								echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.persosim bundle
+																							else
+																								echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.persosim bundle
+																								exit 1
+																						fi
+																					else
+																						echo WARNING: unchecked com.hjp.* bundle
+																				fi
 																		fi
 																	else
 																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
