@@ -44,6 +44,7 @@ for CURRENT_REPO in */
 	do
 		if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 			then
+				echo "################################################################"
 				CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
 				echo INFO: current repo is: $CURRENT_REPO
 				cd $CURRENT_REPO
@@ -63,6 +64,7 @@ for CURRENT_REPO in */
 					do
 						if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
 							then
+								echo ================================================================
 								CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
 								echo INFO: current project is: $CURRENT_PROJECT
 								cd $CURRENT_PROJECT
@@ -98,6 +100,8 @@ for CURRENT_REPO in */
 												CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
 												echo INFO: file $MANIFESTFILE found at $CURRENTDIR
 												
+												# set variables from MANIFEST.MF
+												
 												# check that Bundle-Vendor in MANIFEST.MF is set at all
 												extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
 												EXTRACTVALUEEXITSTATUS=$?
@@ -107,37 +111,9 @@ for CURRENT_REPO in */
 														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLEVENDORLINEIDENTIFIER\"
 														#exit $EXTRACTVALUEEXITSTATUS
 												fi
-												
 												RECEIVEDVENDORSTRING=$VALUE
-												echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
 												
-												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
-												if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
-													then
-														echo 'ERROR: expected "'$BUNDLEVENDORLINEIDENTIFIER'" to be "'$EXPECTEDVENDORSTRING'" but found "'$RECEIVEDVENDORSTRING'" in file' $CURRENTFILE
-														#exit 1
-												fi
-												
-												# check that Bundle-SymbolicName in MAINIFEST.MF matches the actual project path
-												extractValue $MANIFESTFILE $BUNDLESYMBOLICNAMEIDENTIFIER
-												EXTRACTVALUEEXITSTATUS=$?
-										
-												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
-													then
-														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLESYMBOLICNAMEIDENTIFIER\"
-														#exit $EXTRACTVALUEEXITSTATUS
-												fi
-										
-												RECEIVEDSYMBOLICNAMESTRING=$VALUE
-												PROJECTPATH=$CURRENT_PROJECT
-												echo path: $PROJECTPATH
-												if [[ "$PROJECTPATH" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
-													then
-														echo ERROR: mismatching project paths "'$PROJECTPATH'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-														#exit 1
-												fi
-												
-												# check that Bundle-SymbolicName in MANIFEST.MF matches project name from .project
+												# check that Bundle-Name in MAINIFEST.MF is set at all
 												extractValue $MANIFESTFILE $BUNDLENAMEIDENTIFIER
 												EXTRACTVALUEEXITSTATUS=$?
 										
@@ -146,10 +122,43 @@ for CURRENT_REPO in */
 														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLENAMEIDENTIFIER\"
 														exit $EXTRACTVALUEEXITSTATUS
 												fi
-										
 												RECEIVEDNAMESTRING=$VALUE
 												
-												DEBUG=`echo "$PROJECTPATH" | grep "$TESTSCRIPTSIDENTIFIER"`
+												# check that Bundle-SymbolicName in MAINIFEST.MF is set at all
+												extractValue $MANIFESTFILE $BUNDLESYMBOLICNAMEIDENTIFIER
+												EXTRACTVALUEEXITSTATUS=$?
+										
+												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+													then
+														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLESYMBOLICNAMEIDENTIFIER\"
+														#exit $EXTRACTVALUEEXITSTATUS
+												fi
+												RECEIVEDSYMBOLICNAMESTRING=$VALUE
+												
+												echo ----------------------------------------------------------------
+												echo Values read from "$CURRENTFILE"
+												echo \"$BUNDLENAMEIDENTIFIER\" is: \"$RECEIVEDNAMESTRING\"
+												echo \"$BUNDLESYMBOLICNAMEIDENTIFIER\" is: \"$RECEIVEDSYMBOLICNAMESTRING\"
+												echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
+												echo ----------------------------------------------------------------
+												
+												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
+												if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
+													then
+														echo 'ERROR: expected "'$BUNDLEVENDORLINEIDENTIFIER'" to be "'$EXPECTEDVENDORSTRING'" but found "'$RECEIVEDVENDORSTRING'" in file' $CURRENTFILE
+														#exit 1
+												fi
+												
+												# check that Bundle-SymbolicName in MANIFEST.MF matches actual project path
+												if [[ "$CURRENT_PROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
+													then
+														echo ERROR: mismatching project paths "'$CURRENT_PROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
+														#exit 1
+												fi
+												
+												# check that Bundle-Name in MANIFEST.MF matches script project name from .project file
+												# check that Bundle-SymbolicName in MANIFEST.MF matches code project name from .project file
+												DEBUG=`echo "$CURRENT_PROJECT" | grep "$TESTSCRIPTSIDENTIFIER"`
 												GREPRESULT=$?
 												
 												if [[ $GREPRESULT == '0' ]]
