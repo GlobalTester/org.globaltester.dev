@@ -25,6 +25,8 @@ GITATTRIBUTESFILE='.gitattributes'
 #<HJP-specific identifiers>
 GTIDENTIFIER="GT"
 PERSOSIMIDENTIFIER="PersoSim"
+EXTENSIONSIDENTIFIER="Extensions to"
+TESTSPECIDENTIFIER="TestSpecification"
 #</HJP-specific identifiers>
 
 function extractValue(){
@@ -219,7 +221,22 @@ for CURRENT_REPO in */
 																REGEXP="^(com.hjp)(.\w+)*"
 																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																	then
-																		echo INFO: this is an HJP bundle
+																		REGEXP="^(com.hjp.globaltester)(.\w+)*"
+																		if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+																			then
+																				REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER$GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
+																				if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+																					then
+																						echo INFO: this is a known com.hjp.globaltester bundle
+																					else
+																						echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: foo
+																						exit 1
+																				fi
+																			else
+																				#echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
+																				#exit 1
+																				echo WARNING: no com.hjp.globaltester bundle
+																		fi
 																	else
 																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
 																		exit 1
