@@ -8,11 +8,11 @@ METAINFDIR='META-INF'
 MANIFESTFILE='MANIFEST.MF'
 PROJECTFILE='.project'
 
-#<MANIFEST.MF-specific identifier>
+#<MANIFEST.MF-specific identifiers>
 BUNDLENAMEIDENTIFIER="Bundle-Name"
 BUNDLESYMBOLICNAMEIDENTIFIER="Bundle-SymbolicName"
 BUNDLEVENDORLINEIDENTIFIER="Bundle-Vendor"
-#</MANIFEST.MF-specific identifier>
+#</MANIFEST.MF-specific identifiers>
 
 EXPECTEDVENDORSTRING="HJP Consulting GmbH"
 TESTSCRIPTSIDENTIFIER="testscripts"
@@ -21,6 +21,10 @@ TESTSCRIPTSIDENTIFIER="testscripts"
 GITIGNOREFILE='.gitignore'
 GITATTRIBUTESFILE='.gitattributes'
 #</GIT-specific files>
+
+#<HJP-specific identifiers>
+GTIDENTIFIER="GT"
+#</HJP-specific identifiers>
 
 function extractValue(){
 	FILE=$1
@@ -80,8 +84,8 @@ for CURRENT_REPO in */
 								echo INFO: current dir is: $CURRENTDIR
 								
 								# check that the project path complies with the naming guidelines
-								REGEXP="^($CURRENT_REPO)(.\w*)*"
-								if [[ "${CURRENT_PROJECT,,}" =~ $REGEXP ]]
+								REGEXP="^($CURRENT_REPO)(.\w+)*"
+								if [[ "$CURRENT_PROJECT" =~ $REGEXP ]]
 									then
 										echo INFO: project path complies with naming guidelines
 									else
@@ -171,18 +175,36 @@ for CURRENT_REPO in */
 												
 												if [[ $GREPRESULT == '0' ]]
 													then
+														# this is a script project
 														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
 															then
 																echo ERROR: mismatching script project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
 																exit 1
 														fi
 													else
+														# this is a code project
 														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
 															then
 																echo ERROR: mismatching code project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
 																exit 1
 														fi
-												fi	
+												fi
+												
+												# check that Bundle-Name correctly relates to Bundle-SymbolicName
+												REGEXP="^(org.globaltester)(.\w+)*"
+												if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+													then
+														REGEXP="^($GTIDENTIFIER) .+"
+														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+															then
+																echo INFO: this is a $GTIDENTIFIER bundle
+															else
+																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$GTIDENTIFIER\"
+																exit 1
+														fi
+													else
+														echo WARNING ALTERNATIVE
+												fi
 												
 											else
 												echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
