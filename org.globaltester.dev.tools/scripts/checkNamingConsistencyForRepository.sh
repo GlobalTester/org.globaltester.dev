@@ -35,7 +35,6 @@ function extractValue(){
 	fi
 	
 	VALUE=$(echo $LINE | cut -d ':' -f 2- | cut -d ';' -f 1 | sed 's|^\s*||')
-	echo 'INFO: value of "'$IDENTIFIER'" is: '$VALUE
 	
 	return 0
 }
@@ -57,7 +56,7 @@ for CURRENT_REPO in */
 						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR "as expected (content currently unchecked)"
 					else
 						echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
-						#exit 1
+						exit 1
 				fi
 				
 				# check for the presence of a .gitattributes file on repository level
@@ -66,7 +65,7 @@ for CURRENT_REPO in */
 						echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
 					else
 						echo ERROR: file $GITATTRIBUTESFILE NOT found at $CURRENTDIR
-						#exit 1
+						exit 1
 				fi
 				
 				for CURRENT_PROJECT in */
@@ -87,7 +86,7 @@ for CURRENT_REPO in */
 										echo INFO: project path complies with naming guidelines
 									else
 										echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
-										#exit 1
+										exit 1
 								fi
 								
 								# check for the presence of a .project file on project level
@@ -97,7 +96,7 @@ for CURRENT_REPO in */
 										NAMEFROMPROJECT=$(echo $NAMELINE | cut -d '>' -f 2- | cut -d '<' -f 1)
 									else
 										echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
-										#exit 1
+										exit 1
 								fi
 								
 								if [ -d $METAINFDIR ]
@@ -118,7 +117,7 @@ for CURRENT_REPO in */
 												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 													then
 														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLEVENDORLINEIDENTIFIER\"
-														#exit $EXTRACTVALUEEXITSTATUS
+														exit $EXTRACTVALUEEXITSTATUS
 												fi
 												RECEIVEDVENDORSTRING=$VALUE
 												
@@ -140,7 +139,7 @@ for CURRENT_REPO in */
 												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 													then
 														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLESYMBOLICNAMEIDENTIFIER\"
-														#exit $EXTRACTVALUEEXITSTATUS
+														exit $EXTRACTVALUEEXITSTATUS
 												fi
 												RECEIVEDSYMBOLICNAMESTRING=$VALUE
 												
@@ -155,14 +154,14 @@ for CURRENT_REPO in */
 												if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
 													then
 														echo 'ERROR: expected "'$BUNDLEVENDORLINEIDENTIFIER'" to be "'$EXPECTEDVENDORSTRING'" but found "'$RECEIVEDVENDORSTRING'" in file' $CURRENTFILE
-														#exit 1
+														exit 1
 												fi
 												
 												# check that Bundle-SymbolicName in MANIFEST.MF matches actual project path
 												if [[ "$CURRENT_PROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
 													then
 														echo ERROR: mismatching project paths "'$CURRENT_PROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-														#exit 1
+														exit 1
 												fi
 												
 												# check that Bundle-Name in MANIFEST.MF matches script project name from .project file
@@ -175,19 +174,19 @@ for CURRENT_REPO in */
 														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
 															then
 																echo ERROR: mismatching script project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
-																#exit 1
+																exit 1
 														fi
 													else
 														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
 															then
 																echo ERROR: mismatching code project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-																#exit 1
+																exit 1
 														fi
 												fi	
 												
 											else
 												echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
-												#exit 1
+												exit 1
 										fi	
 										cd ..
 								fi
