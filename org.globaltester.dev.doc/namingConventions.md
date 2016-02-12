@@ -2,13 +2,15 @@ Naming conventions
 ==================
 
 This file documents naming conventions to be observed when creating new or modifying existing repositories, projects or bundles.
-This conventions can be checked using the script checkNamingConsistencyForRepository.sh within org.globaltester.dev\org.globaltester.dev.tools\releng.
-Usage: Execute it from your git root directory with "bash -x".
+This conventions can be checked using the script checkNamingConsistencyForRepository.sh within org.globaltester.dev/org.globaltester.dev.tools/releng.
+Usage: Execute it from your git root directory with "bash" or "bash -x" for debug information.
 
 Repository names
 ----------------
 
-When creating a new or modifying an existing repository it first of all must be allocated to one of the following already existing categories:
+When creating a new repository it first of all must be given a name.
+The name of a repository is represented by the name of its directory in the file system.
+It must be allocated to one of the following already existing categories:
 * com.hjp
 * de.persosim
 * org.globaltester
@@ -30,38 +32,58 @@ The prefix in general can be selected freely but should resemble the product it 
 The repository com.hjp.persosim.simulator.protocols.ca3 e.g. describes a closed source addition (com.hjp) to the open source _PersoSim_ project.
 Further more it is part of PersoSim's _simulator_ core adding a certain protocol named ca3.
 
-Project names
--------------
+Naming conventions for projects
+-------------------------------
 
-When creating a new or modifying an existing project its allocation to a repository must be determined or checked.
-The full name/path of the parent repository is to be used as suffix for the project's own sub directory.
-As with the repository's naming the project path's infix can be selected freely. The suffix should be selected from one of the following categories. Extensions and/or modifications to this list are possible but should at least be thoroughly discussed by several developers.
+When creating a new project it first of all must be given a directory and a project name.
+The project's directory name is represented by the name of the directory the project is stored in.
+The project name is represented by the value identified by the "name" tag within the .project file.
 
+The project's directory name consists of a prefix, an infix and a suffix.
+The prefix must be the name of the parent repository.
+The infix can be selected freely as with the repository's naming.
+The suffix should be selected from one of the following categories:
+
+* doc
+	this category contains documentation
 * feature
 	this category contains configurations required for automatically building a feature
+* integrationtest
+	this category contains integration tests
+* product
+	this category contains configurations required for automatically building a product
 * releng
 	this category contains configurations as well as documentation for building and testing a product
+* sample
+	this category contains samples
 * scripts
 	this category contains configurations for packing GlobalTester test scripts
 * site
 	this category contains configurations for building an eclipse update site
-* tests
-	this category contains unit tests
 * test
-	duplicate of 'tests', deprecated
+	this category contains unit tests
+* tools
+	this category contains tools which may be useful for developing, testing or releasing the projects
 * ui
 	this category contains user interface specific code
+* ui.test
+	this category contains ui-specific unit tests
 
-The actual name of the project as denoted by the tag "name" in the project's .project file is to resemble the project's purpose while
+Extensions and/or modifications to this list are possible in general but should at least be thoroughly discussed by all developers.
+Deviating from this scheme each repository must contain one project with the same directory name as its repository, i.e. a base project.
+
+For the actual project name we differentiate between "code" and "script" projects.
+The project name of code projects is to match the project's directory name.
+For script projects the project name is to resemble the project's purpose while
 still being human readable.
 
-Bundle names
-------------
+Naming conventions for bundles
+------------------------------
 
 If a project is to contain a bundle its configuration is stored within the META-INF/MANIFEST.MF file.
 For the MANIFEST.MF the following conventions must be kept:
-* the "Bundle-Name" value must match the name from the .project file
-* the "Bundle-SymbolicName" must match the path of the project
+* the "Bundle-Name" value must match the project's name
+* the "Bundle-SymbolicName" must match the directory name of the project
 * the "Bundle-Vendor" must be consistent within all bundles and is supposed to be "HJP Consulting GmbH"
 
 Further conventions
