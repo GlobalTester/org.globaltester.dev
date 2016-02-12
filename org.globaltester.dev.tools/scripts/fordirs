@@ -1,0 +1,120 @@
+#!/bin/bash
+if [ $# -eq 0 ]
+then
+	printHelp
+fi
+
+function printHelp {
+	echo -e "Usage:\n"
+	echo -e "`basename $0` <toBeExecuted>\n"
+	echo -e ""
+	echo -e "This executes the given commands and parameters in each subfolder."
+	echo -e "-- can be used to separate commands that equal an parameter"
+	echo
+	echo "-g  | --git-only              Only operate on directories containing a .git folder"
+	echo "-u  | --unlimited-retries    shortcut for --max-retries -1"
+	echo "-m  | --max-retries           set maximal retries for each commandline (-1 for no limit)"
+	echo "-q  | --quiet                 do not add output on stdout additional to <toBeExecuted> outputs"
+	echo "-h  | --help                  display this help"
+	
+	exit 1
+}
+
+# parameter handling
+GIT_ONLY=0
+RETRY=1
+MAX_RETRIES=0
+QUIET=0
+
+PARSING_DONE=0
+while [ $# -gt 0 -a $PARSING_DONE -ne 1 ]
+do
+	case "$1" in
+		"-h"|"--help")
+			printHelp
+		;;
+		"-g"|"--git-only")
+			GIT_ONLY=1
+			shift 1
+		;;
+		"-q"|"--quiet")
+			QUIET=1
+			shift 1
+		;;
+		"-u"|"--unlimited-retries")
+			MAX_RETRIES=-1
+			shift 1
+		;;
+		"-m"|"--max-retries")
+			if [[ -z "$2" ]]
+			then
+				echo "Retry count is missing!"
+				exit 1
+			fi
+			MAX_RETRIES=$2
+			shift 2
+		;;
+		"--")
+			PARSING_DONE=1
+			shift 1
+		;;
+		*)
+			PARSING_DONE=1
+		;;
+	esac
+done
+
+
+RETRIES=0
+FAILURES=
+
+for curProj in */
+do
+	if [ $GIT_ONLY -eq 1 -a ! -d "$curProj/.git" ]
+	then
+		continue
+	fi
+
+	cd "$curProj"
+	
+	if [ $QUIET -eq 0 ]
+	then
+	echo -en "\e[36m" ; pwd; echo -en "\e[0m";
+	fi
+	
+	eval "$@"
+	
+	RETURN=$?
+	if [ $RETURN -ne 0 ]
+	then
+		FAILURES=`echo -en "$FAILURES\n$curProj"`
+	fi
+	CURRENT_RETRIES=0
+	while [ $RETURN -ne 0 -a \( $MAX_RETRIES -gt $CURRENT_RETRIES -o $MAX_RETRIES -eq "-1" \) ]
+	do
+		if [ $QUIET -eq 0 ]
+		then
+			echo -en "\e[31m"
+			echo Retrying $curProj ...
+			echo -en "\e[0m"
+		fi
+		((RETRIES++))
+		((CURRENT_RETRIES++))
+		eval "$@"
+	done;
+	cd ..
+done
+
+echo -en "\n\n"
+
+	
+if [ $RETRIES -ne 0 -a $QUIET -eq 0 ]
+then
+	echo Retries done: $RETRIES
+fi
+
+if [ ! -z "$FAILURES" -a $QUIET -eq 0 ]
+then
+	echo 'Directories with != 0 return code:'
+	echo "$FAILURES"
+fi
