@@ -29,6 +29,36 @@ EXTENSIONSIDENTIFIER="Extensions to"
 TESTSPECIDENTIFIER="TestSpecification"
 #</HJP-specific identifiers>
 
+BSN[0]="test"
+BSN[1]="ui"
+BSN[2]="integrationtest"
+BSN[3]="feature"
+BSN[4]="site"
+BSN[5]="product"
+BSN[6]="releng"
+BSN[7]="sample"
+BSN[8]="ui.test"
+BSN[9]="doc"
+BSN[10]="scripts"
+BSN[11]="tools"
+BSN[12]="ui.integrationtest"
+
+BN[0]="Test"
+BN[1]="UI"
+BN[2]="Integration Test"
+BN[3]="Feature"
+BN[4]="Site"
+BN[5]="Product"
+BN[6]="Releng"
+BN[7]="Sample"
+BN[8]="UI Test"
+BN[9]="Doc"
+BN[10]="Scripts"
+BN[11]="Tools"
+BN[12]="UI Integration Test"
+
+
+
 function extractValue(){
 	FILE=$1
 	IDENTIFIER=$2
@@ -194,6 +224,8 @@ for CURRENT_REPO in */
 												fi
 												
 												# check that Bundle-Name correctly relates to Bundle-SymbolicName
+												
+												# check prefixes
 												REGEXP="^(org.globaltester)(.\w+)*"
 												if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 													then
@@ -245,13 +277,50 @@ for CURRENT_REPO in */
 																								exit 1
 																						fi
 																					else
-																						echo WARNING: unchecked com.hjp.* bundle
+																						echo INFO: skipping prefix checks for com.hjp.* bundle
 																				fi
 																		fi
 																	else
 																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
 																		exit 1
 																fi
+														fi
+												fi
+												
+												# check suffixes
+												if [[ "$CURRENT_PROJECT" == "$RECEIVEDSYMBOLICNAMESTRING" ]]
+													then
+														echo INFO: skipping suffix check for base project
+													else
+														MATCH=false
+														MATCHEDPATTERN=""
+														TARGETPATTERN=""
+														for ((i=0; i<${#BSN[*]}; i++));
+															do
+																MATCHEDPATTERN=${BSN[i]}
+																REGEXP="(\w+.)*$MATCHEDPATTERN$"
+																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+																	then
+																		MATCH=true
+																		TARGETPATTERN=${BN[i]}
+																		break
+																	else
+																		MATCHEDPATTERN=""
+																fi
+															done
+														
+														if [ $MATCH = true ]
+															then
+																REGEXP="(\w+ )*$TARGETPATTERN$"
+																if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+																	then
+																		echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
+																	else
+																		echo ERROR: Failed suffix match, Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to end with \"$TARGETPATTERN\"
+																		exit 1
+																fi
+															else
+																echo ERROR: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
 														fi
 												fi
 												
