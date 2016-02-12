@@ -58,4 +58,7 @@ Style
 -----
 We declare variables when we use them, not as early as possible. This allows to reduce scope easily for instance when some code parts need to be captured within a new loop or a try-catch block. Also it is easier to understand a variable defined with a sensible default value than one defined at the beginning of a method without initialization.
 
+System properties
+-----------------
+System properties are used to allow customization of e.g. unit test execution. To find uses and possible values to be set search the workspace for uses of `System.getProperty()`. This is only relevant for very specific use cases and does not apply to every product.
 
