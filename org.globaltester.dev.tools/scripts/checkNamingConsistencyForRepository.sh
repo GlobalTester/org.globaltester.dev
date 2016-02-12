@@ -333,8 +333,7 @@ for CURRENT_REPO in */
 																		exit 1
 																fi
 															else
-																echo ERROR: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
-																#exit 1
+																echo WARNING: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
 														fi
 												fi
 												
