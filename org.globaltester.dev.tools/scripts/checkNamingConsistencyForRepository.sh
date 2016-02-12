@@ -105,6 +105,15 @@ for CURRENT_REPO in */
 						exit 1
 				fi
 				
+				# check for the presence of a project with same path as repo, i.e. a base project
+				if [ -d $CURRENT_REPO ]
+					then
+						echo INFO: base project \"$CURRENT_REPO\" found
+					else
+						echo ERROR: missing base project \"$CURRENT_REPO\"
+						exit 1
+				fi
+				
 				for CURRENT_PROJECT in */
 					do
 						if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
@@ -186,6 +195,8 @@ for CURRENT_REPO in */
 												echo \"$BUNDLESYMBOLICNAMEIDENTIFIER\" is: \"$RECEIVEDSYMBOLICNAMESTRING\"
 												echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
 												echo ----------------------------------------------------------------
+												
+												
 												
 												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
 												if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
@@ -288,17 +299,18 @@ for CURRENT_REPO in */
 												fi
 												
 												# check suffixes
-												if [[ "$CURRENT_PROJECT" == "$RECEIVEDSYMBOLICNAMESTRING" ]]
+												if [[ "$CURRENT_PROJECT" == "$CURRENT_REPO" ]]
 													then
-														echo INFO: skipping suffix check for base project
+														echo INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\"
 													else
+														echo INFO: commencing suffix check for non-base project
 														MATCH=false
 														MATCHEDPATTERN=""
 														TARGETPATTERN=""
 														for ((i=0; i<${#BSN[*]}; i++));
 															do
 																MATCHEDPATTERN=${BSN[i]}
-																REGEXP="(\w+.)*$MATCHEDPATTERN$"
+																REGEXP=".*\.$MATCHEDPATTERN$"
 																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																	then
 																		MATCH=true
@@ -311,7 +323,8 @@ for CURRENT_REPO in */
 														
 														if [ $MATCH = true ]
 															then
-																REGEXP="(\w+ )*$TARGETPATTERN$"
+																echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
+																REGEXP=".* $TARGETPATTERN$"
 																if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																	then
 																		echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
@@ -321,6 +334,7 @@ for CURRENT_REPO in */
 																fi
 															else
 																echo ERROR: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
+																#exit 1
 														fi
 												fi
 												
