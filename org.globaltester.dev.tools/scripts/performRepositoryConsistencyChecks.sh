@@ -76,278 +76,278 @@ function extractValue(){
 	return 0
 }
 
-for CURRENT_REPO in */
-	do
-		if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
+
+
+CURRENT_REPO=$1
+if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
+	then
+		echo "################################################################"
+		CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
+		echo INFO: current repo is: $CURRENT_REPO
+		cd $CURRENT_REPO
+		CURRENTDIR=$CURRENT_REPO
+		echo INFO: current dir is: $CURRENTDIR
+		
+		# check for the presence of a .gitignore file on repository level
+		if [ -f $GITIGNOREFILE ]
 			then
-				echo "################################################################"
-				CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
-				echo INFO: current repo is: $CURRENT_REPO
-				cd $CURRENT_REPO
-				CURRENTDIR=$CURRENT_REPO
-				echo INFO: current dir is: $CURRENTDIR
-				
-				# check for the presence of a .gitignore file on repository level
-				if [ -f $GITIGNOREFILE ]
+				echo INFO: file $GITIGNOREFILE found at $CURRENTDIR "as expected (content currently unchecked)"
+			else
+				echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
+				exit 1
+		fi
+		
+		# check for the presence of a .gitattributes file on repository level
+		if [ -f $GITATTRIBUTESFILE ]
+			then
+				echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
+			else
+				echo ERROR: file $GITATTRIBUTESFILE NOT found at $CURRENTDIR
+				exit 1
+		fi
+		
+		# check for the presence of a project with same path as repo, i.e. a base project
+		if [ -d $CURRENT_REPO ]
+			then
+				echo INFO: base project \"$CURRENT_REPO\" found
+			else
+				echo ERROR: missing base project \"$CURRENT_REPO\"
+				exit 1
+		fi
+		
+		for CURRENT_PROJECT in */
+			do
+				if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
 					then
-						echo INFO: file $GITIGNOREFILE found at $CURRENTDIR "as expected (content currently unchecked)"
-					else
-						echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
-						exit 1
-				fi
-				
-				# check for the presence of a .gitattributes file on repository level
-				if [ -f $GITATTRIBUTESFILE ]
-					then
-						echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
-					else
-						echo ERROR: file $GITATTRIBUTESFILE NOT found at $CURRENTDIR
-						exit 1
-				fi
-				
-				# check for the presence of a project with same path as repo, i.e. a base project
-				if [ -d $CURRENT_REPO ]
-					then
-						echo INFO: base project \"$CURRENT_REPO\" found
-					else
-						echo ERROR: missing base project \"$CURRENT_REPO\"
-						exit 1
-				fi
-				
-				for CURRENT_PROJECT in */
-					do
-						if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
+						echo ================================================================
+						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
+						echo INFO: current project is: $CURRENT_PROJECT
+						cd $CURRENT_PROJECT
+						CURRENTDIR=$CURRENT_REPO/$CURRENT_PROJECT
+						echo INFO: current dir is: $CURRENTDIR
+						
+						# check that the project path complies with the naming guidelines
+						REGEXP="^($CURRENT_REPO)(.\w+)*"
+						if [[ "$CURRENT_PROJECT" =~ $REGEXP ]]
 							then
-								echo ================================================================
-								CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
-								echo INFO: current project is: $CURRENT_PROJECT
-								cd $CURRENT_PROJECT
-								CURRENTDIR=$CURRENT_REPO/$CURRENT_PROJECT
-								echo INFO: current dir is: $CURRENTDIR
-								
-								# check that the project path complies with the naming guidelines
-								REGEXP="^($CURRENT_REPO)(.\w+)*"
-								if [[ "$CURRENT_PROJECT" =~ $REGEXP ]]
+								echo INFO: project path complies with naming guidelines
+							else
+								echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
+								exit 1
+						fi
+						
+						# check for the presence of a .project file on project level
+						if [ -f $PROJECTFILE ]
+							then
+								NAMELINE=`grep -m 1 'name' $PROJECTFILE | sed 's|^\s*||'`
+								NAMEFROMPROJECT=$(echo $NAMELINE | cut -d '>' -f 2- | cut -d '<' -f 1)
+							else
+								echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
+								exit 1
+						fi
+						
+						if [ -d $METAINFDIR ]
+							then
+								cd $METAINFDIR
+								CURRENTDIR=$CURRENTDIR/$METAINFDIR
+								if [ -f $MANIFESTFILE ]
 									then
-										echo INFO: project path complies with naming guidelines
-									else
-										echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
-										exit 1
-								fi
-								
-								# check for the presence of a .project file on project level
-								if [ -f $PROJECTFILE ]
-									then
-										NAMELINE=`grep -m 1 'name' $PROJECTFILE | sed 's|^\s*||'`
-										NAMEFROMPROJECT=$(echo $NAMELINE | cut -d '>' -f 2- | cut -d '<' -f 1)
-									else
-										echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
-										exit 1
-								fi
-								
-								if [ -d $METAINFDIR ]
-									then
-										cd $METAINFDIR
-										CURRENTDIR=$CURRENTDIR/$METAINFDIR
-										if [ -f $MANIFESTFILE ]
+										CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
+										echo INFO: file $MANIFESTFILE found at $CURRENTDIR
+										
+										# set variables from MANIFEST.MF
+										
+										# check that Bundle-Vendor in MANIFEST.MF is set at all
+										extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
+										EXTRACTVALUEEXITSTATUS=$?
+										
+										if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
 											then
-												CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
-												echo INFO: file $MANIFESTFILE found at $CURRENTDIR
-												
-												# set variables from MANIFEST.MF
-												
-												# check that Bundle-Vendor in MANIFEST.MF is set at all
-												extractValue $MANIFESTFILE $BUNDLEVENDORLINEIDENTIFIER
-												EXTRACTVALUEEXITSTATUS=$?
-												
-												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
-													then
-														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLEVENDORLINEIDENTIFIER\"
-														exit $EXTRACTVALUEEXITSTATUS
-												fi
-												RECEIVEDVENDORSTRING=$VALUE
-												
-												# check that Bundle-Name in MAINIFEST.MF is set at all
-												extractValue $MANIFESTFILE $BUNDLENAMEIDENTIFIER
-												EXTRACTVALUEEXITSTATUS=$?
+												echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLEVENDORLINEIDENTIFIER\"
+												exit $EXTRACTVALUEEXITSTATUS
+										fi
+										RECEIVEDVENDORSTRING=$VALUE
 										
-												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
-													then
-														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLENAMEIDENTIFIER\"
-														exit $EXTRACTVALUEEXITSTATUS
-												fi
-												RECEIVEDNAMESTRING=$VALUE
-												
-												# check that Bundle-SymbolicName in MAINIFEST.MF is set at all
-												extractValue $MANIFESTFILE $BUNDLESYMBOLICNAMEIDENTIFIER
-												EXTRACTVALUEEXITSTATUS=$?
+										# check that Bundle-Name in MAINIFEST.MF is set at all
+										extractValue $MANIFESTFILE $BUNDLENAMEIDENTIFIER
+										EXTRACTVALUEEXITSTATUS=$?
+								
+										if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+											then
+												echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLENAMEIDENTIFIER\"
+												exit $EXTRACTVALUEEXITSTATUS
+										fi
+										RECEIVEDNAMESTRING=$VALUE
 										
-												if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+										# check that Bundle-SymbolicName in MAINIFEST.MF is set at all
+										extractValue $MANIFESTFILE $BUNDLESYMBOLICNAMEIDENTIFIER
+										EXTRACTVALUEEXITSTATUS=$?
+								
+										if [[ $EXTRACTVALUEEXITSTATUS != '0' ]]
+											then
+												echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLESYMBOLICNAMEIDENTIFIER\"
+												exit $EXTRACTVALUEEXITSTATUS
+										fi
+										RECEIVEDSYMBOLICNAMESTRING=$VALUE
+										
+										echo ----------------------------------------------------------------
+										echo Values read from "$CURRENTFILE"
+										echo \"$BUNDLENAMEIDENTIFIER\" is: \"$RECEIVEDNAMESTRING\"
+										echo \"$BUNDLESYMBOLICNAMEIDENTIFIER\" is: \"$RECEIVEDSYMBOLICNAMESTRING\"
+										echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
+										echo ----------------------------------------------------------------
+										
+										
+										
+										# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
+										if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
+											then
+												echo 'ERROR: expected "'$BUNDLEVENDORLINEIDENTIFIER'" to be "'$EXPECTEDVENDORSTRING'" but found "'$RECEIVEDVENDORSTRING'" in file' $CURRENTFILE
+												exit 1
+										fi
+										
+										# check that Bundle-SymbolicName in MANIFEST.MF matches actual project path
+										if [[ "$CURRENT_PROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
+											then
+												echo ERROR: mismatching project paths "'$CURRENT_PROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
+												exit 1
+										fi
+										
+										# check that Bundle-Name in MANIFEST.MF matches script project name from .project file
+										# check that Bundle-SymbolicName in MANIFEST.MF matches code project name from .project file
+										DEBUG=`echo "$CURRENT_PROJECT" | grep "$TESTSCRIPTSIDENTIFIER"`
+										GREPRESULT=$?
+										
+										if [[ $GREPRESULT == '0' ]]
+											then
+												# this is a script project
+												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
 													then
-														echo 'ERROR: file' $CURRENTFILE 'does not contain expected identifier' \"$BUNDLESYMBOLICNAMEIDENTIFIER\"
-														exit $EXTRACTVALUEEXITSTATUS
-												fi
-												RECEIVEDSYMBOLICNAMESTRING=$VALUE
-												
-												echo ----------------------------------------------------------------
-												echo Values read from "$CURRENTFILE"
-												echo \"$BUNDLENAMEIDENTIFIER\" is: \"$RECEIVEDNAMESTRING\"
-												echo \"$BUNDLESYMBOLICNAMEIDENTIFIER\" is: \"$RECEIVEDSYMBOLICNAMESTRING\"
-												echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
-												echo ----------------------------------------------------------------
-												
-												
-												
-												# check that Bundle-Vendor in MANIFEST.MF is set to the expected value
-												if [[ "$EXPECTEDVENDORSTRING" != "$RECEIVEDVENDORSTRING" ]]
-													then
-														echo 'ERROR: expected "'$BUNDLEVENDORLINEIDENTIFIER'" to be "'$EXPECTEDVENDORSTRING'" but found "'$RECEIVEDVENDORSTRING'" in file' $CURRENTFILE
+														echo ERROR: mismatching script project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
 														exit 1
 												fi
-												
-												# check that Bundle-SymbolicName in MANIFEST.MF matches actual project path
-												if [[ "$CURRENT_PROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
+											else
+												# this is a code project
+												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
 													then
-														echo ERROR: mismatching project paths "'$CURRENT_PROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
+														echo ERROR: mismatching code project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
 														exit 1
 												fi
-												
-												# check that Bundle-Name in MANIFEST.MF matches script project name from .project file
-												# check that Bundle-SymbolicName in MANIFEST.MF matches code project name from .project file
-												DEBUG=`echo "$CURRENT_PROJECT" | grep "$TESTSCRIPTSIDENTIFIER"`
-												GREPRESULT=$?
-												
-												if [[ $GREPRESULT == '0' ]]
+										fi
+										
+										# check that Bundle-Name correctly relates to Bundle-SymbolicName
+										
+										# check prefixes
+										REGEXP="^(org.globaltester)(.\w+)*"
+										if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+											then
+												REGEXP="^($GTIDENTIFIER) .+"
+												if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 													then
-														# this is a script project
-														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
-															then
-																echo ERROR: mismatching script project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDNAMESTRING'"
-																exit 1
-														fi
+														echo INFO: this is a $GTIDENTIFIER bundle
 													else
-														# this is a code project
-														if [[ "$NAMEFROMPROJECT" != "$RECEIVEDSYMBOLICNAMESTRING" ]]
-															then
-																echo ERROR: mismatching code project names "'$NAMEFROMPROJECT'" and "'$RECEIVEDSYMBOLICNAMESTRING'"
-																exit 1
-														fi
+														echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$GTIDENTIFIER\"
+														exit 1
 												fi
-												
-												# check that Bundle-Name correctly relates to Bundle-SymbolicName
-												
-												# check prefixes
-												REGEXP="^(org.globaltester)(.\w+)*"
+											else
+												REGEXP="^(de.persosim)(.\w+)*"
 												if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 													then
-														REGEXP="^($GTIDENTIFIER) .+"
+														REGEXP="^($PERSOSIMIDENTIFIER) .+"
 														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 															then
-																echo INFO: this is a $GTIDENTIFIER bundle
+																echo INFO: this is a $PERSOSIMIDENTIFIER bundle
 															else
-																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$GTIDENTIFIER\"
+																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
 																exit 1
 														fi
 													else
-														REGEXP="^(de.persosim)(.\w+)*"
+														REGEXP="^(com.hjp)(.\w+)*"
 														if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 															then
-																REGEXP="^($PERSOSIMIDENTIFIER) .+"
-																if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-																	then
-																		echo INFO: this is a $PERSOSIMIDENTIFIER bundle
-																	else
-																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
-																		exit 1
-																fi
-															else
-																REGEXP="^(com.hjp)(.\w+)*"
+																REGEXP="^(com.hjp.globaltester)(.\w+)*"
 																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																	then
-																		REGEXP="^(com.hjp.globaltester)(.\w+)*"
+																		REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
+																		if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+																			then
+																				echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.globaltester bundle
+																			else
+																				echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.globaltester bundle
+																				exit 1
+																		fi
+																	else
+																		REGEXP="^(com.hjp.persosim)(.\w+)*"
 																		if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																			then
-																				REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
+																				REGEXP="^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
 																				if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																					then
-																						echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.globaltester bundle
+																						echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.persosim bundle
 																					else
-																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.globaltester bundle
+																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.persosim bundle
 																						exit 1
 																				fi
 																			else
-																				REGEXP="^(com.hjp.persosim)(.\w+)*"
-																				if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
-																					then
-																						REGEXP="^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
-																						if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-																							then
-																								echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.persosim bundle
-																							else
-																								echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.persosim bundle
-																								exit 1
-																						fi
-																					else
-																						echo INFO: skipping prefix checks for com.hjp.* bundle
-																				fi
+																				echo INFO: skipping prefix checks for com.hjp.* bundle
 																		fi
-																	else
-																		echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
-																		exit 1
-																fi
-														fi
-												fi
-												
-												# check suffixes
-												if [[ "$CURRENT_PROJECT" == "$CURRENT_REPO" ]]
-													then
-														echo INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\"
-													else
-														echo INFO: commencing suffix check for non-base project
-														MATCH=false
-														MATCHEDPATTERN=""
-														TARGETPATTERN=""
-														for ((i=0; i<${#BSN[*]}; i++));
-															do
-																MATCHEDPATTERN=${BSN[i]}
-																REGEXP=".*\.$MATCHEDPATTERN$"
-																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
-																	then
-																		MATCH=true
-																		TARGETPATTERN=${BN[i]}
-																		break
-																	else
-																		MATCHEDPATTERN=""
-																fi
-															done
-														
-														if [ $MATCH = true ]
-															then
-																echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
-																REGEXP=".* $TARGETPATTERN$"
-																if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-																	then
-																		echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
-																	else
-																		echo ERROR: Failed suffix match, Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to end with \"$TARGETPATTERN\"
-																		exit 1
 																fi
 															else
-																echo WARNING: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
+																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
+																exit 1
 														fi
 												fi
-												
+										fi
+										
+										# check suffixes
+										if [[ "$CURRENT_PROJECT" == "$CURRENT_REPO" ]]
+											then
+												echo INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\"
 											else
-												echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
-												exit 1
-										fi	
-										cd ..
-								fi
-								cd ..	
+												echo INFO: commencing suffix check for non-base project
+												MATCH=false
+												MATCHEDPATTERN=""
+												TARGETPATTERN=""
+												for ((i=0; i<${#BSN[*]}; i++));
+													do
+														MATCHEDPATTERN=${BSN[i]}
+														REGEXP=".*\.$MATCHEDPATTERN$"
+														if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+															then
+																MATCH=true
+																TARGETPATTERN=${BN[i]}
+																break
+															else
+																MATCHEDPATTERN=""
+														fi
+													done
+												
+												if [ $MATCH = true ]
+													then
+														echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
+														REGEXP=".* $TARGETPATTERN$"
+														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
+															then
+																echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
+															else
+																echo ERROR: Failed suffix match, Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to end with \"$TARGETPATTERN\"
+																exit 1
+														fi
+													else
+														echo WARNING: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
+												fi
+										fi
+										
+									else
+										echo "ERROR: file $MANIFESTFILE NOT found at "$CURRENTDIR
+										exit 1
+								fi	
+								cd ..
 						fi
-					done
-				cd ..
-		fi
-	done
+						cd ..	
+				fi
+			done
+		cd ..
+fi
 
 echo Script finished successfully
