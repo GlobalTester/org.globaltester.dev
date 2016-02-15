@@ -191,9 +191,7 @@ while true; do
 			
 			for CURRENT_REPO in `cat $REPO_LIST`
 			do
-				cd "$CURRENT_REPO"
-					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/performRepositoryConsistencyChecks.sh $CURRENT_REPO
-				cd "$WORKINGDIR"
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/performRepositoryConsistencyChecks.sh $CURRENT_REPO
 			done
 
 			((NEXT_STEP++))
