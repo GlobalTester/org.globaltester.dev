@@ -90,7 +90,7 @@ do
 		FAILURES=`echo -en "$FAILURES\n$curProj"`
 	fi
 	CURRENT_RETRIES=0
-	while [ $RETURN -ne 0 -a \( $MAX_RETRIES -gt $CURRENT_RETRIES -o $MAX_RETRIES -eq "-1" \) ]
+	while [ $RETURN -ne 0 ] && [ $MAX_RETRIES -gt $CURRENT_RETRIES -o $MAX_RETRIES -eq "-1" ]
 	do
 		if [ $QUIET -eq 0 ]
 		then
@@ -101,6 +101,7 @@ do
 		((RETRIES++))
 		((CURRENT_RETRIES++))
 		eval "$@"
+		RETURN=$?
 	done;
 	cd ..
 done
