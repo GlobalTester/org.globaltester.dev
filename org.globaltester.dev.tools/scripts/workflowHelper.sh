@@ -188,7 +188,11 @@ while true; do
 		;;
 		"2")
 			echo "Consistency checks"
-			echo "--none implemented yet--"
+			
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/performRepositoryConsistencyChecks.sh $CURRENT_REPO
+			done
 
 			((NEXT_STEP++))
 		;;
