@@ -139,8 +139,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						# check for the presence of a .project file on project level
 						if [ -f $PROJECTFILE ]
 							then
-								NAMELINE=`grep -m 1 'name' $PROJECTFILE | sed 's|^\s*||'`
-								NAMEFROMPROJECT=$(echo $NAMELINE | cut -d '>' -f 2- | cut -d '<' -f 1)
+								NAMEFROMPROJECT=`grep -m 1 "<name>" .project | sed "s/\s*<name>//; s/<\/name>.*//"`
 							else
 								echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
 								exit 1
