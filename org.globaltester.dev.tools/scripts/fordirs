@@ -4,27 +4,31 @@ then
 	printHelp
 fi
 
+# parameter handling
+GIT_ONLY='[ -d ".git" ]'
+RETRY=1
+MAX_RETRIES=0
+QUIET=0
+CONDITION=
+
 function printHelp {
 	echo -e "Usage:\n"
-	echo -e "`basename $0` <toBeExecuted>\n"
+	echo -e "`basename $0` <options> [--] <toBeExecuted>\n"
 	echo -e ""
 	echo -e "This executes the given commands and parameters in each subfolder."
 	echo -e "-- can be used to separate commands that equal an parameter"
 	echo
+	echo "-c  | --condition             Only operate on directories in which the condition evaluates to 0"
+	echo "                               This takes a single string to be evaluated as bash code"
 	echo "-g  | --git-only              Only operate on directories containing a .git folder"
-	echo "-u  | --unlimited-retries    shortcut for --max-retries -1"
+	echo "                               This sets --condition to $GIT_ONLY"
 	echo "-m  | --max-retries           set maximal retries for each commandline (-1 for no limit)"
+	echo "-u  | --unlimited-retries     shortcut for --max-retries -1"
 	echo "-q  | --quiet                 do not add output on stdout additional to <toBeExecuted> outputs"
 	echo "-h  | --help                  display this help"
 	
 	exit 1
 }
-
-# parameter handling
-GIT_ONLY=0
-RETRY=1
-MAX_RETRIES=0
-QUIET=0
 
 PARSING_DONE=0
 while [ $# -gt 0 -a $PARSING_DONE -ne 1 ]
@@ -33,8 +37,17 @@ do
 		"-h"|"--help")
 			printHelp
 		;;
+		"-c"|"--condition")
+			if [[ -z "$2" ]]
+			then
+				echo "Condition is missing!"
+				exit 1
+			fi
+			CONDITION="$2"
+			shift 2
+		;;
 		"-g"|"--git-only")
-			GIT_ONLY=1
+			CONDITION="$GIT_ONLY"
 			shift 1
 		;;
 		"-q"|"--quiet")
@@ -67,15 +80,19 @@ done
 
 RETRIES=0
 FAILURES=
+SKIPPED=
 
 for curProj in */
 do
-	if [ $GIT_ONLY -eq 1 -a ! -d "$curProj/.git" ]
+	cd "$curProj"
+	eval "$CONDITION"
+	RETURN=$?
+	if [ ! -z "$CONDITION" -a $RETURN -eq 1 ]
 	then
+		SKIPPED=`echo -en "$SKIPPED\n$curProj"`
+		cd ..
 		continue
 	fi
-
-	cd "$curProj"
 	
 	if [ $QUIET -eq 0 ]
 	then
@@ -112,6 +129,14 @@ echo -en "\n\n"
 if [ $RETRIES -ne 0 -a $QUIET -eq 0 ]
 then
 	echo Retries done: $RETRIES
+	echo
+fi
+
+if [ ! -z "$SKIPPED" -a $QUIET -eq 0 ]
+then
+	echo 'Skipped directories'
+	echo "$SKIPPED"
+	echo
 fi
 
 if [ ! -z "$FAILURES" -a $QUIET -eq 0 ]
