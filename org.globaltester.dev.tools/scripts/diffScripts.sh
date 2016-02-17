@@ -88,16 +88,11 @@ do
 			shift 2
 		;;
 		*)
-			if [ $# -le 2 ]
+			if [ $# -eq 2 ]
 			then 
-				if [ -z "$SOURCE_DIR" ]
-				then
-					SOURCE_DIR=`readlink -f $1`
-				elif [ -z "$COMPARE_TO_DIR" ]
-				then
-					COMPARE_TO_DIR=`readlink -f $1`
-				fi
-				shift
+				SOURCE_DIR=`readlink -f $1`
+				COMPARE_TO_DIR=`readlink -f $2`
+				shift 2
 			else
 				echo "unknown parameter: $1"
 				exit 1;
