@@ -4,6 +4,8 @@ set -e
 . org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
 set +e
 
+VERBOSE=false
+
 METAINFDIR='META-INF'
 MANIFESTFILE='MANIFEST.MF'
 PROJECTFILE='.project'
@@ -57,7 +59,43 @@ BN[10]="Scripts"
 BN[11]="Tools"
 BN[12]="UI Integration Test"
 
+# parameter handling
+while [ $# -gt 0 ]
+do
+	case "$1" in
+		"-h"|"--help")
+			echo -e "Usage:\n"
+			echo -e "`basename $0` <options> REPO\n"
+			echo -e "Perform some consistency checks on all projects in the given REPO."
+			echo -e "Must be called from the root of all checked out HJP repositories."
+			echo -e "REPO needs to be the local folder name of the repository (which is expected to match the repository name."
+			echo
+			echo "-v | --verbose          output more progress information"
 
+			exit 1
+		;;
+		"-v"|"--verbose")
+			VERBOSE=true
+			shift 1
+		;;
+		*)
+			if [ $# -eq 1 ]
+			then
+				CURRENT_REPO=$1
+				shift 1
+			else
+				echo "unknown parameter: $1"
+				exit 1;
+			fi
+		;;
+		esac
+done
+if [ ! $CURRENT_REPO ]
+then
+	echo "Missing paramter: REPO"
+	echo "see `basename $0` -h for help"
+	exit 1
+fi
 
 function extractValue(){
 	FILE=$1
@@ -78,20 +116,19 @@ function extractValue(){
 
 
 
-CURRENT_REPO=$1
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 	then
-		echo "################################################################"
+		$VERBOSE && echo "################################################################"
 		CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
-		echo INFO: current repo is: $CURRENT_REPO
+		$VERBOSE && echo INFO: current repo is: $CURRENT_REPO
 		cd $CURRENT_REPO
 		CURRENTDIR=$CURRENT_REPO
-		echo INFO: current dir is: $CURRENTDIR
+		$VERBOSE && echo INFO: current dir is: $CURRENTDIR
 		
 		# check for the presence of a .gitignore file on repository level
 		if [ -f $GITIGNOREFILE ]
 			then
-				echo INFO: file $GITIGNOREFILE found at $CURRENTDIR "as expected (content currently unchecked)"
+				$VERBOSE && echo INFO: file $GITIGNOREFILE found at $CURRENTDIR "as expected (content currently unchecked)"
 			else
 				echo ERROR: file $GITIGNOREFILE NOT found at $CURRENTDIR
 				exit 1
@@ -100,7 +137,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 		# check for the presence of a .gitattributes file on repository level
 		if [ -f $GITATTRIBUTESFILE ]
 			then
-				echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
+				$VERBOSE && echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
 			else
 				echo ERROR: file $GITATTRIBUTESFILE NOT found at $CURRENTDIR
 				exit 1
@@ -109,7 +146,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 		# check for the presence of a project with same path as repo, i.e. a base project
 		if [ -d $CURRENT_REPO ]
 			then
-				echo INFO: base project \"$CURRENT_REPO\" found
+				$VERBOSE && echo INFO: base project \"$CURRENT_REPO\" found
 			else
 				echo ERROR: missing base project \"$CURRENT_REPO\"
 				exit 1
@@ -119,18 +156,18 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 			do
 				if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
 					then
-						echo ================================================================
+						$VERBOSE && echo ================================================================
 						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
-						echo INFO: current project is: $CURRENT_PROJECT
+						$VERBOSE && echo INFO: current project is: $CURRENT_PROJECT
 						cd $CURRENT_PROJECT
 						CURRENTDIR=$CURRENT_REPO/$CURRENT_PROJECT
-						echo INFO: current dir is: $CURRENTDIR
+						$VERBOSE && echo INFO: current dir is: $CURRENTDIR
 						
 						# check that the project path complies with the naming guidelines
 						REGEXP="^($CURRENT_REPO)(.\w+)*"
 						if [[ "$CURRENT_PROJECT" =~ $REGEXP ]]
 							then
-								echo INFO: project path complies with naming guidelines
+								$VERBOSE && echo INFO: project path complies with naming guidelines
 							else
 								echo ERROR: project path is $CURRENT_PROJECT but should start with repo name, i.e. $CURRENT_REPO
 								exit 1
@@ -152,7 +189,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								if [ -f $MANIFESTFILE ]
 									then
 										CURRENTFILE=$CURRENTDIR'/'$MANIFESTFILE
-										echo INFO: file $MANIFESTFILE found at $CURRENTDIR
+										$VERBOSE && echo INFO: file $MANIFESTFILE found at $CURRENTDIR
 										
 										# set variables from MANIFEST.MF
 										
@@ -189,12 +226,12 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										fi
 										RECEIVEDSYMBOLICNAMESTRING=$VALUE
 										
-										echo ----------------------------------------------------------------
-										echo Values read from "$CURRENTFILE"
-										echo \"$BUNDLENAMEIDENTIFIER\" is: \"$RECEIVEDNAMESTRING\"
-										echo \"$BUNDLESYMBOLICNAMEIDENTIFIER\" is: \"$RECEIVEDSYMBOLICNAMESTRING\"
-										echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
-										echo ----------------------------------------------------------------
+										$VERBOSE && echo ----------------------------------------------------------------
+										$VERBOSE && echo Values read from "$CURRENTFILE"
+										$VERBOSE && echo \"$BUNDLENAMEIDENTIFIER\" is: \"$RECEIVEDNAMESTRING\"
+										$VERBOSE && echo \"$BUNDLESYMBOLICNAMEIDENTIFIER\" is: \"$RECEIVEDSYMBOLICNAMESTRING\"
+										$VERBOSE && echo \"$BUNDLEVENDORLINEIDENTIFIER\" is: \"$RECEIVEDVENDORSTRING\"
+										$VERBOSE && echo ----------------------------------------------------------------
 										
 										
 										
@@ -243,7 +280,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 												REGEXP="^($GTIDENTIFIER) .+"
 												if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 													then
-														echo INFO: this is a $GTIDENTIFIER bundle
+														$VERBOSE && echo INFO: this is a $GTIDENTIFIER bundle
 													else
 														echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$GTIDENTIFIER\"
 														exit 1
@@ -255,7 +292,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 														REGEXP="^($PERSOSIMIDENTIFIER) .+"
 														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 															then
-																echo INFO: this is a $PERSOSIMIDENTIFIER bundle
+																$VERBOSE && echo INFO: this is a $PERSOSIMIDENTIFIER bundle
 															else
 																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
 																exit 1
@@ -270,7 +307,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 																		REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
 																		if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																			then
-																				echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.globaltester bundle
+																				$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.globaltester bundle
 																			else
 																				echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.globaltester bundle
 																				exit 1
@@ -282,13 +319,13 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 																				REGEXP="^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
 																				if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																					then
-																						echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.persosim bundle
+																						$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.persosim bundle
 																					else
 																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.persosim bundle
 																						exit 1
 																				fi
 																			else
-																				echo INFO: skipping prefix checks for com.hjp.* bundle
+																				$VERBOSE && echo INFO: skipping prefix checks for com.hjp.* bundle
 																		fi
 																fi
 															else
@@ -301,9 +338,9 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										# check suffixes
 										if [[ "$CURRENT_PROJECT" == "$CURRENT_REPO" ]]
 											then
-												echo INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\"
+												$VERBOSE && echo INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\"
 											else
-												echo INFO: commencing suffix check for non-base project
+												$VERBOSE && echo INFO: commencing suffix check for non-base project
 												MATCH=false
 												MATCHEDPATTERN=""
 												TARGETPATTERN=""
@@ -323,11 +360,11 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 												
 												if [ $MATCH = true ]
 													then
-														echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
+														$VERBOSE && echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
 														REGEXP=".* $TARGETPATTERN$"
 														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 															then
-																echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
+																$VERBOSE && echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
 															else
 																echo ERROR: Failed suffix match, Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to end with \"$TARGETPATTERN\"
 																exit 1
@@ -349,4 +386,4 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 		cd ..
 fi
 
-echo Script finished successfully
+$VERBOSE && echo Script finished successfully
