@@ -49,12 +49,9 @@ else
 	touch $CHANGELOG_FILE_NAME
 fi
 
-FIRSTLINE=1
-SECONDLINE=`getSecondLineNumberContaining "$CHANGELOG_VERSION_REGEXP" $OLD_CHANGELOG`
-cat $OLD_CHANGELOG | tail -n $((`cat $OLD_CHANGELOG | sed -e '$a\' | wc -l` - $SECONDLINE + 1 )) > $CHANGELOG_FOOTER
-
-
 LAST_TAG=`getLastTag version`
+git show "$LAST_TAG":$CHANGELOG_FILE_NAME 2>/dev/null > $CHANGELOG_FOOTER
+
 
 VERSION_NEEDED=1
 
