@@ -1,3 +1,11 @@
+Version 0.1.1 (18.02.2016)
+
+* updated documentation concerning naming conventions
+* Add a tool for easy execution of commands for our repo structure
+* describe new intended release workflow
+* Use maven to set changed versions from manifest files into pom.xml
+
+
 Version 0.1.0 (29.01.2016)
 
 * Initial version
