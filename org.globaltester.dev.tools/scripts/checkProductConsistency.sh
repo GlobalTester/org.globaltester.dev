@@ -169,6 +169,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						echo ----------------------------------------------------------------
 						
+						# extract and list all requirements listed in the MANIFEST.MF of the test script project
 						CURRENTPATH="$CURRENT_REPO/$CURRENT_PROJECT/META-INF/MANIFEST.MF"
 						extractReqsFromManifest "$CURRENTPATH" "Require-Bundle"
 						MANIFESTREQS=$EXTRACTREQSRESULT
@@ -184,9 +185,9 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						echo ----------------------------------------------------------------
 						
+						# match dependencies from script project against requirements defined in MANIFEST.MF
 						while read -r CURRDEPEXPECTED
 						do
-							echo CURRDEPEXPECTED:"$CURRDEPEXPECTED"
 							GREPREQS=`echo "$MANIFESTREQS" | grep "$CURRDEPEXPECTED"`
 							GREPEXITSTATUS=$?
 							
@@ -194,9 +195,10 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								then
 									echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$CURRENTPATH"!
 									continue
+								else
+									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$CURRENTPATH"!
 							fi
 							
-							#echo GREPREQS:"$GREPREQS" exit:"$GREPEXITSTATUS"
 						done <<< "$UDEPS"
 						
 						echo ----------------------------------------------------------------
