@@ -82,7 +82,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						# find reuired classes or packages
 						DEPENDENCIESTMP1=`find "$CURRENT_PROJECT" -name *.xml -o -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-						RAWDEPENDENCIES=`echo "$DEPENDENCIESTMP1" | sed -e "s|\(.*\)\..*|\1|"`
+						RAWDEPENDENCIES=`echo "$DEPENDENCIESTMP1" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
 						
 						count=0
 						echo INFO: found the following raw dependencies
@@ -182,9 +182,6 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						done <<< "$UDEPS"
 						
 						echo ----------------------------------------------------------------
-						
-						RES=`extractFieldFromManifest "$CURRENTPATH" "Bundle-Vendor"`
-						echo INFO: output is - "$RES"
 						
 						# extend script here
 						
