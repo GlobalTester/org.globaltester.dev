@@ -128,7 +128,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						#echo INFO: clean dependencies - $CLEANDEPENDENCIES
 						UDEPS=`echo "$CLEANDEPENDENCIES" | sort -u`
-						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						echo INFO: unique dependencies - $UDEPS
 						
 						count=0
