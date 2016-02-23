@@ -38,7 +38,6 @@ function findDir(){
 	do
 		PREVDEPTMP="$CURRDEPTMP"
 		CURRDEPTMP=$(echo "$PREVDEPTMP" | rev | cut -d '.' -f 2- | rev)
-		#echo INFO: CURRDEPTMP="$CURRDEPTMP"
 		if [[ "$CURRDEPTMP" == "$PREVDEPTMP" ]]
 			then
 				#echo WARNING: did not find directory matching "$CURRENTRAWDEPENDENCY"!
@@ -47,7 +46,27 @@ function findDir(){
 	done
 	
 	FINDDIRRESULT="$CURRDEPTMP"
+	
+	return 0
+}
 
+EXTRACTREQSRESULT=""
+function extractReqsFromManifest() {
+	MANIFESTFILE="$1"
+	REQUIREMENT="$2"
+	
+	RAWREQS=`grep "^Req"  "$MANIFESTFILE" -A500 -B0 | sed "s|^$REQUIREMENT:\s| |; /^[^ ]/q"| sed -e "/^[^ ]/d"`
+	
+	EXTRACTREQSRESULT=""
+	count=0
+	while read -r CURRENTREQUIREMENT
+	do
+		TMPREQ=$(echo "$CURRENTREQUIREMENT" | cut -d ' ' -f 2- | cut -d ';' -f 1 | cut -d ',' -f 1)
+		EXTRACTREQSRESULT=`echo -e "$EXTRACTREQSRESULT"'\n'"$TMPREQ"`
+	done <<< "$RAWREQS"
+	
+	EXTRACTREQSRESULT="$(echo -e "${EXTRACTREQSRESULT}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+	
 	return 0
 }
 
@@ -136,15 +155,34 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						echo INFO: unique dependencies - $UDEPS
 						
+						echo ----------------------------------------------------------------
+						
 						# list all final dependencies
 						count=0
-						echo INFO: found the following unique dependencies
+						echo INFO: found the following unique dependencies in $TESTSCRIPTSIDENTIFIER project
 						while read -r CURRENTRAWDEPENDENCY
 						do
 							echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
 							count=$((count+1))
 						done <<< "$UDEPS"
 						echo INFO: -$count- elements
+						
+						echo ----------------------------------------------------------------
+						
+						CURRENTPATH="$CURRENT_REPO/$CURRENT_PROJECT/META-INF/MANIFEST.MF"
+						extractReqsFromManifest "$CURRENTPATH" "Require-Bundle"
+						MANIFESTREQS=$EXTRACTREQSRESULT
+						
+						count=0
+						echo INFO: found the following unique dependencies in $CURRENTPATH
+						while read -r CURRDEP
+						do
+							echo INFO: \($count\) "$CURRDEP"
+							count=$((count+1))
+						done <<< "$MANIFESTREQS"
+						echo INFO: -$count- elements
+						
+						echo ----------------------------------------------------------------
 						
 						# extend script here
 						
