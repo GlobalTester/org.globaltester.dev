@@ -184,6 +184,23 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						echo ----------------------------------------------------------------
 						
+						while read -r CURRDEPEXPECTED
+						do
+							echo CURRDEPEXPECTED:"$CURRDEPEXPECTED"
+							GREPREQS=`echo "$MANIFESTREQS" | grep "$CURRDEPEXPECTED"`
+							GREPEXITSTATUS=$?
+							
+							if [[ $GREPEXITSTATUS != '0' ]]
+								then
+									echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$CURRENTPATH"!
+									continue
+							fi
+							
+							#echo GREPREQS:"$GREPREQS" exit:"$GREPEXITSTATUS"
+						done <<< "$UDEPS"
+						
+						echo ----------------------------------------------------------------
+						
 						# extend script here
 						
 				fi
