@@ -51,17 +51,25 @@ function findDir(){
 }
 
 EXTRACTREQSRESULT=""
-function extractReqsFromManifest() {
+function extractFieldFromManifest() {
 	MANIFESTFILE="$1"
-	REQUIREMENT="$2"
+	IDENTIFIER="$2"
 	
-	RAWREQS=`grep "^Req"  "$MANIFESTFILE" -A500 -B0 | sed "s|^$REQUIREMENT:\s| |; /^[^ ]/q"| sed -e "/^[^ ]/d"`
+	LINE=`grep "$IDENTIFIER" "$MANIFESTFILE" -A500 -B0`
+	GREPRESULT=$?
+	
+	if [[ $GREPRESULT != '0' ]]
+		then
+			return 1
+	fi
+	
+	RAWREQS=`echo "$LINE" | sed "s|^$IDENTIFIER:\s| |; /^[^ ]/q"| sed -e "/^[^ ]/d"`
 	
 	EXTRACTREQSRESULT=""
 	count=0
 	while read -r CURRENTREQUIREMENT
 	do
-		TMPREQ=$(echo "$CURRENTREQUIREMENT" | cut -d ' ' -f 2- | cut -d ';' -f 1 | cut -d ',' -f 1)
+		TMPREQ=$(echo "$CURRENTREQUIREMENT" | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -d ';' -f 1 | cut -d ',' -f 1)
 		EXTRACTREQSRESULT=`echo -e "$EXTRACTREQSRESULT"'\n'"$TMPREQ"`
 	done <<< "$RAWREQS"
 	
@@ -171,7 +179,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						# extract and list all requirements listed in the MANIFEST.MF of the test script project
 						CURRENTPATH="$CURRENT_REPO/$CURRENT_PROJECT/META-INF/MANIFEST.MF"
-						extractReqsFromManifest "$CURRENTPATH" "Require-Bundle"
+						extractFieldFromManifest "$CURRENTPATH" "Require-Bundle"
 						MANIFESTREQS=$EXTRACTREQSRESULT
 						
 						count=0
@@ -202,6 +210,9 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						done <<< "$UDEPS"
 						
 						echo ----------------------------------------------------------------
+						
+						extractFieldFromManifest "$CURRENTPATH" "Bundle-Vendor"
+						echo INFO: output is - "$EXTRACTREQSRESULT"
 						
 						# extend script here
 						
