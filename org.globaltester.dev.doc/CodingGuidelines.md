@@ -7,6 +7,7 @@ The following definitions should clarify some of these definitions and fill some
 Code formatting
 ---------------
 With regard to code formatting the reference to the Eclipse guidelines allows the simple usage of the integrated code formatter without the need to provide an additional template. Just hit Ctrl-Shift-F from time to time and you should be almost safe (except for cases where you intentionally violate those rules).
+Before committing code it should be checked that the correct line endings (Unix/lf) are used in all commits. Git-Attributes and a server side hook will reject push requests which contain wrong line endings. This step is necessary to avoid failures on some operating systems and to make code reviews more comfortable. 
 
 Naming conventions
 ------------------

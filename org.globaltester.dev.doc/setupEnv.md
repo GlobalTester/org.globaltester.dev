@@ -28,6 +28,7 @@ We were used to use Eclipse Standard and moved to Eclipse IDE for Eclipse Commit
 - eGit, for version control
 - e4 Tools Developer Resources, for convenient editing of E4 resources
 - m2e, Maven Integration for Eclipse, if you want to trigger the maven build from within the IDE
+- Windows users should make sure that correct line endings are used (Preferences->Workspace->choose Unix line endings)
 
 Upgrading
 ---------
