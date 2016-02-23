@@ -212,6 +212,10 @@ function addCommit {
 	cd ..
 }
 
+function getDescriptionFileName {
+	echo description-$1.txt;
+}
+
 function createDefaultProduct {
 	local NAME="$1"
 	local MODULES="$2"
@@ -224,7 +228,7 @@ function createDefaultProduct {
 	fi
 	
 	
-	if [ ! -e default-description.txt ]
+	if [ ! -e `getDescriptionFileName default` ]
 	then
 		appendDoc "default" "A product that was correctly released at version 0.5.0. The
 Product repository is correctly tagged and contains one version."
@@ -265,7 +269,7 @@ version is part of the 0.6.2 product release"
 }
 
 function appendDoc {
-	local PRODUCT_NAME="description-$1.txt"
+	local PRODUCT_NAME=`getDescriptionFileName $1`
 	shift 1
 	local DESCRIPTION="$@"
 	
@@ -310,20 +314,20 @@ cd "$TESTING_DIR"
 git clone git@git.hjp-consulting.com:org.globaltester.dev
 #----------------------------
 createDefaultProduct "afterCorrectReleases"
-appendDoc "afterCorrectReleases" "Expectation for update repository changelogs:
-* Skipped
+appendDoc "afterCorrectReleases" "
+Expectation for update repository changelogs:
+* skipped
 Expectation for update product changelogs:
-* Skipped
+* skipped
 "
 #----------------------------
 createOldProduct "afterMultipleCorrectReleases"
-appendDoc "afterCorrectReleases" "Expectation for update repository changelogs:
-* Skipped
+appendDoc "afterMultipleCorrectReleases" "
+Expectation for update repository changelogs:
+* skipped
 
 Expectation for update product changelogs:
-* Skipped
-Expectation for update product changelogs:
-* Skipped
+* skipped
 "
 #----------------------------
 createDefaultProduct "withNewCommitsSinceRelease"
@@ -388,7 +392,7 @@ addCommit "module.multipleVersions.threeVersions"
 appendDoc "multipleVersions" "The three modules contain multiple version tags and according changelogs
 
 Expectation for update repository changelogs:
-* For all three modules the editor contains the dummy version and one dummy commit
+* for all three modules the editor contains the dummy version and one dummy commit
 
 Expectation for update product changelogs:
 * dummy version
@@ -405,9 +409,9 @@ tagProduct "product.withMultipleProductVersions" "0.3.2"
 appendDoc "withMultipleProductVersions" "The product contains 3 released versions in its changelog
 
 Expectation:
-* Skipped because there are no changes to the last version
+* skipped because there are no changes to the last version
 Expectation for update product changelogs:
-* Skipped
+* skipped
 "
 #----------------------------
 createDefaultProduct "withMultipleProductVersionsAndChange"
@@ -421,7 +425,7 @@ addCommit "product.withMultipleProductVersionsAndChange"
 appendDoc "withMultipleProductVersionsAndChange" "The product contains 3 released versions in its changelog and a change
 
 Expectation:
-Dummy version at the top and one commit in the prepared changelog
+* dummy version at the top and one commit in the prepared changelog
 
 Expectation for update product changelogs:
 * version from previous module versioning
