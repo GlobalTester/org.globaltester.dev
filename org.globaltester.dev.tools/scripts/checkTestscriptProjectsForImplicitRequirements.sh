@@ -50,7 +50,6 @@ function findDir(){
 	return 0
 }
 
-EXTRACTREQSRESULT=""
 function extractFieldFromManifest() {
 	MANIFESTFILE="$1"
 	IDENTIFIER="$2"
@@ -63,17 +62,19 @@ function extractFieldFromManifest() {
 			return 1
 	fi
 	
-	RAWREQS=`echo "$LINE" | sed "s|^$IDENTIFIER:\s| |; /^[^ ]/q"| sed -e "/^[^ ]/d"`
+	CLEANEDLINE=`echo "$LINE" | sed "s|^$IDENTIFIER:\s| |; /^[^ ]/q"| sed -e "/^[^ ]/d"`
 	
-	EXTRACTREQSRESULT=""
+	EXTRACTFIELDRESULT=""
 	count=0
 	while read -r CURRENTREQUIREMENT
 	do
 		TMPREQ=$(echo "$CURRENTREQUIREMENT" | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -d ';' -f 1 | cut -d ',' -f 1)
-		EXTRACTREQSRESULT=`echo -e "$EXTRACTREQSRESULT"'\n'"$TMPREQ"`
-	done <<< "$RAWREQS"
+		EXTRACTFIELDRESULT=`echo -e "$EXTRACTFIELDRESULT"'\n'"$TMPREQ"`
+	done <<< "$CLEANEDLINE"
 	
-	EXTRACTREQSRESULT="$(echo -e "${EXTRACTREQSRESULT}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+	EXTRACTFIELDRESULT="$(echo -e "${EXTRACTFIELDRESULT}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+	
+	echo "$EXTRACTFIELDRESULT"
 	
 	return 0
 }
@@ -180,7 +181,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						# extract and list all requirements listed in the MANIFEST.MF of the test script project
 						CURRENTPATH="$CURRENT_REPO/$CURRENT_PROJECT/META-INF/MANIFEST.MF"
 						extractFieldFromManifest "$CURRENTPATH" "Require-Bundle"
-						MANIFESTREQS=$EXTRACTREQSRESULT
+						MANIFESTREQS=$EXTRACTFIELDRESULT
 						
 						count=0
 						echo INFO: found the following unique dependencies in $CURRENTPATH
@@ -212,7 +213,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						echo ----------------------------------------------------------------
 						
 						extractFieldFromManifest "$CURRENTPATH" "Bundle-Vendor"
-						echo INFO: output is - "$EXTRACTREQSRESULT"
+						echo INFO: output is - "$EXTRACTFIELDRESULT"
 						
 						# extend script here
 						
