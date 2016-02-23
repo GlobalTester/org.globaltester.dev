@@ -180,8 +180,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						# extract and list all requirements listed in the MANIFEST.MF of the test script project
 						CURRENTPATH="$CURRENT_REPO/$CURRENT_PROJECT/META-INF/MANIFEST.MF"
-						extractFieldFromManifest "$CURRENTPATH" "Require-Bundle"
-						MANIFESTREQS=$EXTRACTFIELDRESULT
+						MANIFESTREQS=`extractFieldFromManifest "$CURRENTPATH" "Require-Bundle"`
 						
 						count=0
 						echo INFO: found the following unique dependencies in $CURRENTPATH
@@ -212,8 +211,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						echo ----------------------------------------------------------------
 						
-						extractFieldFromManifest "$CURRENTPATH" "Bundle-Vendor"
-						echo INFO: output is - "$EXTRACTFIELDRESULT"
+						RES=`extractFieldFromManifest "$CURRENTPATH" "Bundle-Vendor"`
+						echo INFO: output is - "$RES"
 						
 						# extend script here
 						
