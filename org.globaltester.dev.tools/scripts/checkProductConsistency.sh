@@ -79,6 +79,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						echo ================================================================
 						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
 						echo INFO: currently checked project is: $CURRENT_REPO/$CURRENT_PROJECT
+						
+						# find reuired classes or packages
 						DEPENDENCIESTMP1=`find "$CURRENT_PROJECT" -name *.xml -o -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 						RAWDEPENDENCIES=`echo "$DEPENDENCIESTMP1" | sed -e "s|\(.*\)\..*|\1|"`
 						
@@ -100,6 +102,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							findDir "$CURRENTRAWDEPENDENCY" "."
 							FINDDIREXITSTATUS=$?
 							
+							# greedily find repository containing the raw dependency
 							if [[ $FINDDIREXITSTATUS != '0' ]]
 								then
 									echo WARNING: did not find directory matching "$CURRENTRAWDEPENDENCY" in \.!
@@ -111,6 +114,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							#----------------------------------------------------------------
 							
+							# greedily find project containing the raw dependency
 							findDir "$CURRENTRAWDEPENDENCY" "$CURRDEPREPO"
 							FINDDIREXITSTATUS=$?
 							
@@ -121,16 +125,18 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							fi
 							
 							CURRDEPPROJECT=$FINDDIRRESULT
+							
+							# save project containing the raw dependency
 							CLEANDEPENDENCIES=`echo -e "$CLEANDEPENDENCIES"'\n'"$CURRDEPPROJECT"`
 							echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
 							
 						done <<< "$RAWDEPENDENCIES"
 						
-						#echo INFO: clean dependencies - $CLEANDEPENDENCIES
 						UDEPS=`echo "$CLEANDEPENDENCIES" | sort -u`
 						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						echo INFO: unique dependencies - $UDEPS
 						
+						# list all final dependencies
 						count=0
 						echo INFO: found the following unique dependencies
 						while read -r CURRENTRAWDEPENDENCY
@@ -139,6 +145,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							count=$((count+1))
 						done <<< "$UDEPS"
 						echo INFO: -$count- elements
+						
+						# extend script here
 						
 				fi
 			done
