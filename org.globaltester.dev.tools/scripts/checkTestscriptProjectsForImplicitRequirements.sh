@@ -59,16 +59,7 @@ CURRENT_REPO=$1
 echo INFO: current repo is $CURRENT_REPO
 
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
-	then
-		DEBUG=`echo "$CURRENT_REPO" | grep "$TESTSCRIPTSIDENTIFIER"`
-		GREPRESULT=$?
-		
-		if [[ $GREPRESULT != '0' ]]
-			then
-				echo ERROR: this is not a \"$TESTSCRIPTSIDENTIFIER\" repository
-				exit 1
-		fi
-		
+	then	
 		CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
 		echo INFO: current repo is: $CURRENT_REPO
 		
@@ -78,11 +69,29 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 					then
 						echo ================================================================
 						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
+						CURRENT_PATH="$CURRENT_REPO"/"$CURRENT_PROJECT"
 						echo INFO: currently checked project is: $CURRENT_REPO/$CURRENT_PROJECT
 						
-						# find reuired classes or packages
-						DEPENDENCIESTMP1=`find "$CURRENT_PROJECT" -name *.xml -o -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-						RAWDEPENDENCIES=`echo "$DEPENDENCIESTMP1" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
+						# find required classes or packages
+						
+						DEBUG=`echo "$CURRENT_REPO" | grep "$TESTSCRIPTSIDENTIFIER"`
+						GREPRESULT=$?
+						
+						if [[ $GREPRESULT == '0' ]]
+							then
+								RAWDEPENDENCIESJS=`find "$CURRENT_PATH/Helper" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								RAWDEPENDENCIESXML=`find "$CURRENT_PATH/TestSuites" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								
+								RAWDEPENDENCIES="$RAWDEPENDENCIESJS
+""$RAWDEPENDENCIESXML"
+								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sort -u`
+								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
+							else
+								RAWDEPENDENCIESJAVA=`find "$CURRENT_PATH"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
+						fi
+						
+						#RAWDEPENDENCIES=$DEPENDENCIESTMP1
 						
 						count=0
 						echo INFO: found the following raw dependencies
