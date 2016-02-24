@@ -158,12 +158,19 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 ""$RAWDEPENDENCIESXMLLOAD"
 								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
 								
+								BUNDLENAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-Name"`
+								
 								CLEANEDBUNDLENAMES=""
 								while read -r CURRDEP
 								do
 									CLEANEDBUNDLENAME=`echo "$CURRDEP" | cut -d '"' -f 2 | cut -d '"' -f 1`
-									CLEANEDBUNDLENAMES="$CLEANEDBUNDLENAMES""$CLEANEDBUNDLENAME
+									
+									if [[ "$CLEANEDBUNDLENAME" != "$BUNDLENAME" ]]
+										then
+											CLEANEDBUNDLENAMES="$CLEANEDBUNDLENAMES""$CLEANEDBUNDLENAME
 "
+									fi
+								
 								done <<< "$RAWDEPENDENCIESJSXMLLOAD"
 								
 								CLEANEDBUNDLENAMES=`echo "$CLEANEDBUNDLENAMES" | sort -u`
@@ -176,7 +183,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 									echo INFO: load \($count\) "$CURRDEP"
 									count=$((count+1))
 								done <<< "$CLEANEDBUNDLENAMES"
-								echo INFO: -$count- elements
+								echo INFO: load -$count- elements
 								
 								echo cleaned loads: "$CLEANEDBUNDLENAMES"
 								
@@ -184,11 +191,13 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								
 								
 								#MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
-								BUNDLENAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-Name"`
+								
 								echo INFO: Bundle-Name: $BUNDLENAME
+								
+								echo ----------------------------------------------------------------
 						fi
 						
-						echo ----------------------------------------------------------------
+						# ----------------------------------------------------------------
 						
 						UDEPS=`echo "$CLEANDEPENDENCIES" | sort -u`
 						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
