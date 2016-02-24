@@ -69,6 +69,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $GREPRESULT == '0' ]]
 							then
 								# this is a testscripts project
+								echo INFO: this is a testscripts project
 								TESTSCRIPTSPROJECT=true
 								RAWDEPENDENCIES="";
 								
@@ -76,6 +77,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								PATHTOHELPER="$PATHTOPROJECT"/Helper
 								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
 									then
+										echo INFO: parsing "$PATHTOHELPER"
 										RAWDEPENDENCIESJS=`find "$PATHTOHELPER" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 										RAWDEPENDENCIES="$RAWDEPENDENCIESJS"
 								fi
@@ -83,6 +85,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								PATHTOTESTSUITES="$PATHTOPROJECT"/TestSuites
 								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
 									then
+										echo INFO: parsing "$PATHTOTESTSUITES"
 										RAWDEPENDENCIESXML=`find "$PATHTOTESTSUITES" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 										RAWDEPENDENCIES="$RAWDEPENDENCIES
 ""$RAWDEPENDENCIESXML"
@@ -93,6 +96,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
 							else
 								# this is a code project
+								echo INFO: this is a code project
 								TESTSCRIPTSPROJECT=false
 								RAWDEPENDENCIESJAVA=`find "$PATHTOPROJECT"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
@@ -154,8 +158,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $TESTSCRIPTSPROJECT ]]
 							then
 								# get all indirect dependencies via load from *.js and *.xml
-								RAWDEPENDENCIESJSLOAD=`find "$PATHTOPROJECT/Helper" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
-								RAWDEPENDENCIESXMLLOAD=`find "$PATHTOPROJECT/TestSuites" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESJSLOAD=`find "$PATHTOHELPER" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESXMLLOAD=`find "$PATHTOTESTSUITES" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
 								
 								RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD
 ""$RAWDEPENDENCIESXMLLOAD"
