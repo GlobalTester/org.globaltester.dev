@@ -69,7 +69,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 					then
 						echo ================================================================
 						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
-						CURRENT_PATH="$CURRENT_REPO"/"$CURRENT_PROJECT"
+						PATHTOPROJECT="$CURRENT_REPO"/"$CURRENT_PROJECT"
+						PATHTOMANIFESTMF="$PATHTOPROJECT/META-INF/MANIFEST.MF"
 						echo INFO: currently checked project is: $CURRENT_REPO/$CURRENT_PROJECT
 						
 						# find required classes or packages
@@ -79,19 +80,58 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						if [[ $GREPRESULT == '0' ]]
 							then
-								RAWDEPENDENCIESJS=`find "$CURRENT_PATH/Helper" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-								RAWDEPENDENCIESXML=`find "$CURRENT_PATH/TestSuites" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								# this is a testscripts project
+								
+								# get all direct dependencies from *.js and *.xml
+								RAWDEPENDENCIESJS=`find "$PATHTOPROJECT/Helper" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								RAWDEPENDENCIESXML=`find "$PATHTOPROJECT/TestSuites" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 								
 								RAWDEPENDENCIES="$RAWDEPENDENCIESJS
 ""$RAWDEPENDENCIESXML"
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sort -u`
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
+								
+								# get all indirect dependencies via load from *.js and *.xml
+								RAWDEPENDENCIESJSLOAD=`find "$PATHTOPROJECT/Helper" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESXMLLOAD=`find "$PATHTOPROJECT/TestSuites" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								
+								RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD
+""$RAWDEPENDENCIESXMLLOAD"
+								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
+								
+								CLEANEDBUNDLENAMES=""
+								while read -r CURRDEP
+								do
+									CLEANEDBUNDLENAME=`echo "$CURRDEP" | cut -d '"' -f 2 | cut -d '"' -f 1`
+									CLEANEDBUNDLENAMES="$CLEANEDBUNDLENAMES""$CLEANEDBUNDLENAME
+"
+								done <<< "$RAWDEPENDENCIESJSXMLLOAD"
+								
+								CLEANEDBUNDLENAMES=`echo "$CLEANEDBUNDLENAMES" | sort -u`
+								
+								count=0
+								echo INFO: found the following loads
+								while read -r CURRDEP
+								do
+									echo INFO: load \($count\) "$CURRDEP"
+									count=$((count+1))
+								done <<< "$CLEANEDBUNDLENAMES"
+								echo INFO: -$count- elements
+								
+								
+								
+								
+								
+								
+								#MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
+								BUNDLENAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-Name"`
+								echo INFO: Bundle-Name: $BUNDLENAME
+								
 							else
-								RAWDEPENDENCIESJAVA=`find "$CURRENT_PATH"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								# this is a code project
+								RAWDEPENDENCIESJAVA=`find "$PATHTOPROJECT"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
 						fi
-						
-						#RAWDEPENDENCIES=$DEPENDENCIESTMP1
 						
 						count=0
 						echo INFO: found the following raw dependencies
@@ -160,11 +200,10 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						echo ----------------------------------------------------------------
 						
 						# extract and list all requirements listed in the MANIFEST.MF of the test script project
-						CURRENTPATH="$CURRENT_REPO/$CURRENT_PROJECT/META-INF/MANIFEST.MF"
-						MANIFESTREQS=`extractFieldFromManifest "$CURRENTPATH" "Require-Bundle"`
+						MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
 						
 						count=0
-						echo INFO: found the following unique dependencies in $CURRENTPATH
+						echo INFO: found the following unique dependencies in $PATHTOMANIFESTMF
 						while read -r CURRDEP
 						do
 							echo INFO: \($count\) "$CURRDEP"
@@ -182,13 +221,31 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							if [[ $GREPEXITSTATUS != '0' ]]
 								then
-									echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$CURRENTPATH"!
+									echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 									continue
 								else
-									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$CURRENTPATH"!
+									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 							fi
 							
 						done <<< "$UDEPS"
+						
+						echo ----------------------------------------------------------------
+						
+						# match dependencies from script project against requirements defined in MANIFEST.MF
+						while read -r CURRDEPEXPECTED
+						do
+							GREPREQS=`echo "$UDEPS" | grep "$CURRDEPEXPECTED"`
+							GREPEXITSTATUS=$?
+							
+							if [[ $GREPEXITSTATUS != '0' ]]
+								then
+									echo WARNING: obsolete requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+									continue
+								else
+									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+							fi
+							
+						done <<< "$MANIFESTREQS"
 						
 						echo ----------------------------------------------------------------
 						
