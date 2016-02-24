@@ -91,43 +91,6 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 ""$RAWDEPENDENCIESXML"
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sort -u`
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
-								
-								# get all indirect dependencies via load from *.js and *.xml
-								RAWDEPENDENCIESJSLOAD=`find "$PATHTOPROJECT/Helper" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
-								RAWDEPENDENCIESXMLLOAD=`find "$PATHTOPROJECT/TestSuites" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
-								
-								RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD
-""$RAWDEPENDENCIESXMLLOAD"
-								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
-								
-								CLEANEDBUNDLENAMES=""
-								while read -r CURRDEP
-								do
-									CLEANEDBUNDLENAME=`echo "$CURRDEP" | cut -d '"' -f 2 | cut -d '"' -f 1`
-									CLEANEDBUNDLENAMES="$CLEANEDBUNDLENAMES""$CLEANEDBUNDLENAME
-"
-								done <<< "$RAWDEPENDENCIESJSXMLLOAD"
-								
-								CLEANEDBUNDLENAMES=`echo "$CLEANEDBUNDLENAMES" | sort -u`
-								
-								count=0
-								echo INFO: found the following loads
-								while read -r CURRDEP
-								do
-									echo INFO: load \($count\) "$CURRDEP"
-									count=$((count+1))
-								done <<< "$CLEANEDBUNDLENAMES"
-								echo INFO: -$count- elements
-								
-								
-								
-								
-								
-								
-								#MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
-								BUNDLENAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-Name"`
-								echo INFO: Bundle-Name: $BUNDLENAME
-								
 							else
 								# this is a code project
 								TESTSCRIPTSPROJECT=false
@@ -187,7 +150,42 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						if [[ $TESTSCRIPTSPROJECT ]]
 							then
-								echo test
+								# get all indirect dependencies via load from *.js and *.xml
+								RAWDEPENDENCIESJSLOAD=`find "$PATHTOPROJECT/Helper" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESXMLLOAD=`find "$PATHTOPROJECT/TestSuites" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								
+								RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD
+""$RAWDEPENDENCIESXMLLOAD"
+								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
+								
+								CLEANEDBUNDLENAMES=""
+								while read -r CURRDEP
+								do
+									CLEANEDBUNDLENAME=`echo "$CURRDEP" | cut -d '"' -f 2 | cut -d '"' -f 1`
+									CLEANEDBUNDLENAMES="$CLEANEDBUNDLENAMES""$CLEANEDBUNDLENAME
+"
+								done <<< "$RAWDEPENDENCIESJSXMLLOAD"
+								
+								CLEANEDBUNDLENAMES=`echo "$CLEANEDBUNDLENAMES" | sort -u`
+								CLEANEDBUNDLENAMES="$(echo -e "${CLEANEDBUNDLENAMES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+								
+								count=0
+								echo INFO: found the following loads
+								while read -r CURRDEP
+								do
+									echo INFO: load \($count\) "$CURRDEP"
+									count=$((count+1))
+								done <<< "$CLEANEDBUNDLENAMES"
+								echo INFO: -$count- elements
+								
+								echo cleaned loads: "$CLEANEDBUNDLENAMES"
+								
+								
+								
+								
+								#MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
+								BUNDLENAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-Name"`
+								echo INFO: Bundle-Name: $BUNDLENAME
 						fi
 						
 						echo ----------------------------------------------------------------
