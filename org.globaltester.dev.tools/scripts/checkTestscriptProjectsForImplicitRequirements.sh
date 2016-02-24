@@ -11,18 +11,6 @@ PROJECTFILE='.project'
 
 TESTSCRIPTSIDENTIFIER="testscripts"
 
-#<GIT-specific files>
-GITIGNOREFILE='.gitignore'
-GITATTRIBUTESFILE='.gitattributes'
-#</GIT-specific files>
-
-#<HJP-specific identifiers>
-GTIDENTIFIER="GT"
-PERSOSIMIDENTIFIER="PersoSim"
-EXTENSIONSIDENTIFIER="Extensions to"
-TESTSPECIDENTIFIER="TestSpecification"
-#</HJP-specific identifiers>
-
 
 
 FINDDIRRESULT=""
@@ -187,12 +175,53 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								
 								echo cleaned loads: "$CLEANEDBUNDLENAMES"
 								
+								MANIFESTFILES=`find "." -mindepth 4 -maxdepth 4 -name MANIFEST.MF `
 								
+								LOADEDPROJECTS=""
+								while read -r CURRBUNDLENAME
+								do	
+									echo INFO: looking up MANIFEST.MF with Bundle-Name:"$CURRBUNDLENAME"
+									CURRMANIFESTBUNDLESYMBOLICNAME=""
+									
+									while read -r CURRMANIFEST
+									do
+										CURRMANIFESTBUNDLENAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-Name"`
+										if [[ "$CURRBUNDLENAME" != "$CURRMANIFESTBUNDLENAME" ]]
+											then
+												continue
+										fi
+										
+										CURRMANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-SymbolicName"`
+										
+										echo INFO: found Bundle-Name "$CURRBUNDLENAME" in "$CURRMANIFEST"
+										echo INFO: matching Bundle-SymbolicName is: "$CURRMANIFESTBUNDLESYMBOLICNAME"
+										break
+									done <<< "$MANIFESTFILES"
+									
+									if [[ "$CURRMANIFESTBUNDLESYMBOLICNAME" == "" ]]
+										then
+											echo WARNING: unable to find project with Bundle-Name "$CURRBUNDLENAME"
+											continue
+									fi
+									
+									LOADEDPROJECTS="$LOADEDPROJECTS
+""$CURRMANIFESTBUNDLESYMBOLICNAME"
+									
+								done <<< "$CLEANEDBUNDLENAMES"
 								
+								LOADEDPROJECTS="$(echo -e "${LOADEDPROJECTS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 								
-								#MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
+								count=0
+								echo INFO: found the following loads
+								while read -r CURRDEP
+								do
+									echo INFO: load \($count\) "$CURRDEP"
+									count=$((count+1))
+								done <<< "$LOADEDPROJECTS"
+								echo INFO: load -$count- elements
 								
-								echo INFO: Bundle-Name: $BUNDLENAME
+								CLEANDEPENDENCIES="$CLEANDEPENDENCIES
+""$LOADEDPROJECTS"
 								
 								echo ----------------------------------------------------------------
 						fi
