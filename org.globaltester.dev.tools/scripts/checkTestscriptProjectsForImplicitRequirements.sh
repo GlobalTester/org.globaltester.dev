@@ -158,13 +158,27 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $TESTSCRIPTSPROJECT ]]
 							then
 								# get all indirect dependencies via load from *.js and *.xml
-								RAWDEPENDENCIESJSLOAD=`find "$PATHTOHELPER" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
-								RAWDEPENDENCIESXMLLOAD=`find "$PATHTOTESTSUITES" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESJSXMLLOAD=""
 								
-								RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD
+								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
+									then
+										echo INFO: parsing "$PATHTOHELPER"
+										RAWDEPENDENCIESJSLOAD=`find "$PATHTOHELPER" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+										RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD"
+								fi
+								
+								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
+									then
+										echo INFO: parsing "$PATHTOTESTSUITES"
+										RAWDEPENDENCIESXMLLOAD=`find "$PATHTOTESTSUITES" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+										RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSXMLLOAD
 ""$RAWDEPENDENCIESXMLLOAD"
+										RAWDEPENDENCIESJSXMLLOAD="$(echo -e "${RAWDEPENDENCIESJSXMLLOAD}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+								fi
+								
 								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
 								
+								# strip load commands down to Bundle-Name for each bundle
 								BUNDLENAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-Name"`
 								
 								CLEANEDBUNDLENAMES=""
@@ -183,64 +197,68 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								CLEANEDBUNDLENAMES=`echo "$CLEANEDBUNDLENAMES" | sort -u`
 								CLEANEDBUNDLENAMES="$(echo -e "${CLEANEDBUNDLENAMES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 								
-								count=0
-								echo INFO: found the following loads
-								while read -r CURRDEP
-								do
-									echo INFO: load \($count\) "$CURRDEP"
-									count=$((count+1))
-								done <<< "$CLEANEDBUNDLENAMES"
-								echo INFO: load -$count- elements
-								
-								echo cleaned loads: "$CLEANEDBUNDLENAMES"
-								
-								MANIFESTFILES=`find "." -mindepth 4 -maxdepth 4 -name MANIFEST.MF `
-								
-								LOADEDPROJECTS=""
-								while read -r CURRBUNDLENAME
-								do	
-									echo INFO: looking up MANIFEST.MF with Bundle-Name:"$CURRBUNDLENAME"
-									CURRMANIFESTBUNDLESYMBOLICNAME=""
-									
-									while read -r CURRMANIFEST
-									do
-										CURRMANIFESTBUNDLENAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-Name"`
-										if [[ "$CURRBUNDLENAME" != "$CURRMANIFESTBUNDLENAME" ]]
-											then
-												continue
-										fi
+								if [[ "$CLEANEDBUNDLENAMES" != "" ]]
+									then
+										count=0
+										echo INFO: found the following loads
+										while read -r CURRDEP
+										do
+											echo INFO: load \($count\) "$CURRDEP"
+											count=$((count+1))
+										done <<< "$CLEANEDBUNDLENAMES"
+										echo INFO: load -$count- elements
 										
-										CURRMANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-SymbolicName"`
+										# find MANIFEST.MF files matching each Bundle-Name entry
+										MANIFESTFILES=`find "." -mindepth 4 -maxdepth 4 -name MANIFEST.MF `
 										
-										echo INFO: found Bundle-Name "$CURRBUNDLENAME" in "$CURRMANIFEST"
-										echo INFO: matching Bundle-SymbolicName is: "$CURRMANIFESTBUNDLESYMBOLICNAME"
-										break
-									done <<< "$MANIFESTFILES"
-									
-									if [[ "$CURRMANIFESTBUNDLESYMBOLICNAME" == "" ]]
-										then
-											echo WARNING: unable to find project with Bundle-Name "$CURRBUNDLENAME"
-											continue
-									fi
-									
-									LOADEDPROJECTS="$LOADEDPROJECTS
+										LOADEDPROJECTS=""
+										while read -r CURRBUNDLENAME
+										do	
+											echo INFO: looking up MANIFEST.MF with Bundle-Name:"$CURRBUNDLENAME"
+											CURRMANIFESTBUNDLESYMBOLICNAME=""
+											
+											while read -r CURRMANIFEST
+											do
+												CURRMANIFESTBUNDLENAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-Name"`
+												if [[ "$CURRBUNDLENAME" != "$CURRMANIFESTBUNDLENAME" ]]
+													then
+														continue
+												fi
+												
+												CURRMANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-SymbolicName"`
+												
+												echo INFO: found Bundle-Name "$CURRBUNDLENAME" in "$CURRMANIFEST"
+												echo INFO: matching Bundle-SymbolicName is: "$CURRMANIFESTBUNDLESYMBOLICNAME"
+												break
+											done <<< "$MANIFESTFILES"
+											
+											if [[ "$CURRMANIFESTBUNDLESYMBOLICNAME" == "" ]]
+												then
+													echo WARNING: unable to find project with Bundle-Name "$CURRBUNDLENAME"
+													continue
+											fi
+											
+											LOADEDPROJECTS="$LOADEDPROJECTS
 ""$CURRMANIFESTBUNDLESYMBOLICNAME"
-									
-								done <<< "$CLEANEDBUNDLENAMES"
-								
-								LOADEDPROJECTS="$(echo -e "${LOADEDPROJECTS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
-								
-								count=0
-								echo INFO: found the following loads
-								while read -r CURRDEP
-								do
-									echo INFO: load \($count\) "$CURRDEP"
-									count=$((count+1))
-								done <<< "$LOADEDPROJECTS"
-								echo INFO: load -$count- elements
-								
-								CLEANDEPENDENCIES="$CLEANDEPENDENCIES
+											
+										done <<< "$CLEANEDBUNDLENAMES"
+										
+										LOADEDPROJECTS="$(echo -e "${LOADEDPROJECTS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+										
+										count=0
+										echo INFO: found the following loads
+										while read -r CURRDEP
+										do
+											echo INFO: load \($count\) "$CURRDEP"
+											count=$((count+1))
+										done <<< "$LOADEDPROJECTS"
+										echo INFO: load -$count- elements
+										
+										CLEANDEPENDENCIES="$CLEANDEPENDENCIES
 ""$LOADEDPROJECTS"
+									else
+										echo INFO: nothing to load
+								fi
 								
 								echo ----------------------------------------------------------------
 						fi
