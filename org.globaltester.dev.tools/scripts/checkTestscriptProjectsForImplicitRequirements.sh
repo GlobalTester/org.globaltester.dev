@@ -70,13 +70,25 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							then
 								# this is a testscripts project
 								TESTSCRIPTSPROJECT=true
+								RAWDEPENDENCIES="";
 								
 								# get all direct dependencies from *.js and *.xml
-								RAWDEPENDENCIESJS=`find "$PATHTOPROJECT/Helper" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-								RAWDEPENDENCIESXML=`find "$PATHTOPROJECT/TestSuites" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+								PATHTOHELPER="$PATHTOPROJECT"/Helper
+								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
+									then
+										RAWDEPENDENCIESJS=`find "$PATHTOHELPER" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+										RAWDEPENDENCIES="$RAWDEPENDENCIESJS"
+								fi
 								
-								RAWDEPENDENCIES="$RAWDEPENDENCIESJS
+								PATHTOTESTSUITES="$PATHTOPROJECT"/TestSuites
+								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
+									then
+										RAWDEPENDENCIESXML=`find "$PATHTOTESTSUITES" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
+										RAWDEPENDENCIES="$RAWDEPENDENCIES
 ""$RAWDEPENDENCIESXML"
+										RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+								fi
+								
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sort -u`
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
 							else
@@ -85,6 +97,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								RAWDEPENDENCIESJAVA=`find "$PATHTOPROJECT"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
 						fi
+						
+						RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						
 						count=0
 						echo INFO: found the following raw dependencies
@@ -136,6 +150,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						echo ----------------------------------------------------------------
 						
+						# add indirect dependencies via load from *.js and *.xml
 						if [[ $TESTSCRIPTSPROJECT ]]
 							then
 								# get all indirect dependencies via load from *.js and *.xml
