@@ -81,6 +81,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $GREPRESULT == '0' ]]
 							then
 								# this is a testscripts project
+								TESTSCRIPTSPROJECT=true
 								
 								# get all direct dependencies from *.js and *.xml
 								RAWDEPENDENCIESJS=`find "$PATHTOPROJECT/Helper" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
@@ -129,6 +130,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								
 							else
 								# this is a code project
+								TESTSCRIPTSPROJECT=false
 								RAWDEPENDENCIESJAVA=`find "$PATHTOPROJECT"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
 						fi
@@ -180,6 +182,15 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
 							
 						done <<< "$RAWDEPENDENCIES"
+						
+						echo ----------------------------------------------------------------
+						
+						if [[ $TESTSCRIPTSPROJECT ]]
+							then
+								echo test
+						fi
+						
+						echo ----------------------------------------------------------------
 						
 						UDEPS=`echo "$CLEANDEPENDENCIES" | sort -u`
 						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
