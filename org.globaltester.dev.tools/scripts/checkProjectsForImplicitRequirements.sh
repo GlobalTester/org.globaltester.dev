@@ -51,13 +51,14 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 		CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
 		echo INFO: current repo is \""$CURRENT_REPO"\"
 		
-		for CURRENT_PROJECT in "$CURRENT_REPO"
+		for CURRENT_PROJECT in $CURRENT_REPO/*/
 			do
-				if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
+				CURRENT_PROJECT=`basename $CURRENT_PROJECT`
+				PATHTOPROJECT="$CURRENT_REPO/$CURRENT_PROJECT"
+				if [[ -d $PATHTOPROJECT && $PATHTOPROJECT != '.' && $PATHTOPROJECT != '..' ]]
 					then
 						echo ================================================================
-						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
-						PATHTOPROJECT="$CURRENT_REPO"/"$CURRENT_PROJECT"
+						#CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
 						PATHTOMANIFESTMF="$PATHTOPROJECT/META-INF/MANIFEST.MF"
 						echo INFO: currently checked project is: \""$CURRENT_REPO/$CURRENT_PROJECT"\"
 						
@@ -341,7 +342,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							if [[ $GREPEXITSTATUS != '0' ]]
 								then
-									echo WARNING: obsolete requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+									echo WARNING: potentially obsolete requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 									continue
 								else
 									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
