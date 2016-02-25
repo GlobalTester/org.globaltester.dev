@@ -258,7 +258,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										CLEANDEPENDENCIES="$CLEANDEPENDENCIES
 ""$LOADEDPROJECTS"
 									else
-										echo INFO: nothing to load
+										echo INFO: no indirect dependencies from load
 								fi
 								
 								echo ----------------------------------------------------------------
@@ -268,11 +268,11 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						UDEPS=`echo "$CLEANDEPENDENCIES" | sort -u`
 						UDEPS="$(echo -e "${UDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
-						echo INFO: unique dependencies - $UDEPS
 						
-						echo ----------------------------------------------------------------
+						# ----------------------------------------------------------------
 						
 						# filter self dependency
+						echo INFO: filtering self-dependency
 						MANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-SymbolicName"`
 						NEWUDEPS=""
 						while read -r CURRENTDEPENDENCY
@@ -288,67 +288,87 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						NEWUDEPS="$(echo -e "${NEWUDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						UDEPS="$NEWUDEPS"
 						
-						# ----------------------------------------------------------------
+						echo ----------------------------------------------------------------
 						
 						# list all final dependencies
-						count=0
-						echo INFO: found the following unique dependencies in $TESTSCRIPTSIDENTIFIER project
-						while read -r CURRENTRAWDEPENDENCY
-						do
-							echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
-							count=$((count+1))
-						done <<< "$UDEPS"
-						echo INFO: -$count- elements
+						if [[ "$UDEPS" != "" ]]
+							then
+								count=0
+								echo INFO: found the following parsed unique dependencies in $TESTSCRIPTSIDENTIFIER project
+								while read -r CURRENTRAWDEPENDENCY
+								do
+									echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
+									count=$((count+1))
+								done <<< "$UDEPS"
+								echo INFO: -$count- elements
+							else
+								echo INFO: there are no parsed dependencies
+						fi
 						
 						echo ----------------------------------------------------------------
 						
 						# extract and list all requirements listed in the MANIFEST.MF of the test script project
 						MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
 						
-						count=0
-						echo INFO: found the following unique dependencies in $PATHTOMANIFESTMF
-						while read -r CURRDEP
-						do
-							echo INFO: \($count\) "$CURRDEP"
-							count=$((count+1))
-						done <<< "$MANIFESTREQS"
-						echo INFO: -$count- elements
+						if [[ "$MANIFESTREQS" != "" ]]
+							then
+								count=0
+								echo INFO: found the following unique dependencies in $PATHTOMANIFESTMF
+								while read -r CURRDEP
+								do
+									echo INFO: \($count\) "$CURRDEP"
+									count=$((count+1))
+								done <<< "$MANIFESTREQS"
+								echo INFO: -$count- elements
+							else
+								echo INFO: there are no dependencies defined in "$PATHTOMANIFESTMF"
+						fi
 						
 						echo ----------------------------------------------------------------
 						
 						# match dependencies from script project against requirements defined in MANIFEST.MF
-						while read -r CURRDEPEXPECTED
-						do
-							GREPREQS=`echo "$MANIFESTREQS" | grep "$CURRDEPEXPECTED"`
-							GREPEXITSTATUS=$?
-							
-							if [[ $GREPEXITSTATUS != '0' ]]
-								then
-									echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
-									continue
-								else
-									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
-							fi
-							
-						done <<< "$UDEPS"
+						if [[ "$UDEPS" != "" ]]
+							then
+								while read -r CURRDEPEXPECTED
+								do
+									GREPREQS=`echo "$MANIFESTREQS" | grep "$CURRDEPEXPECTED"`
+									GREPEXITSTATUS=$?
+									
+									if [[ $GREPEXITSTATUS != '0' ]]
+										then
+											echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+											continue
+										else
+											echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+									fi
+									
+								done <<< "$UDEPS"
+							else
+								echo INFO: not missing any requirements in "$PATHTOMANIFESTMF"
+						fi
 						
 						echo ----------------------------------------------------------------
 						
 						# match dependencies from script project against requirements defined in MANIFEST.MF
-						while read -r CURRDEPEXPECTED
-						do
-							GREPREQS=`echo "$UDEPS" | grep "$CURRDEPEXPECTED"`
-							GREPEXITSTATUS=$?
-							
-							if [[ $GREPEXITSTATUS != '0' ]]
-								then
-									echo WARNING: potentially obsolete requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
-									continue
-								else
-									echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
-							fi
-							
-						done <<< "$MANIFESTREQS"
+						if [[ "$MANIFESTREQS" != "" ]]
+							then
+								while read -r CURRDEPEXPECTED
+								do
+									GREPREQS=`echo "$UDEPS" | grep "$CURRDEPEXPECTED"`
+									GREPEXITSTATUS=$?
+									
+									if [[ $GREPEXITSTATUS != '0' ]]
+										then
+											echo WARNING: potentially obsolete requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+											continue
+										else
+											echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+									fi
+									
+								done <<< "$MANIFESTREQS"
+							else
+								echo INFO: there are definitely not too many requirements in "$PATHTOMANIFESTMF"
+						fi
 						
 						echo ----------------------------------------------------------------
 						
