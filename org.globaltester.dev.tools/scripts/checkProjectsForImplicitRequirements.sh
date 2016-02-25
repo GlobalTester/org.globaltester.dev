@@ -271,6 +271,24 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						
 						echo ----------------------------------------------------------------
 						
+						# filter self dependency
+						MANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-SymbolicName"`
+						NEWUDEPS=""
+						while read -r CURRENTDEPENDENCY
+						do
+							if [[ "$CURRENTDEPENDENCY" != "$MANIFESTBUNDLESYMBOLICNAME" ]]
+								then
+									NEWUDEPS="$NEWUDEPS
+""$CURRENTDEPENDENCY"
+								else
+									echo INFO: skipped self-dependency \""$CURRENTDEPENDENCY"\"
+							fi
+						done <<< "$UDEPS"
+						NEWUDEPS="$(echo -e "${NEWUDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+						UDEPS="$NEWUDEPS"
+						
+						# ----------------------------------------------------------------
+						
 						# list all final dependencies
 						count=0
 						echo INFO: found the following unique dependencies in $TESTSCRIPTSIDENTIFIER project
