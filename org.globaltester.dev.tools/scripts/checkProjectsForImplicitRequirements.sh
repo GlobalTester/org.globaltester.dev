@@ -42,16 +42,16 @@ function findDir(){
 
 
 BASEDIR=`pwd`
-echo INFO: base dir is $BASEDIR
+echo INFO: base dir is \""$BASEDIR"\"
 CURRENT_REPO=$1
-echo INFO: current repo is $CURRENT_REPO
+echo INFO: current repo is \""$CURRENT_REPO"\"
 
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 	then	
 		CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
-		echo INFO: current repo is: $CURRENT_REPO
+		echo INFO: current repo is \""$CURRENT_REPO"\"
 		
-		for CURRENT_PROJECT in $CURRENT_REPO
+		for CURRENT_PROJECT in "$CURRENT_REPO"
 			do
 				if [[ -d $CURRENT_PROJECT && $CURRENT_PROJECT != '.' && $CURRENT_PROJECT != '..' ]]
 					then
@@ -59,7 +59,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
 						PATHTOPROJECT="$CURRENT_REPO"/"$CURRENT_PROJECT"
 						PATHTOMANIFESTMF="$PATHTOPROJECT/META-INF/MANIFEST.MF"
-						echo INFO: currently checked project is: $CURRENT_REPO/$CURRENT_PROJECT
+						echo INFO: currently checked project is: \""$CURRENT_REPO/$CURRENT_PROJECT"\"
 						
 						# find required classes or packages
 						
@@ -334,10 +334,15 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						echo ----------------------------------------------------------------
 						
 						# extend script here
-						
+					
+					else
+						echo WARNING: illegal project name "$CURRENT_PROJECT"
 				fi
 			done
-			
+	else
+		echo WARNING: illegal repo name "$CURRENT_REPO"
 fi
 
 echo Script finished successfully
+
+exit 0
