@@ -22,6 +22,7 @@ TESTSCRIPTSIDENTIFIER="testscripts"
 #<GIT-specific files>
 GITIGNOREFILE='.gitignore'
 GITATTRIBUTESFILE='.gitattributes'
+GITATTRIBUTESFILEMATCH='../org.globaltester.dev/.gitattributes'
 #</GIT-specific files>
 
 #<HJP-specific identifiers>
@@ -137,7 +138,15 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 		# check for the presence of a .gitattributes file on repository level
 		if [ -f $GITATTRIBUTESFILE ]
 			then
-				$VERBOSE && echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR "as expected (content currently unchecked)"
+				HASH1=`md5sum $GITATTRIBUTESFILE | cut -d ' ' -f 1`
+				HASH2=`md5sum $GITATTRIBUTESFILEMATCH | cut -d ' ' -f 1`
+				if [[ $HASH1 == $HASH2 ]]
+					then
+						$VERBOSE && echo INFO: file $GITATTRIBUTESFILE found at $CURRENTDIR matching $GITATTRIBUTESFILEMATCH
+					else
+						echo -e ERROR: file $GITATTRIBUTESFILE differs at $CURRENTDIR from $GITATTRIBUTESFILEMATCH
+						exit 1
+				fi
 			else
 				echo ERROR: file $GITATTRIBUTESFILE NOT found at $CURRENTDIR
 				exit 1
