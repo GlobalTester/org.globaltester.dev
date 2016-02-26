@@ -13,6 +13,47 @@ TESTSCRIPTSIDENTIFIER="testscripts"
 
 
 
+# parameter handling
+while [ $# -gt 0 ]
+do
+	case "$1" in
+		"-h"|"--help")
+			echo -e "Usage:\n"
+			echo -e "`basename $0` <options> REPO\n"
+			echo -e "Perform some dependency checks on all projects in the given REPO."
+			echo -e "Must be called from the root of all checked out HJP repositories."
+			echo -e "REPO needs to be the local folder name of the repository (which is expected to match the repository name."
+			echo
+			echo "-v | --verbose          output more progress information"
+
+			exit 1
+		;;
+		"-v"|"--verbose")
+			VERBOSE=true
+			shift 1
+		;;
+		*)
+			if [ $# -eq 1 ]
+			then
+				CURRENT_REPO=$1
+				shift 1
+			else
+				echo "unknown parameter: $1"
+				exit 1;
+			fi
+		;;
+		esac
+done
+
+if [ ! $CURRENT_REPO ]
+then
+	echo "Missing paramter: REPO"
+	echo "see `basename $0` -h for help"
+	exit 1
+fi
+
+
+
 FINDDIRRESULT=""
 function findDir(){
 	CURRENTRAWDEPENDENCY="$1"
@@ -118,7 +159,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						while read -r CURRENTRAWDEPENDENCY
 						do
 							echo ----------------------------------------------------------------
-							echo "DEBUG: current raw dependency: $CURRENTRAWDEPENDENCY"
+							echo INFO: current raw dependency: "$CURRENTRAWDEPENDENCY"
 							
 							findDir "$CURRENTRAWDEPENDENCY" "."
 							FINDDIREXITSTATUS=$?
