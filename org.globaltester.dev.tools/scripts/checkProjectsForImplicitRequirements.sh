@@ -14,6 +14,7 @@ TESTSCRIPTSIDENTIFIER="testscripts"
 
 
 # parameter handling
+VERBOSE=false
 while [ $# -gt 0 ]
 do
 	case "$1" in
@@ -62,8 +63,6 @@ function findDir(){
 	PREVDEPTMP=""
 	CURRDEPTMP="$CURRENTRAWDEPENDENCY"
 	
-	#echo INFO: curr wdir is `pwd`
-	
 	while [[ ! -d "$MYPATH/$CURRDEPTMP" ]]
 	do
 		PREVDEPTMP="$CURRDEPTMP"
@@ -83,14 +82,14 @@ function findDir(){
 
 
 BASEDIR=`pwd`
-echo INFO: base dir is \""$BASEDIR"\"
-CURRENT_REPO=$1
-echo INFO: current repo is \""$CURRENT_REPO"\"
+$VERBOSE && echo INFO: base dir is \""$BASEDIR"\"
+#CURRENT_REPO=$1
+$VERBOSE && echo INFO: current repo is \""$CURRENT_REPO"\"
 
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 	then	
 		CURRENT_REPO=$(echo $CURRENT_REPO | cut -d '/' -f 1)
-		echo INFO: current repo is \""$CURRENT_REPO"\"
+		$VERBOSE && echo INFO: current repo is \""$CURRENT_REPO"\"
 		
 		for CURRENT_PROJECT in $CURRENT_REPO/*/
 			do
@@ -98,10 +97,10 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 				PATHTOPROJECT="$CURRENT_REPO/$CURRENT_PROJECT"
 				if [[ -d $PATHTOPROJECT && $PATHTOPROJECT != '.' && $PATHTOPROJECT != '..' ]]
 					then
-						echo ================================================================
+						$VERBOSE && echo ================================================================
 						#CURRENT_PROJECT=$(echo $CURRENT_PROJECT | cut -d '/' -f 1)
 						PATHTOMANIFESTMF="$PATHTOPROJECT/META-INF/MANIFEST.MF"
-						echo INFO: currently checked project is: \""$CURRENT_REPO/$CURRENT_PROJECT"\"
+						$VERBOSE && echo INFO: currently checked project is: \""$CURRENT_REPO/$CURRENT_PROJECT"\"
 						
 						# find required classes or packages
 						
@@ -111,7 +110,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $GREPRESULT == '0' ]]
 							then
 								# this is a testscripts project
-								echo INFO: this is a testscripts project
+								$VERBOSE && echo INFO: this is a testscripts project
 								TESTSCRIPTSPROJECT=true
 								RAWDEPENDENCIES="";
 								
@@ -119,7 +118,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								PATHTOHELPER="$PATHTOPROJECT"/Helper
 								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
 									then
-										echo INFO: parsing "$PATHTOHELPER"
+										$VERBOSE && echo INFO: parsing "$PATHTOHELPER"
 										RAWDEPENDENCIESJS=`find "$PATHTOHELPER" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 										RAWDEPENDENCIES="$RAWDEPENDENCIESJS"
 								fi
@@ -127,7 +126,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								PATHTOTESTSUITES="$PATHTOPROJECT"/TestSuites
 								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
 									then
-										echo INFO: parsing "$PATHTOTESTSUITES"
+										$VERBOSE && echo INFO: parsing "$PATHTOTESTSUITES"
 										RAWDEPENDENCIESXML=`find "$PATHTOTESTSUITES" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 										RAWDEPENDENCIES="$RAWDEPENDENCIES
 ""$RAWDEPENDENCIESXML"
@@ -138,7 +137,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
 							else
 								# this is a code project
-								echo INFO: this is a code project
+								$VERBOSE && echo INFO: this is a code project
 								TESTSCRIPTSPROJECT=false
 								RAWDEPENDENCIESJAVA=`find "$PATHTOPROJECT"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
 								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
@@ -147,19 +146,19 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						
 						count=0
-						echo INFO: found the following raw dependencies
+						$VERBOSE && echo INFO: found the following raw dependencies
 						while read -r CURRENTRAWDEPENDENCY
 						do
-							echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
+							$VERBOSE && echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
 							count=$((count+1))
 						done <<< "$RAWDEPENDENCIES"
-						echo INFO: -$count- elements
+						$VERBOSE && echo INFO: -$count- elements
 						
 						CLEANDEPENDENCIES=""
 						while read -r CURRENTRAWDEPENDENCY
 						do
-							echo ----------------------------------------------------------------
-							echo INFO: current raw dependency: "$CURRENTRAWDEPENDENCY"
+							$VERBOSE && echo ----------------------------------------------------------------
+							$VERBOSE && echo INFO: current raw dependency: "$CURRENTRAWDEPENDENCY"
 							
 							findDir "$CURRENTRAWDEPENDENCY" "."
 							FINDDIREXITSTATUS=$?
@@ -172,7 +171,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							fi
 							
 							CURRDEPREPO=$FINDDIRRESULT
-							echo INFO: parent repository of "$CURRENTRAWDEPENDENCY" is "$CURRDEPREPO"
+							$VERBOSE && $VERBOSE && echo INFO: parent repository of "$CURRENTRAWDEPENDENCY" is "$CURRDEPREPO"
 							
 							#----------------------------------------------------------------
 							
@@ -190,11 +189,11 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							# save project containing the raw dependency
 							CLEANDEPENDENCIES=`echo -e "$CLEANDEPENDENCIES"'\n'"$CURRDEPPROJECT"`
-							echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
+							$VERBOSE && $VERBOSE && echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
 							
 						done <<< "$RAWDEPENDENCIES"
 						
-						echo ----------------------------------------------------------------
+						$VERBOSE && echo ----------------------------------------------------------------
 						
 						# add indirect dependencies via load from *.js and *.xml
 						if [[ $TESTSCRIPTSPROJECT ]]
@@ -204,14 +203,14 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								
 								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
 									then
-										echo INFO: parsing "$PATHTOHELPER"
+										$VERBOSE && $VERBOSE && echo INFO: parsing "$PATHTOHELPER"
 										RAWDEPENDENCIESJSLOAD=`find "$PATHTOHELPER" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
 										RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD"
 								fi
 								
 								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
 									then
-										echo INFO: parsing "$PATHTOTESTSUITES"
+										$VERBOSE && $VERBOSE && echo INFO: parsing "$PATHTOTESTSUITES"
 										RAWDEPENDENCIESXMLLOAD=`find "$PATHTOTESTSUITES" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
 										RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSXMLLOAD
 ""$RAWDEPENDENCIESXMLLOAD"
@@ -242,13 +241,13 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								if [[ "$CLEANEDBUNDLENAMES" != "" ]]
 									then
 										count=0
-										echo INFO: found the following loads
+										$VERBOSE && $VERBOSE && echo INFO: found the following loads
 										while read -r CURRDEP
 										do
-											echo INFO: load \($count\) "$CURRDEP"
+											$VERBOSE && $VERBOSE && echo INFO: load \($count\) "$CURRDEP"
 											count=$((count+1))
 										done <<< "$CLEANEDBUNDLENAMES"
-										echo INFO: load -$count- elements
+										$VERBOSE && $VERBOSE && echo INFO: load -$count- elements
 										
 										# find MANIFEST.MF files matching each Bundle-Name entry
 										MANIFESTFILES=`find "." -mindepth 4 -maxdepth 4 -name MANIFEST.MF `
@@ -256,7 +255,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										LOADEDPROJECTS=""
 										while read -r CURRBUNDLENAME
 										do	
-											echo INFO: looking up MANIFEST.MF with Bundle-Name:"$CURRBUNDLENAME"
+											$VERBOSE && echo INFO: looking up MANIFEST.MF with Bundle-Name:"$CURRBUNDLENAME"
 											CURRMANIFESTBUNDLESYMBOLICNAME=""
 											
 											while read -r CURRMANIFEST
@@ -269,8 +268,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 												
 												CURRMANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$CURRMANIFEST" "Bundle-SymbolicName"`
 												
-												echo INFO: found Bundle-Name "$CURRBUNDLENAME" in "$CURRMANIFEST"
-												echo INFO: matching Bundle-SymbolicName is: "$CURRMANIFESTBUNDLESYMBOLICNAME"
+												$VERBOSE && echo INFO: found Bundle-Name "$CURRBUNDLENAME" in "$CURRMANIFEST"
+												$VERBOSE && echo INFO: matching Bundle-SymbolicName is: "$CURRMANIFESTBUNDLESYMBOLICNAME"
 												break
 											done <<< "$MANIFESTFILES"
 											
@@ -288,21 +287,21 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										LOADEDPROJECTS="$(echo -e "${LOADEDPROJECTS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 										
 										count=0
-										echo INFO: found the following loads
+										$VERBOSE && echo INFO: found the following loads
 										while read -r CURRDEP
 										do
-											echo INFO: load \($count\) "$CURRDEP"
+											$VERBOSE && echo INFO: load \($count\) "$CURRDEP"
 											count=$((count+1))
 										done <<< "$LOADEDPROJECTS"
-										echo INFO: load -$count- elements
+										$VERBOSE && echo INFO: load -$count- elements
 										
 										CLEANDEPENDENCIES="$CLEANDEPENDENCIES
 ""$LOADEDPROJECTS"
 									else
-										echo INFO: no indirect dependencies from load
+										$VERBOSE && echo INFO: no indirect dependencies from load
 								fi
 								
-								echo ----------------------------------------------------------------
+								$VERBOSE && echo ----------------------------------------------------------------
 						fi
 						
 						# ----------------------------------------------------------------
@@ -313,7 +312,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						# ----------------------------------------------------------------
 						
 						# filter self dependency
-						echo INFO: filtering self-dependency
+						$VERBOSE && echo INFO: filtering self-dependency
 						MANIFESTBUNDLESYMBOLICNAME=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Bundle-SymbolicName"`
 						NEWUDEPS=""
 						while read -r CURRENTDEPENDENCY
@@ -323,30 +322,30 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 									NEWUDEPS="$NEWUDEPS
 ""$CURRENTDEPENDENCY"
 								else
-									echo INFO: skipped self-dependency \""$CURRENTDEPENDENCY"\"
+									$VERBOSE && echo INFO: skipped self-dependency \""$CURRENTDEPENDENCY"\"
 							fi
 						done <<< "$UDEPS"
 						NEWUDEPS="$(echo -e "${NEWUDEPS}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						UDEPS="$NEWUDEPS"
 						
-						echo ----------------------------------------------------------------
+						$VERBOSE && echo ----------------------------------------------------------------
 						
 						# list all final dependencies
 						if [[ "$UDEPS" != "" ]]
 							then
 								count=0
-								echo INFO: found the following parsed unique dependencies in $TESTSCRIPTSIDENTIFIER project
+								$VERBOSE && echo INFO: found the following parsed unique dependencies in $TESTSCRIPTSIDENTIFIER project
 								while read -r CURRENTRAWDEPENDENCY
 								do
-									echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
+									$VERBOSE && echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
 									count=$((count+1))
 								done <<< "$UDEPS"
-								echo INFO: -$count- elements
+								$VERBOSE && echo INFO: -$count- elements
 							else
-								echo INFO: there are no parsed dependencies
+								$VERBOSE && echo INFO: there are no parsed dependencies
 						fi
 						
-						echo ----------------------------------------------------------------
+						$VERBOSE && echo ----------------------------------------------------------------
 						
 						# extract and list all requirements listed in the MANIFEST.MF of the test script project
 						MANIFESTREQS=`extractFieldFromManifest "$PATHTOMANIFESTMF" "Require-Bundle"`
@@ -354,15 +353,15 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ "$MANIFESTREQS" != "" ]]
 							then
 								count=0
-								echo INFO: found the following unique dependencies in $PATHTOMANIFESTMF
+								$VERBOSE && echo INFO: found the following unique dependencies in $PATHTOMANIFESTMF
 								while read -r CURRDEP
 								do
-									echo INFO: \($count\) "$CURRDEP"
+									$VERBOSE && echo INFO: \($count\) "$CURRDEP"
 									count=$((count+1))
 								done <<< "$MANIFESTREQS"
-								echo INFO: -$count- elements
+								$VERBOSE && echo INFO: -$count- elements
 							else
-								echo INFO: there are no dependencies defined in "$PATHTOMANIFESTMF"
+								$VERBOSE && echo INFO: there are no dependencies defined in "$PATHTOMANIFESTMF"
 						fi
 						
 						echo ----------------------------------------------------------------
@@ -380,12 +379,12 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 											echo WARNING: missing requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 											continue
 										else
-											echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+											$VERBOSE && echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 									fi
 									
 								done <<< "$UDEPS"
 							else
-								echo INFO: not missing any requirements in "$PATHTOMANIFESTMF"
+								$VERBOSE && echo INFO: not missing any requirements in "$PATHTOMANIFESTMF"
 						fi
 						
 						echo ----------------------------------------------------------------
@@ -403,12 +402,12 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 											echo WARNING: potentially obsolete requirement "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 											continue
 										else
-											echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
+											$VERBOSE && echo INFO: found dependency for "$CURRDEPEXPECTED" in "$PATHTOMANIFESTMF"!
 									fi
 									
 								done <<< "$MANIFESTREQS"
 							else
-								echo INFO: there are definitely not too many requirements in "$PATHTOMANIFESTMF"
+								$VERBOSE && echo INFO: there are definitely not too many requirements in "$PATHTOMANIFESTMF"
 						fi
 						
 						echo ----------------------------------------------------------------
@@ -423,6 +422,6 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 		echo WARNING: illegal repo name "$CURRENT_REPO"
 fi
 
-echo Script finished successfully
+$VERBOSE && echo Script finished successfully
 
 exit 0
