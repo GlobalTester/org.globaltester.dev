@@ -129,9 +129,9 @@ for CURRENT_PROJECT in $REPOSITORY/*/
 do
 	echo Currently updating file in $CURRENT_PROJECT
 	
-	replaceManifest "$CURRENT_PROJECT" META-INF/MANIFEST.MF "$VERSION"
-	replaceFeature "$CURRENT_PROJECT" feature.xml "$VERSION"
-	replaceProduct "$CURRENT_PROJECT" *.product "$VERSION"
+	replaceManifest "$CURRENT_PROJECT" META-INF/MANIFEST.MF "${VERSION}.qualifier"
+	replaceFeature "$CURRENT_PROJECT" feature.xml "${VERSION}.qualifier"
+	replaceProduct "$CURRENT_PROJECT" *.product "${VERSION}.qualifier"
 	stampTestScripts "$CURRENT_PROJECT" TestSuites "$VERSION" "$DATE"
 done
 

@@ -2,6 +2,12 @@
 # must be called from root directory
 . org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
 
+BUILDTYPE_NIGHTLY=NIGHTLY
+BUILDTYPE_HOTFIX=HOTFIX
+BUILDTYPE_RELEASE=RELEASE
+
+BUILDTYPE=$BUILDTYPE_NIGHTLY
+
 function createProductList {
 	if [ -e $PRODUCT_LIST ]
 	then
@@ -67,7 +73,12 @@ do
 			echo -e "`basename $0` <options>\n"
 			echo -e "This must be called from the root of all checked out HJP repositories."
 			echo
-			echo "-d | --dir          the build directory to store information used/generated throughout the process                     defaults to a temp file"
+			echo "-d | --dir                     the build directory to store information used/generated throughout the process               defaults to a temp file"
+			echo
+			echo "Build type options                											  defaults to nightly build"
+			echo "--hotfix <qualifier>      build a hotfix"
+			echo "                               <qualifier> needs to be the issueID optionally followed by an underscore and an index"
+			echo "-r | --release                 build a release (build qualifier will be v<date>)"
 
 			exit 1
 		;;
@@ -79,6 +90,22 @@ do
 			fi
 			BUILDDIR=$2
 			shift 2
+		;;
+		"--hotfix")
+			if [[ -z "$2" || $2 == "-"* ]]
+			then
+				echo "Hotfix needs to specify build qualifier e.g. <issueID>[_<index>]"
+				exit 1
+			fi
+			BUILDTYPE=$BUILDTYPE_HOTFIX
+			HOTFIX=$2
+			MAVEN_QUALIFIER="-DforceContextQualifier=hotfix${HOTFIX}_`date +%Y%m%d`"
+			shift 2
+		;;
+		"-r"|"--release")
+			BUILDTYPE=$BUILDTYPE_RELEASE
+			MAVEN_QUALIFIER="-DforceContextQualifier=v`date +%Y%m%d`"
+			shift 1
 		;;
 		*)
 			echo "unknown parameter: $1"
@@ -286,7 +313,7 @@ while true; do
 		"8")
 			echo "Build the desired products"
 			cd "$AGGREGATOR"
-			mvn clean verify -T 2C
+			mvn clean verify -T 2C $MAVEN_QUALIFIER
 			if [ $? -ne 0 ]; then
 				echo
 				echo "Failed to create build all products"
@@ -385,18 +412,36 @@ while true; do
 		;;
 		"13")
 			echo "Tag repositories"
-			for CURRENT_REPO in `cat $REPO_LIST`
-			do
-				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
-			done
+			if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
+			then
+				for CURRENT_REPO in `cat $REPO_LIST`
+				do
+					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
+				done
+			elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
+			then
+				for CURRENT_REPO in `cat $REPO_LIST`
+				do
+					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagHotfix.sh "$CURRENT_REPO" "$HOTFIX"
+				done
+			else
+				echo "Current buildtype is $BUILDTYPE"
+				echo "Can't tag repositories for this buildtype"
+			fi
 			((NEXT_STEP++))
 		;;
 		"14")
 			echo "Tag products"
-			for CURRENT_LINE in `cat $PRODUCT_LIST`
-			do
-				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagProduct.sh -r "$CURRENT_LINE"
-			done
+			if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
+			then
+				for CURRENT_LINE in `cat $PRODUCT_LIST`
+				do
+					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagProduct.sh -r "$CURRENT_LINE"
+				done
+			else
+				echo "Current buildtype is $BUILDTYPE"
+				echo "Can't tag products for this buildtype"
+			fi
 			((NEXT_STEP++))
 		;;
 		"15")
