@@ -48,7 +48,7 @@ done
 
 if [ ! $CURRENT_REPO ]
 then
-	echo "Missing paramter: REPO"
+	echo "Missing parameter: REPO"
 	echo "see `basename $0` -h for help"
 	exit 1
 fi
@@ -56,7 +56,7 @@ fi
 
 
 FINDDIRRESULT=""
-function findDir(){
+function findDir {
 	CURRENTRAWDEPENDENCY="$1"
 	MYPATH="$2"
 	
@@ -69,21 +69,17 @@ function findDir(){
 		CURRDEPTMP=$(echo "$PREVDEPTMP" | rev | cut -d '.' -f 2- | rev)
 		if [[ "$CURRDEPTMP" == "$PREVDEPTMP" ]]
 			then
-				#echo WARNING: did not find directory matching "$CURRENTRAWDEPENDENCY"!
 				return 1
 		fi
 	done
 	
-	FINDDIRRESULT="$CURRDEPTMP"
-	
-	return 0
+	echo "$CURRDEPTMP"
 }
 
 
 
 BASEDIR=`pwd`
 $VERBOSE && echo INFO: base dir is \""$BASEDIR"\"
-#CURRENT_REPO=$1
 $VERBOSE && echo INFO: current repo is \""$CURRENT_REPO"\"
 
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
@@ -107,6 +103,9 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						DEBUG=`echo "$CURRENT_REPO" | grep "$TESTSCRIPTSIDENTIFIER"`
 						GREPRESULT=$?
 						
+						IDENTIFY_REFERENCES='.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*'
+						
+						
 						if [[ $GREPRESULT == '0' ]]
 							then
 								# this is a testscripts project
@@ -114,45 +113,30 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								TESTSCRIPTSPROJECT=true
 								RAWDEPENDENCIES="";
 								
-								# get all direct dependencies from *.js and *.xml
-								PATHTOHELPER="$PATHTOPROJECT"/Helper
-								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
-									then
-										$VERBOSE && echo INFO: parsing "$PATHTOHELPER"
-										RAWDEPENDENCIESJS=`find "$PATHTOHELPER" -name *.js -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-										RAWDEPENDENCIES="$RAWDEPENDENCIESJS"
-								fi
+								# get all direct dependencies from test cases and java script
 								
-								PATHTOTESTSUITES="$PATHTOPROJECT"/TestSuites
-								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
-									then
-										$VERBOSE && echo INFO: parsing "$PATHTOTESTSUITES"
-										RAWDEPENDENCIESXML=`find "$PATHTOTESTSUITES" -name *.xml -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-										RAWDEPENDENCIES="$RAWDEPENDENCIES
-""$RAWDEPENDENCIESXML"
-										RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
-								fi
-								
-								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sort -u`
+								RAWDEPENDENCIES=`find "$PATHTOPROJECT" -name "*.gt*" -o -name *.js -exec sed -n -e "s@$IDENTIFY_REFERENCES@\1@gp" {} \; | sort -u`
 								RAWDEPENDENCIES=`echo "$RAWDEPENDENCIES" | sed -e "s|\(.*\)\..*|\1|" | sort -u`
 							else
 								# this is a code project
 								$VERBOSE && echo INFO: this is a code project
 								TESTSCRIPTSPROJECT=false
-								RAWDEPENDENCIESJAVA=`find "$PATHTOPROJECT"/src -name *.java -exec  sed -n -e 's@.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*@\1@gp' {} \; | sort -u`
-								RAWDEPENDENCIES="$RAWDEPENDENCIESJAVA"
+								RAWDEPENDENCIES=`find "$PATHTOPROJECT"/src -name *.java -exec sed -n -e 's@$IDENTIFY_REFERENCES@\1@gp' {} \; | sort -u`
 						fi
 						
 						RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						
-						count=0
-						$VERBOSE && echo INFO: found the following raw dependencies
-						while read -r CURRENTRAWDEPENDENCY
-						do
-							$VERBOSE && echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
-							count=$((count+1))
-						done <<< "$RAWDEPENDENCIES"
-						$VERBOSE && echo INFO: -$count- elements
+						if [ "$VERBOSE" == "true" ]
+						then
+							count=0
+							$VERBOSE && echo INFO: found the following raw dependencies
+							while read -r CURRENTRAWDEPENDENCY
+							do
+								$VERBOSE && echo INFO: \($count\) "$CURRENTRAWDEPENDENCY"
+								count=$((count+1))
+							done <<< "$RAWDEPENDENCIES"
+							$VERBOSE && echo INFO: -$count- elements
+						fi
 						
 						CLEANDEPENDENCIES=""
 						while read -r CURRENTRAWDEPENDENCY
@@ -160,7 +144,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							$VERBOSE && echo ----------------------------------------------------------------
 							$VERBOSE && echo INFO: current raw dependency: "$CURRENTRAWDEPENDENCY"
 							
-							findDir "$CURRENTRAWDEPENDENCY" "."
+							FINDDIRRESULT=`findDir "$CURRENTRAWDEPENDENCY" "."`
 							FINDDIREXITSTATUS=$?
 							
 							# greedily find repository containing the raw dependency
@@ -176,7 +160,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							#----------------------------------------------------------------
 							
 							# greedily find project containing the raw dependency
-							findDir "$CURRENTRAWDEPENDENCY" "$CURRDEPREPO"
+							FINDDIRRESULT=`findDir "$CURRENTRAWDEPENDENCY" "$CURRDEPREPO"`
 							FINDDIREXITSTATUS=$?
 							
 							if [[ $FINDDIREXITSTATUS != '0' ]]
@@ -199,24 +183,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $TESTSCRIPTSPROJECT ]]
 							then
 								# get all indirect dependencies via load from *.js and *.xml
-								RAWDEPENDENCIESJSXMLLOAD=""
-								
-								if [[ -d "$PATHTOHELPER" && "$PATHTOHELPER" != '.' && "$PATHTOHELPER" != '..' ]]
-									then
-										$VERBOSE && $VERBOSE && echo INFO: parsing "$PATHTOHELPER"
-										RAWDEPENDENCIESJSLOAD=`find "$PATHTOHELPER" -name *.js -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
-										RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSLOAD"
-								fi
-								
-								if [[ -d "$PATHTOTESTSUITES" && "$PATHTOTESTSUITES" != '.' && "$PATHTOTESTSUITES" != '..' ]]
-									then
-										$VERBOSE && $VERBOSE && echo INFO: parsing "$PATHTOTESTSUITES"
-										RAWDEPENDENCIESXMLLOAD=`find "$PATHTOTESTSUITES" -name *.xml -exec grep "^[[:space:]]*load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
-										RAWDEPENDENCIESJSXMLLOAD="$RAWDEPENDENCIESJSXMLLOAD
-""$RAWDEPENDENCIESXMLLOAD"
-										RAWDEPENDENCIESJSXMLLOAD="$(echo -e "${RAWDEPENDENCIESJSXMLLOAD}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
-								fi
-								
+								RAWDEPENDENCIESJSXMLLOAD=`find "$PATHTOPROJECT" -name "*.js" -o -name "*.gt*" -exec grep "load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESJSXMLLOAD="$(echo -e "${RAWDEPENDENCIESJSXMLLOAD}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
 								
 								# strip load commands down to Bundle-Name for each bundle
