@@ -1,3 +1,12 @@
+Version 0.1.2 (29.02.2016)
+
+* Implement qualified version numbers in workflowHelper
+* ConsistencyCheck: Compare gitattributes with file from o.g.dev
+* Adds .project file suffix to .gitignore
+* Enhance Coding Guidelines (about line endings)
+* Adds a script for building a test environment for the build scripts
+
+
 Version 0.1.1 (18.02.2016)
 
 * updated documentation concerning naming conventions
