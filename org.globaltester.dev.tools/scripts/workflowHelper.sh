@@ -64,6 +64,25 @@ function createProductList {
 	getRepositoriesFromAggregator $AGGREGATOR_POM > $REPO_LIST
 }
 
+function commitChanges {
+	QUESTION="$1"
+	MESSAGE="$2"
+	FILES="$3"
+	
+	read -p "$QUESTION Y/n " INPUT
+	case $INPUT in
+		"y"|"Y"|"")
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				cd "$CURRENT_REPO"
+				git add $FILES
+				git commit -m "$MESSAGE"
+				cd "$WORKINGDIR"
+			done
+		;;
+	esac
+}
+
 # parameter handling
 while [ $# -gt 0 ]
 do
@@ -231,21 +250,8 @@ while true; do
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
 			done
 
-			read -p "Commit modified changelogs? Y/n " INPUT
-			case $INPUT in
-				"y"|"Y"|"")
-					for CURRENT_REPO in `cat $REPO_LIST`
-					do
-						cd "$CURRENT_REPO"
-						if [ -e $CHANGELOG_FILE_NAME ]
-						then
-							git add $CHANGELOG_FILE_NAME
-							git commit -m "Updated the changelog"
-						fi
-						cd "$WORKINGDIR"
-					done
-				;;
-			esac
+			commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
+
 			((NEXT_STEP++))
 		;;
 		"4")
@@ -255,21 +261,7 @@ while true; do
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateProductChangelog.sh "$CURRENT_LINE"
 			done
 
-			read -p "Commit modified changelogs? Y/n " INPUT
-			case $INPUT in
-				"y"|"Y"|"")
-					for CURRENT_REPO in `cat $REPO_LIST`
-					do
-						cd "$CURRENT_REPO"
-						if [ -e $CHANGELOG_FILE_NAME ]
-						then
-							git add $CHANGELOG_FILE_NAME
-							git commit -m "Updated the changelog"
-						fi
-						cd "$WORKINGDIR"
-					done
-				;;
-			esac
+			commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
 			((NEXT_STEP++))
 		;;
 		"5")
@@ -285,6 +277,8 @@ while true; do
 				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
 			done
+
+			commitChanges "Commit files modified with version numbers?" "Update version numbers" "."
 			((NEXT_STEP++))
 		;;
 		"6")
@@ -301,6 +295,7 @@ while true; do
 					break;
 				fi
 			done
+			commitChanges "Commit updated checksums?" "Update checksums" "."
 			((NEXT_STEP++))
 		;;
 		"7")
@@ -308,6 +303,7 @@ while true; do
 			cd "$AGGREGATOR"
 			mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
 			cd "$WORKINGDIR"
+			commitChanges "Commit POM files modified with version numbers?" "Update version numbers in POM" "."
 			((NEXT_STEP++))
 		;;
 		"8")
