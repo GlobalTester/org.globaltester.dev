@@ -96,6 +96,9 @@ then
 	echo \# ---------------------------------------- >> $PREPARED_CHANGELOG
 	cat $CHANGELOG_HEADER >> $PREPARED_CHANGELOG
 	cat $CHANGELOG_CONTENT >> $PREPARED_CHANGELOG
+	echo \# ---------------------------------------- >> $PREPARED_CHANGELOG
+	echo "* Code maintenance" >> $PREPARED_CHANGELOG
+	echo \# ---------------------------------------- >> $PREPARED_CHANGELOG
 
 	$EDITOR $PREPARED_CHANGELOG
 
