@@ -1,6 +1,7 @@
+<?xml version="1.0"?>
 <project>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.globaltester</groupId>
-	<artifactId>org.globaltester.dev.doc</artifactId>
-	<version>0.1.0</version>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.globaltester</groupId>
+  <artifactId>org.globaltester.dev.doc</artifactId>
+  <version>0.1.2-SNAPSHOT</version>
 </project>
