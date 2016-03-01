@@ -300,9 +300,28 @@ while true; do
 		;;
 		"7")
 			echo "Update POM versions"
+			#update POMs with tycho (this updates all bundles and features and keeps their relations intact)
 			cd "$AGGREGATOR"
 			mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
 			cd "$WORKINGDIR"
+
+			#update remaining POM files (e.g. .site and .product POMs)
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				if [ ! -e "$CURRENT_REPO/$CHANGELOG_FILE_NAME" ]
+				then
+					continue;
+				fi
+
+				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+
+				find "$CURRENT_REPO" -name pom.xml -exec xmlstarlet ed --inplace -u "//project/version" -v "$CURRENT_VERSION-SNAPSHOT" {} \;
+			done
+		
+			#update parent pom versions
+			PARENT_VERSION=`xmlstarlet sel -t -v "//project/version" org.globaltester.parent/org.globaltester.parent/pom.xml`
+			find `cat $REPO_LIST` -name pom.xml -exec xmlstarlet ed --inplace -u "//project/parent/version" -v "$PARENT_VERSION" {} \;
+
 			commitChanges "Commit POM files modified with version numbers?" "Update version numbers in POM" "."
 			((NEXT_STEP++))
 		;;
