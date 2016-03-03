@@ -5,6 +5,7 @@
 BUILDTYPE_NIGHTLY=NIGHTLY
 BUILDTYPE_HOTFIX=HOTFIX
 BUILDTYPE_RELEASE=RELEASE
+BUILDTYPE_QA=QA
 
 BUILDTYPE=$BUILDTYPE_NIGHTLY
 
@@ -97,7 +98,8 @@ do
 			echo "Build type options                											  defaults to nightly build"
 			echo "--hotfix <qualifier>      build a hotfix"
 			echo "                               <qualifier> needs to be the issueID optionally followed by an underscore and an index"
-			echo "-r | --release                 build a release (build qualifier will be v<date>)"
+			echo "-r | --release            build a release (build qualifier will be v<date>)"
+			echo "-qa                       build for quality assurance (build qualifier will be qa<date>)"
 
 			exit 1
 		;;
@@ -120,6 +122,11 @@ do
 			HOTFIX=$2
 			MAVEN_QUALIFIER="-DforceContextQualifier=hotfix${HOTFIX}_`date +%Y%m%d`"
 			shift 2
+		;;
+		"-qa")
+			BUILDTYPE=$BUILDTYPE_QA
+			MAVEN_QUALIFIER="-DforceContextQualifier=qa`date +%Y%m%d`"
+			shift 1
 		;;
 		"-r"|"--release")
 			BUILDTYPE=$BUILDTYPE_RELEASE
@@ -427,22 +434,33 @@ while true; do
 		;;
 		"13")
 			echo "Tag repositories"
-			if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
-			then
-				for CURRENT_REPO in `cat $REPO_LIST`
-				do
-					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
-				done
-			elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
-			then
-				for CURRENT_REPO in `cat $REPO_LIST`
-				do
-					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagHotfix.sh "$CURRENT_REPO" "$HOTFIX"
-				done
-			else
-				echo "Current buildtype is $BUILDTYPE"
-				echo "Can't tag repositories for this buildtype"
-			fi
+
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
+				then
+					TAG_MESSAGE="Version bump to $REPO_VERSION"
+					REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
+					TAG_NAME="version/$REPO_VERSION"
+				elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
+				then
+					TAG_MESSAGE="Tag Hotfix version $HOTFIX"
+					TAG_NAME="hotfix/$HOTFIX"
+				elif [ $BUILDTYPE = $BUILDTYPE_QA ]
+				then
+					TAG_MESSAGE="Tag QA version $HOTFIX"
+					TAG_NAME="qaPassed/`date +%Y%m%d`"
+				else
+					echo "Current buildtype is $BUILDTYPE"
+					echo "Can't tag repositories for this buildtype"
+					break
+				fi
+
+				cd "$CURRENT_REPO"
+				git tag -a -m "$TAG_MESSAGE" "$TAG_NAME"
+				cd ..
+			done
+
 			((NEXT_STEP++))
 		;;
 		"14")
