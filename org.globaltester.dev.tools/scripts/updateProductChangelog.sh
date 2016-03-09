@@ -88,6 +88,7 @@ do
 		cd $CURRENT_REPO
 		BUNDLE_VERSION=`getCurrentVersionFromChangeLog $CHANGELOG_FILE_NAME`
 		LAST_TAG=`getLastTag release $REPOSITORY`
+
 		if [ ! -z "$LAST_TAG" ]
 		then
 			PRODUCT_VERSION=`echo $LAST_TAG | sed -e "s|.*/.*/\($VERSION_REGEXP_PATCH_LEVEL_EVERYTHING\)|\1|"`
@@ -95,31 +96,26 @@ do
 			extractGitDiffSinceCommit $LAST_TAG $CHANGELOG_FILE_NAME $GIT_DIFF
 			if [ ! -z "`cat $GIT_DIFF`" ]
 			then
-				FIRSTLINE=`getFirstLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`
-				LASTLINE=`getLastLineNumberContaining "$CHANGELOG_VERSION_REGEXP" "$GIT_DIFF"`
+				FIRSTLINE=$(( `getFirstLineNumberContaining "@@.*@@" "$GIT_DIFF"` + 1))
+				LASTLINE=`wc -l $GIT_DIFF`
 
 				if [ $LAST_TAGGED_PRODUCT_VERSION != $PRODUCT_VERSION ]
 				then
 					echo \# WARNING: Last tagged version for this repository was: $PRODUCT_VERSION but should be $LAST_TAGGED_PRODUCT_VERSION >> $CHANGELOG_CONTENT
 				fi
 
-				LAST_TAGGED_REPO_VERSION=`cat $GIT_DIFF | head -n $(($LASTLINE + 1)) | tail -n 1 | sed -e "s|Version \($VERSION_REGEXP_PATCH_LEVEL_NO_WHITESPACE\).*|\1|"`
+				echo "#* $CURRENT_REPO updated to version $BUNDLE_VERSION" >> $CHANGELOG_CONTENT
 
-				if [ "$BUNDLE_VERSION" != "$LAST_TAGGED_REPO_VERSION" ]
-				then
-					echo \* $CURRENT_REPO updated to version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
-				fi
-
-				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "/^ *$/d;/^$/d;" -e "s|[^#].*|$SPACER&|" >> $CHANGELOG_CONTENT
-				echo >> $CHANGELOG_CONTENT
+				extractLinesFromDiff $FIRSTLINE $LASTLINE $GIT_DIFF | sed -e "s|^\+\(.*\)|\1|" -e "s|^.*$CHANGELOG_VERSION_REGEXP|## &|" -e "/^ *$/d;/^$/d;" -e "s|^[^#].*|#$SPACER&|" >> $CHANGELOG_CONTENT
+				echo "#" >> $CHANGELOG_CONTENT
 			else
 				echo No diff found, skipping
 			fi
 
 			rm $GIT_DIFF
 		else
-			echo \* $CURRENT_REPO contained in version $BUNDLE_VERSION >> $CHANGELOG_CONTENT
-			cat $CHANGELOG_FILE_NAME | sed -e "s|^.*$CHANGELOG_VERSION_REGEXP|# &|" -e "s|[^#].*|$SPACER&|" -e "/^\s*$/d"  >> $CHANGELOG_CONTENT
+			echo "# * $CURRENT_REPO added in version $BUNDLE_VERSION" >> $CHANGELOG_CONTENT
+
 			removeLeadingAndTrailingEmptyLines $CHANGELOG_CONTENT
 			echo >> $CHANGELOG_CONTENT
 		fi

@@ -5,6 +5,7 @@
 BUILDTYPE_NIGHTLY=NIGHTLY
 BUILDTYPE_HOTFIX=HOTFIX
 BUILDTYPE_RELEASE=RELEASE
+BUILDTYPE_QA=QA
 
 BUILDTYPE=$BUILDTYPE_NIGHTLY
 
@@ -64,6 +65,25 @@ function createProductList {
 	getRepositoriesFromAggregator $AGGREGATOR_POM > $REPO_LIST
 }
 
+function commitChanges {
+	QUESTION="$1"
+	MESSAGE="$2"
+	FILES="$3"
+	
+	read -p "$QUESTION Y/n " INPUT
+	case $INPUT in
+		"y"|"Y"|"")
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				cd "$CURRENT_REPO"
+				git add $FILES
+				git commit -m "$MESSAGE"
+				cd "$WORKINGDIR"
+			done
+		;;
+	esac
+}
+
 # parameter handling
 while [ $# -gt 0 ]
 do
@@ -78,7 +98,8 @@ do
 			echo "Build type options                											  defaults to nightly build"
 			echo "--hotfix <qualifier>      build a hotfix"
 			echo "                               <qualifier> needs to be the issueID optionally followed by an underscore and an index"
-			echo "-r | --release                 build a release (build qualifier will be v<date>)"
+			echo "-r | --release            build a release (build qualifier will be v<date>)"
+			echo "-qa                       build for quality assurance (build qualifier will be qa<date>)"
 
 			exit 1
 		;;
@@ -101,6 +122,11 @@ do
 			HOTFIX=$2
 			MAVEN_QUALIFIER="-DforceContextQualifier=hotfix${HOTFIX}_`date +%Y%m%d`"
 			shift 2
+		;;
+		"-qa")
+			BUILDTYPE=$BUILDTYPE_QA
+			MAVEN_QUALIFIER="-DforceContextQualifier=qa`date +%Y%m%d`"
+			shift 1
 		;;
 		"-r"|"--release")
 			BUILDTYPE=$BUILDTYPE_RELEASE
@@ -238,21 +264,8 @@ while true; do
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
 			done
 
-			read -p "Commit modified changelogs? Y/n " INPUT
-			case $INPUT in
-				"y"|"Y"|"")
-					for CURRENT_REPO in `cat $REPO_LIST`
-					do
-						cd "$CURRENT_REPO"
-						if [ -e $CHANGELOG_FILE_NAME ]
-						then
-							git add $CHANGELOG_FILE_NAME
-							git commit -m "Updated the changelog"
-						fi
-						cd "$WORKINGDIR"
-					done
-				;;
-			esac
+			commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
+
 			((NEXT_STEP++))
 		;;
 		"4")
@@ -262,21 +275,7 @@ while true; do
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateProductChangelog.sh "$CURRENT_LINE"
 			done
 
-			read -p "Commit modified changelogs? Y/n " INPUT
-			case $INPUT in
-				"y"|"Y"|"")
-					for CURRENT_REPO in `cat $REPO_LIST`
-					do
-						cd "$CURRENT_REPO"
-						if [ -e $CHANGELOG_FILE_NAME ]
-						then
-							git add $CHANGELOG_FILE_NAME
-							git commit -m "Updated the changelog"
-						fi
-						cd "$WORKINGDIR"
-					done
-				;;
-			esac
+			commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
 			((NEXT_STEP++))
 		;;
 		"5")
@@ -292,6 +291,8 @@ while true; do
 				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
 			done
+
+			commitChanges "Commit files modified with version numbers?" "Update version numbers" "."
 			((NEXT_STEP++))
 		;;
 		"6")
@@ -308,13 +309,34 @@ while true; do
 					break;
 				fi
 			done
+			commitChanges "Commit updated checksums?" "Update checksums" "."
 			((NEXT_STEP++))
 		;;
 		"7")
 			echo "Update POM versions"
+			#update POMs with tycho (this updates all bundles and features and keeps their relations intact)
 			cd "$AGGREGATOR"
 			mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
 			cd "$WORKINGDIR"
+
+			#update remaining POM files (e.g. .site and .product POMs)
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				if [ ! -e "$CURRENT_REPO/$CHANGELOG_FILE_NAME" ]
+				then
+					continue;
+				fi
+
+				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+
+				find "$CURRENT_REPO" -name pom.xml -exec xmlstarlet ed --inplace -u "//project/version" -v "$CURRENT_VERSION-SNAPSHOT" {} \;
+			done
+		
+			#update parent pom versions
+			PARENT_VERSION=`xmlstarlet sel -t -v "//project/version" org.globaltester.parent/org.globaltester.parent/pom.xml`
+			find `cat $REPO_LIST` -name pom.xml -exec xmlstarlet ed --inplace -u "//project/parent/version" -v "$PARENT_VERSION" {} \;
+
+			commitChanges "Commit POM files modified with version numbers?" "Update version numbers in POM" "."
 			((NEXT_STEP++))
 		;;
 		"8")
@@ -419,22 +441,33 @@ while true; do
 		;;
 		"13")
 			echo "Tag repositories"
-			if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
-			then
-				for CURRENT_REPO in `cat $REPO_LIST`
-				do
-					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagRepository.sh "$CURRENT_REPO"
-				done
-			elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
-			then
-				for CURRENT_REPO in `cat $REPO_LIST`
-				do
-					bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/tagHotfix.sh "$CURRENT_REPO" "$HOTFIX"
-				done
-			else
-				echo "Current buildtype is $BUILDTYPE"
-				echo "Can't tag repositories for this buildtype"
-			fi
+
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
+				then
+					TAG_MESSAGE="Version bump to $REPO_VERSION"
+					REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
+					TAG_NAME="version/$REPO_VERSION"
+				elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
+				then
+					TAG_MESSAGE="Tag Hotfix version $HOTFIX"
+					TAG_NAME="hotfix/$HOTFIX"
+				elif [ $BUILDTYPE = $BUILDTYPE_QA ]
+				then
+					TAG_MESSAGE="Tag QA version $HOTFIX"
+					TAG_NAME="qaPassed/`date +%Y%m%d`"
+				else
+					echo "Current buildtype is $BUILDTYPE"
+					echo "Can't tag repositories for this buildtype"
+					break
+				fi
+
+				cd "$CURRENT_REPO"
+				git tag -a -m "$TAG_MESSAGE" "$TAG_NAME"
+				cd ..
+			done
+
 			((NEXT_STEP++))
 		;;
 		"14")
