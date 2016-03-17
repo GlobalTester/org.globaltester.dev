@@ -39,6 +39,8 @@ Together with every project we might define several affiliate projects that host
 
 Here is a complete list of the known suffixes currently in use:
 
+* deploy [Deploy]
+	project to build a product with certain installed features
 * doc [Doc]
 	documentation on the project, e.g. Eclipse online help
 * feature [Feature]
