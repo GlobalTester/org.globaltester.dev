@@ -195,8 +195,6 @@ while true; do
 	incrementI
 	printf "%3d: %s\n" $i "Update checksums";
 	incrementI
-	printf "%3d: %s\n" $i "Update POM versions";
-	incrementI
 	printf "%3d: %s\n" $i "Build the desired products";
 	incrementI
 	printf "%3d: %s\n" $i "Collect build artifacts";
@@ -290,6 +288,53 @@ while true; do
 				CURRENT_DATE=`getCurrentDateFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
 				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
+				
+				#update versions within POM files
+				for CURRENT_PROJECT in $CURRENT_REPO/*/
+				do
+					if [ ! -e "$CURRENT_PROJECT/pom.xml" ]
+					then
+						continue;
+					fi
+					
+					echo Updating pom.xml in "$CURRENT_PROJECT"
+					
+					ARTIFACT_IDS=`xmlstarlet sel -t -v "//artifactId" $CURRENT_PROJECT/pom.xml`
+					ARTIFACT_COUNTER=1
+					
+					#update version for all artifactIds
+					for ARTIFACT_ID in $ARTIFACT_IDS
+					do
+						#search for corresponding repository
+						for CURRENT_REPO in `cat $REPO_LIST | sort -r`
+						do
+							case "$ARTIFACT_ID" in 
+								"$CURRENT_REPO"*)
+								ARTIFACT_REPO=$ARTIFACT_ID
+								while [ "$ARTIFACT_REPO" != "$CURRENT_REPO" ]
+								do
+									ARTIFACT_REPO=`echo $ARTIFACT_REPO | sed -e "s|\(^.*\)\..*|\1|"`
+									if [[ ! $ARTIFACT_REPO =~ "." ]]
+									then
+										break;
+									fi
+								done
+								[ "$ARTIFACT_REPO" = "$CURRENT_REPO" ] && break
+								;;
+							esac
+						done
+						
+						#update version corresponding to artifactId
+						if [ "$ARTIFACT_REPO" = "$CURRENT_REPO" ]
+						then
+							ARTIFACT_VERSION=`getCurrentVersionFromChangeLog $ARTIFACT_REPO/$CHANGELOG_FILE_NAME`
+							xmlstarlet ed -P --inplace -u "/descendant::artifactId[$ARTIFACT_COUNTER]/parent::node()/version" -v "$ARTIFACT_VERSION-SNAPSHOT" "$CURRENT_PROJECT"/pom.xml
+						fi
+						((ARTIFACT_COUNTER++))
+					done
+					
+				done
+				
 			done
 
 			commitChanges "Commit files modified with version numbers?" "Update version numbers" "."
@@ -313,33 +358,6 @@ while true; do
 			((NEXT_STEP++))
 		;;
 		"7")
-			echo "Update POM versions"
-			#update POMs with tycho (this updates all bundles and features and keeps their relations intact)
-			cd "$AGGREGATOR"
-			mvn org.eclipse.tycho:tycho-versions-plugin:update-pom
-			cd "$WORKINGDIR"
-
-			#update remaining POM files (e.g. .site and .product POMs)
-			for CURRENT_REPO in `cat $REPO_LIST`
-			do
-				if [ ! -e "$CURRENT_REPO/$CHANGELOG_FILE_NAME" ]
-				then
-					continue;
-				fi
-
-				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
-
-				find "$CURRENT_REPO" -name pom.xml -exec xmlstarlet ed --inplace -u "//project/version" -v "$CURRENT_VERSION-SNAPSHOT" {} \;
-			done
-		
-			#update parent pom versions
-			PARENT_VERSION=`xmlstarlet sel -t -v "//project/version" org.globaltester.parent/org.globaltester.parent/pom.xml`
-			find `cat $REPO_LIST` -name pom.xml -exec xmlstarlet ed --inplace -u "//project/parent/version" -v "$PARENT_VERSION" {} \;
-
-			commitChanges "Commit POM files modified with version numbers?" "Update version numbers in POM" "."
-			((NEXT_STEP++))
-		;;
-		"8")
 			echo "Build the desired products"
 			cd "$AGGREGATOR"
 			mvn clean verify -T 2C $MAVEN_QUALIFIER
@@ -352,14 +370,14 @@ while true; do
 			cd "$WORKINGDIR"
 			((NEXT_STEP++))
 		;;
-		"9")
+		"8")
 			echo "Collect build artifacts"
 			TARGET="$BUILDDIR/target"
 			mkdir "$TARGET"
 			find . \( -name *site*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip -o -name *releasetests*.zip \)  -exec cp {} $TARGET \;
 			((NEXT_STEP++))
 		;;
-		"10")
+		"9")
 			echo "Generate test documentation"
 
 			# aggregate all releaseTest.md files and generate html
@@ -378,7 +396,7 @@ while true; do
 
 			((NEXT_STEP++))
 		;;
-		"11")
+		"10")
 			echo "Test the build"
 			echo
 			echo "All artifacts are generated in $TARGET"
@@ -387,7 +405,7 @@ while true; do
 			read -p "press enter when finished" INPUT
 			((NEXT_STEP++))
 		;;
-		"12")
+		"11")
 			echo "Generate release documentation"
 
 			# init release documentation file
@@ -439,7 +457,7 @@ while true; do
 
 			((NEXT_STEP++))
 		;;
-		"13")
+		"12")
 			echo "Tag repositories"
 
 			for CURRENT_REPO in `cat $REPO_LIST`
@@ -470,7 +488,7 @@ while true; do
 
 			((NEXT_STEP++))
 		;;
-		"14")
+		"13")
 			echo "Tag products"
 			if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
 			then
@@ -484,7 +502,7 @@ while true; do
 			fi
 			((NEXT_STEP++))
 		;;
-		"15")
+		"14")
 			echo "Publish release"
 			echo
 			echo "Congratulations! You just created a complete release."
