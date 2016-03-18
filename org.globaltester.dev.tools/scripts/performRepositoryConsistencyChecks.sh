@@ -9,6 +9,7 @@ VERBOSE=false
 METAINFDIR='META-INF'
 MANIFESTFILE='MANIFEST.MF'
 PROJECTFILE='.project'
+POMFILE='pom.xml'
 
 #<MANIFEST.MF-specific identifiers>
 BUNDLENAMEIDENTIFIER="Bundle-Name"
@@ -188,6 +189,12 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								NAMEFROMPROJECT=`grep -m 1 "<name>" .project | sed "s/\s*<name>//; s/<\/name>.*//"`
 							else
 								echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
+								exit 1
+						fi
+						# check for the presence of a pom.xml file on project level
+						if [ ! -f $POMFILE ]
+							then
+								echo ERROR: $POMFILE NOT found at $CURRENTDIR
 								exit 1
 						fi
 						
