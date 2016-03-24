@@ -71,7 +71,7 @@ function replaceTestScriptsVersion {
 	DETECT="\(<version>\)[^<]*\(</version>\)"
 	REPLACE="\1 $DATA \2"
 	
-	find $PROJECT -name "*.xml" -a ! -name "pom.xml" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
+	find $PROJECT -name "*.xml" -o -name "*.gt*" -a ! -name "pom.xml" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
 }
 
 function replaceTestScriptsDate {
@@ -87,7 +87,7 @@ function replaceTestScriptsDate {
 	DETECT="\(<date>\)[^<]*\(</date>\)"
 	REPLACE="\1 $DATA \2"
 	
-	find $PROJECT -name "*.xml" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
+	find $PROJECT -name "*.xml" -o -name "*.gt*" -exec sed -i -e "s|$DETECT|$REPLACE|" {} \;
 }
 
 function stampTestScripts {
