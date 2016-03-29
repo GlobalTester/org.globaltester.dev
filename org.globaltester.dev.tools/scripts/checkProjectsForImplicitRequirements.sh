@@ -106,7 +106,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						IDENTIFY_REFERENCES='.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*'
 						
 						
-						if [[ $GREPRESULT == '0' ]]
+						if [ "$GREPRESULT" -eq 0 ]
 							then
 								# this is a testscripts project
 								$VERBOSE && echo INFO: this is a testscripts project
@@ -121,7 +121,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								# this is a code project
 								$VERBOSE && echo INFO: this is a code project
 								TESTSCRIPTSPROJECT=false
-								RAWDEPENDENCIES=`find "$PATHTOPROJECT"/src -name *.java -exec sed -n -e 's@$IDENTIFY_REFERENCES@\1@gp' {} \; | sort -u`
+								RAWDEPENDENCIES=`find "$PATHTOPROJECT"/src -name *.java -exec sed -n -e "s@$IDENTIFY_REFERENCES@\1@gp" {} \; | sort -u`
 						fi
 						
 						RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
