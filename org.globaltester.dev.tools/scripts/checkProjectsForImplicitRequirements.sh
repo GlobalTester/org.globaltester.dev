@@ -155,7 +155,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							fi
 							
 							CURRDEPREPO=$FINDDIRRESULT
-							$VERBOSE && $VERBOSE && echo INFO: parent repository of "$CURRENTRAWDEPENDENCY" is "$CURRDEPREPO"
+							$VERBOSE && echo INFO: parent repository of "$CURRENTRAWDEPENDENCY" is "$CURRDEPREPO"
 							
 							#----------------------------------------------------------------
 							
@@ -173,7 +173,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							# save project containing the raw dependency
 							CLEANDEPENDENCIES=`echo -e "$CLEANDEPENDENCIES"'\n'"$CURRDEPPROJECT"`
-							$VERBOSE && $VERBOSE && echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
+							$VERBOSE && echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
 							
 						done <<< "$RAWDEPENDENCIES"
 						
@@ -209,13 +209,13 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								if [[ "$CLEANEDBUNDLENAMES" != "" ]]
 									then
 										count=0
-										$VERBOSE && $VERBOSE && echo INFO: found the following loads
+										$VERBOSE && echo INFO: found the following loads
 										while read -r CURRDEP
 										do
-											$VERBOSE && $VERBOSE && echo INFO: load \($count\) "$CURRDEP"
+											$VERBOSE && echo INFO: load \($count\) "$CURRDEP"
 											count=$((count+1))
 										done <<< "$CLEANEDBUNDLENAMES"
-										$VERBOSE && $VERBOSE && echo INFO: load -$count- elements
+										$VERBOSE && echo INFO: load -$count- elements
 										
 										# find MANIFEST.MF files matching each Bundle-Name entry
 										MANIFESTFILES=`find "." -mindepth 4 -maxdepth 4 -name MANIFEST.MF `
