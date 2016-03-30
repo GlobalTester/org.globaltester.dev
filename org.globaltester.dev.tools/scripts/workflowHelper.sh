@@ -360,7 +360,7 @@ while true; do
 		"7")
 			echo "Build the desired products"
 			cd "$AGGREGATOR"
-			mvn clean verify -T 2C $MAVEN_QUALIFIER
+			mvn clean verify $MAVEN_QUALIFIER
 			if [ $? -ne 0 ]; then
 				echo
 				echo "Failed to create build all products"
