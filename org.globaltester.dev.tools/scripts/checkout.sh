@@ -192,7 +192,7 @@ else
 	#extract repo names from pom
 	if [ -e $RELENG/pom.xml ]
 	then
-		REPOS_TO_CLONE=`cat $RELENG/pom.xml | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | grep -v "$REPOSITORY" | sort -u`
+		REPOS_TO_CLONE=`cat $RELENG/pom.xml | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | grep -v "$REPOSITORY" | sort -u`
 	else
 		echo No releng pom file found to extract a file list from
 		exit 1
