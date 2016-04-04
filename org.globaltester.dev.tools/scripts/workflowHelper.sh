@@ -374,7 +374,7 @@ while true; do
 			echo "Collect build artifacts"
 			TARGET="$BUILDDIR/target"
 			mkdir "$TARGET"
-			find . \( -name *site*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip -o -name *releasetests*.zip \)  -exec cp {} $TARGET \;
+			find . \( -name *site*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip -o -name *deploy*.zip -o -name *releasetests*.zip \)  -exec cp {} $TARGET \;
 			((NEXT_STEP++))
 		;;
 		"9")
