@@ -5,8 +5,7 @@
 
 #set default values
 REPOSITORY=org.globaltester.platform
-FOLDER=org.globaltester.platform.releng
-DESTINATION=
+DESTINATION=.
 SOURCE=GlobalTester
 
 PARAMETER_NUMBER=0
@@ -21,9 +20,7 @@ do
 		"-h"|"--help") echo -en "Usage:\n\n"
 			echo -en "`basename $0` <options>\n\n"
 			echo "-r  | --repo            sets the repository name for the build                 defaults to $REPOSITORY"
-			echo "                         Setting this as the first parameter also sets folder"
-			echo "                         to <value>.releng"
-			echo "-f  | --folder          sets the project folder name for the build             defaults to $FOLDER"
+			echo "-f  | --folder          sets the project folder name for the build             defaults to \$REPOSITORY.releng"
 			echo "-d  | --destination     sets the destination folder name for the checkout      defaults to $DESTINATION"
 			echo "-b  | --branch          the branch to be checked out"
 			echo "-s  | --source          the source to be used                                  defaults to $SOURCE"
@@ -49,10 +46,6 @@ do
 				exit 1
 			fi
 			REPOSITORY=$2
-			if [ $PARAMETER_NUMBER -eq 0 ]
-			then
-				FOLDER="$REPOSITORY.releng"
-			fi
 			shift 2
 		;;
 		"-d"|"--destination")
@@ -111,8 +104,8 @@ fi
 
 if [ -z "$FOLDER" ]
 then
-	echo "No folder was set or could not be derived from other parameters"
-	exit 1
+	FOLDER="$REPOSITORY.releng"
+	echo "No folder was set. Using default: $FOLDER"
 fi
 
 RELENG=$REPOSITORY/$FOLDER
