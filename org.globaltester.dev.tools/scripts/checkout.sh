@@ -4,8 +4,8 @@
 #
 
 #set default values
-REPOSITORY=org.globaltester.demo
-FOLDER=org.globaltester.demo.releng
+REPOSITORY=org.globaltester.platform
+FOLDER=org.globaltester.platform.releng
 DESTINATION=
 SOURCE=GlobalTester
 
