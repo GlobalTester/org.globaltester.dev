@@ -116,7 +116,7 @@ function extractValue(){
 	return 0
 }
 
-
+echo Checking repository: $CURRENT_REPO
 
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 	then

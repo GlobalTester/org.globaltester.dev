@@ -106,12 +106,13 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						IDENTIFY_REFERENCES='.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*'
 						
 						
-						if [[ $GREPRESULT == '0' ]]
+						RAWDEPENDENCIES=""
+						
+						if [ "$GREPRESULT" -eq 0 ]
 							then
 								# this is a testscripts project
 								$VERBOSE && echo INFO: this is a testscripts project
 								TESTSCRIPTSPROJECT=true
-								RAWDEPENDENCIES="";
 								
 								# get all direct dependencies from test cases and java script
 								
@@ -121,10 +122,10 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								# this is a code project
 								$VERBOSE && echo INFO: this is a code project
 								TESTSCRIPTSPROJECT=false
-								RAWDEPENDENCIES=`find "$PATHTOPROJECT"/src -name *.java -exec sed -n -e 's@$IDENTIFY_REFERENCES@\1@gp' {} \; | sort -u`
+								RAWDEPENDENCIES=`find "$PATHTOPROJECT"/src -name *.java -exec sed -n -e "s@$IDENTIFY_REFERENCES@\1@gp" {} \; | sort -u`
 						fi
 						
-						RAWDEPENDENCIES="$(echo -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
+						RAWDEPENDENCIES="$(echo -n -e "${RAWDEPENDENCIES}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 						
 						if [ "$VERBOSE" == "true" ]
 						then
@@ -150,12 +151,12 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							# greedily find repository containing the raw dependency
 							if [[ $FINDDIREXITSTATUS != '0' ]]
 								then
-									echo WARNING: did not find directory matching "$CURRENTRAWDEPENDENCY" in \.!
+									$VERBOSE && echo WARNING: did not find repository matching "$CURRENTRAWDEPENDENCY" in \.!
 									continue
 							fi
 							
 							CURRDEPREPO=$FINDDIRRESULT
-							$VERBOSE && $VERBOSE && echo INFO: parent repository of "$CURRENTRAWDEPENDENCY" is "$CURRDEPREPO"
+							$VERBOSE && echo INFO: parent repository of "$CURRENTRAWDEPENDENCY" is "$CURRDEPREPO"
 							
 							#----------------------------------------------------------------
 							
@@ -165,7 +166,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							if [[ $FINDDIREXITSTATUS != '0' ]]
 								then
-									echo WARNING: did not find directory matching "$CURRENTRAWDEPENDENCY" in "$CURRDEPREPO"!
+									$VERBOSE && echo WARNING: did not find project matching "$CURRENTRAWDEPENDENCY" in "$CURRDEPREPO"!
 									continue
 							fi
 							
@@ -173,7 +174,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 							
 							# save project containing the raw dependency
 							CLEANDEPENDENCIES=`echo -e "$CLEANDEPENDENCIES"'\n'"$CURRDEPPROJECT"`
-							$VERBOSE && $VERBOSE && echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
+							$VERBOSE && echo INFO: parent project of "$CURRENTRAWDEPENDENCY" is "$CURRDEPPROJECT"
 							
 						done <<< "$RAWDEPENDENCIES"
 						
@@ -183,7 +184,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [[ $TESTSCRIPTSPROJECT ]]
 							then
 								# get all indirect dependencies via load from *.js and *.xml
-								RAWDEPENDENCIESJSXMLLOAD=`find "$PATHTOPROJECT" -name "*.js" -o -name "*.gt*" -exec grep "load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
+								RAWDEPENDENCIESJSXMLLOAD=`find "$PATHTOPROJECT" -name "*.js" -o -name "*.gt*" -exec grep -a "load[[:space:]]*([[:space:]]*\".*\"[[:space:]]*," {} \;`
 								RAWDEPENDENCIESJSXMLLOAD="$(echo -e "${RAWDEPENDENCIESJSXMLLOAD}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d')"
 								RAWDEPENDENCIESJSXMLLOAD=`echo "$RAWDEPENDENCIESJSXMLLOAD" | sort -u`
 								
@@ -209,13 +210,13 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 								if [[ "$CLEANEDBUNDLENAMES" != "" ]]
 									then
 										count=0
-										$VERBOSE && $VERBOSE && echo INFO: found the following loads
+										$VERBOSE && echo INFO: found the following loads
 										while read -r CURRDEP
 										do
-											$VERBOSE && $VERBOSE && echo INFO: load \($count\) "$CURRDEP"
+											$VERBOSE && echo INFO: load \($count\) "$CURRDEP"
 											count=$((count+1))
 										done <<< "$CLEANEDBUNDLENAMES"
-										$VERBOSE && $VERBOSE && echo INFO: load -$count- elements
+										$VERBOSE && echo INFO: load -$count- elements
 										
 										# find MANIFEST.MF files matching each Bundle-Name entry
 										MANIFESTFILES=`find "." -mindepth 4 -maxdepth 4 -name MANIFEST.MF `
