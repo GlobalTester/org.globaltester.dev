@@ -10,6 +10,7 @@ RETRY=1
 MAX_RETRIES=0
 QUIET=0
 CONDITION=
+DIRS=*/
 
 function printHelp {
 	echo -e "Usage:\n"
@@ -18,6 +19,8 @@ function printHelp {
 	echo -e "This executes the given commands and parameters in each subfolder."
 	echo -e "-- can be used to separate commands that equal an parameter"
 	echo
+	echo "-a  | --aggrgator             Only operate on repositories mentioned in the given aggregator"
+	echo "                               This takes a repo name as argument and highly relies on the HJP conventions wrt directories and pom structure"
 	echo "-c  | --condition             Only operate on directories in which the condition evaluates to 0"
 	echo "                               This takes a single string to be evaluated as bash code"
 	echo "-g  | --git-only              Only operate on directories containing a .git folder"
@@ -49,6 +52,19 @@ do
 		"-g"|"--git-only")
 			CONDITION="$GIT_ONLY"
 			shift 1
+		;;
+		"-a"|"--aggregator")
+			if [[ -z "$2" ]]
+			then
+				echo "Aggregator is missing!"
+				exit 1
+			fi
+
+			set -e
+			. org.globaltester.dev/org.globaltester.dev.tools/scripts/helper.sh
+
+			DIRS=`getRepositoriesFromAggregator $2/$2.releng/pom.xml`
+			shift 2
 		;;
 		"-q"|"--quiet")
 			QUIET=1
@@ -82,7 +98,7 @@ RETRIES=0
 FAILURES=
 SKIPPED=
 
-for curProj in */
+for curProj in $DIRS
 do
 	cd "$curProj"
 	eval "$CONDITION"
