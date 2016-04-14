@@ -123,7 +123,7 @@ function extractGitDiffSinceCommit {
 function getRepositoriesFromAggregator {
 	POM_FILE=$1
 
-	cat $POM_FILE | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>|\1|' | sort -u
+	cat $POM_FILE | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u
 }
 
 function removeLeadingAndTrailingEmptyLines {
