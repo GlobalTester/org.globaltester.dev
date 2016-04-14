@@ -135,7 +135,7 @@ cd $DIR
 
 #clone given releng repo
 
-SOURCE_IS_HJP=0
+FULLCLONE_ALLOWED=0
 case "$SOURCE" in
 	PersoSim|persosim|PERSOSIM)
 		CLONE_URI=git@github.com:PersoSim/
@@ -143,13 +143,17 @@ case "$SOURCE" in
 	GlobalTester|globaltester|gt|GT|GLOBALTESTER)
 		CLONE_URI=git@github.com:GlobalTester/
 	;;
-	HJP|hjp|*)
+	HJP|hjp)
 		CLONE_URI=git@git.hjp-consulting.com:
-		SOURCE_IS_HJP=1
+		FULLCLONE_ALLOWED=1
+	;;
+	*)
+		CLONE_URI=$SOURCE
+		FULLCLONE_ALLOWED=1
 	;;
 esac
 
-if [ $FULL_CLONE -eq 1 -a $SOURCE_IS_HJP -ne 1 ]
+if [ $FULL_CLONE -eq 1 -a $FULLCLONE_ALLOWED -ne 1 ]
 then
 	echo "A full clone is only possible using the HJP servers."
 	exit 1
