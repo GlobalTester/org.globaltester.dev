@@ -17,7 +17,7 @@ function replaceManifest {
 	echo "  $FULLPATH"
 	
 	#Bundle-Version: 0.7.0
-	sed -i -e "s|\(Bundle-Version: \)[0-9]\{1,\}\.[0-9]\{1,\}\..*|\1$DATA|" $FULLPATH
+	sed -i -e "s|\(Bundle-Version: \).*|\1$DATA|" $FULLPATH
 }
 
 function replaceFeature {
