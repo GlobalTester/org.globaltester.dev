@@ -37,6 +37,8 @@ Affiliate projects
 ------------------
 Together with every project we might define several affiliate projects that host code/artifacts related to that project but not essentially part of it, e.g. test or documentation. Those affiliate projects are hosted within the same repository and use specific suffixes to differentiate them.
 
+As a rule of thumb affiliate projects should not add to much external dependencies (besides those implied by their specific use e.g. o.e.help for doc bundles). This allows importing of affiliate projects into a common workspace without adding new dependency errors.
+
 Here is a complete list of the known suffixes currently in use:
 
 * deploy [Deploy]
@@ -70,6 +72,14 @@ Here is a complete list of the known suffixes currently in use:
 
 Exceptions and/or modifications to this list are possible in general but should at least be thoroughly discussed by all developers.
 For example we currently have several projects that are combined into one repository while not strictly being affiliate projects according to the above definition (e.g. `o.g.cryptoprovider.bc` and `o.g.c.sc`). Legit reasons to do so may be very small related projects that wont change much in the future, interchangeable third party libraries that we just package or legacy code that will get removed in the near future.
+
+Affiliate repos
+------------------
+While affiliate projects (as described in the previous section) shall not add additional dependencies the need arises to define some kind of related projects with (severe) additional dependencies. These should be separated into their own repository (with their own affiliate projects as appropriate). That allows users to in-/exclude them from their checkout/workspace as needed.  
+
+Here is a complete list of the known suffixes currently in use:
+* crossover [CrossOver]
+	repo that defines crossover tests between different products. Contains a integrationtest bundles that test several aspects of the base product by using other projects from the GlobalTester universe. This implies that these might require access to several repos from other products.
 
 Bundle-Name and Bundle-SymbolicName
 -----------------------------------
