@@ -311,7 +311,7 @@ TESTING_DIR=`mktemp -d`
 
 cd "$TESTING_DIR"
 
-git clone git@git.hjp-consulting.com:org.globaltester.dev
+git clone git@git.globaltester.org:org.globaltester.dev
 #----------------------------
 createDefaultProduct "afterCorrectReleases"
 appendDoc "afterCorrectReleases" "

@@ -144,7 +144,7 @@ case "$SOURCE" in
 		CLONE_URI=git@github.com:GlobalTester/
 	;;
 	HJP|hjp)
-		CLONE_URI=git@git.hjp-consulting.com:
+		CLONE_URI=git@git.globaltester.org:
 		FULLCLONE_ALLOWED=1
 	;;
 	*)
@@ -155,7 +155,7 @@ esac
 
 if [ $FULL_CLONE -eq 1 -a $FULLCLONE_ALLOWED -ne 1 ]
 then
-	echo "A full clone is only possible using the HJP servers."
+	echo "A full clone is only possible using the secunet servers."
 	exit 1
 fi
 
@@ -165,7 +165,7 @@ ACTUALLY_CLONED=
 if [ $FULL_CLONE -eq 1 ]
 then
 	#extract repo names from git
-	REPOS_TO_CLONE=`ssh git@git.hjp-consulting.com | sed -e '/^ R/!d' | sed "s/^[ RW\t]*//" | grep "\."`
+	REPOS_TO_CLONE=`ssh git@git.globaltester.org | sed -e '/^ R/!d' | sed "s/^[ RW\t]*//" | grep "\."`
 else
 	#clone releng repo
 	if [ -d $REPOSITORY ]

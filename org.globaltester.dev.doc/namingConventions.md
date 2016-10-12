@@ -13,7 +13,7 @@ In essence our project names (and resulting repository names) consist of a prefi
 The prefix shall be defined as one of the exisitng following categories: 
 
 `com.hjp`  
-This category denotes everything that is the closed source property of HJP Consulting GmbH.
+This category denotes everything that is the closed source property of secunet Security Networks AG.
 If something is not explicitly determined to be open source it is to be placed in this category.
 
 `de.persosim`  
