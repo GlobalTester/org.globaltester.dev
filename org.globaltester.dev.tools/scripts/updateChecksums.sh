@@ -9,7 +9,7 @@ do
 		"-h"|"--help") 
 			echo -e "Usage:\n"
 			echo -e "`basename $0` <path_to_project>\n"
-			echo -e "This must be called from the root of all checked out HJP repositories."
+			echo -e "This must be called from the root of all checked out secunet repositories."
 			exit 1
 		;;
 		*)

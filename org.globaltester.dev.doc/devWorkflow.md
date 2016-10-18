@@ -1,6 +1,6 @@
 Development workflow
 ====================
-This document describes the development workflow HJP uses. We use essentially the same process internally as when cooperating with external developers, see the last section of this document for the differences.
+This document describes the development workflow secunet uses. We use essentially the same process internally as when cooperating with external developers, see the last section of this document for the differences.
 
 In essence this workflow shall ensure that the latest commits on the master branch of all repositories comply with our quality standards and allow a release at any time.
 

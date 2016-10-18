@@ -91,7 +91,7 @@ do
 		"-h"|"--help")
 			echo -e "Usage:\n"
 			echo -e "`basename $0` <options>\n"
-			echo -e "This must be called from the root of all checked out HJP repositories."
+			echo -e "This must be called from the root of all checked out secunet repositories."
 			echo
 			echo "-d | --dir                     the build directory to store information used/generated throughout the process               defaults to a temp file"
 			echo
@@ -538,7 +538,7 @@ while true; do
 			echo "Final artifacts are located in $TARGET"
 			echo
 			echo "This step is not yet supported by the workflow script but should include:"
-			echo "* pushing release commits and tags to relevant repos (HJP servers, GitHub)"
+			echo "* pushing release commits and tags to relevant repos (secunet servers, GitHub)"
 			echo "* uploading the release to website"
 			echo "* informing customers about the new version (the CHANGELOG files are a great basis for this)"
 			echo

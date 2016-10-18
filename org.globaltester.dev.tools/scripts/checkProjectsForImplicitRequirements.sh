@@ -22,7 +22,7 @@ do
 			echo -e "Usage:\n"
 			echo -e "`basename $0` <options> REPO\n"
 			echo -e "Perform some dependency checks on all projects in the given REPO."
-			echo -e "Must be called from the root of all checked out HJP repositories."
+			echo -e "Must be called from the root of all checked out secunet repositories."
 			echo -e "REPO needs to be the local folder name of the repository (which is expected to match the repository name."
 			echo
 			echo "-v | --verbose          output more progress information"

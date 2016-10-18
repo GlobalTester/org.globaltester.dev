@@ -34,7 +34,7 @@ function replaceFeature {
 	#      id="de.persosim.rcp.feature"
 	#      label="PersoSim RCP"
 	#      version="0.7.0"
-	#      provider-name="HJP Consulting GmbH">
+	#      provider-name="secunet Security Networks AG">
 	
 	DETECT='\(<feature[^<]*version="\)[0-9]\{1,\}\.[0-9]\{1,\}\.[^"]*\(".*\)'
 	REPLACE="\1$DATA\2"

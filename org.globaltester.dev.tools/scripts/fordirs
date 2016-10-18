@@ -20,7 +20,7 @@ function printHelp {
 	echo -e "-- can be used to separate commands that equal an parameter"
 	echo
 	echo "-a  | --aggrgator             Only operate on repositories mentioned in the given aggregator"
-	echo "                               This takes a repo name as argument and highly relies on the HJP conventions wrt directories and pom structure"
+	echo "                               This takes a repo name as argument and highly relies on the secunet conventions wrt directories and pom structure"
 	echo "-c  | --condition             Only operate on directories in which the condition evaluates to 0"
 	echo "                               This takes a single string to be evaluated as bash code"
 	echo "-g  | --git-only              Only operate on directories containing a .git folder"

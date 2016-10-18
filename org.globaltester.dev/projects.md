@@ -1,6 +1,6 @@
 Projects overview
 ===
-This file gives you an overview of the projects managed by HJP Consulting. Some of the mentioned projects are available as open source software, while others are proprietary. 
+This file gives you an overview of the projects managed by secunet. Some of the mentioned projects are available as open source software, while others are proprietary. 
 It focuses on the relevant top level projects, describes their scope and development entrypoint. It will *not* describe each single project repository, for that information look in the README files provided within these repositories and contained projects.
 
 GlobalTester

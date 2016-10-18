@@ -61,7 +61,7 @@ Finally the release is completely done. Not quite! Until now we have not actuall
 This step is not yet covered by the workflow script but should include:
     * uploading the release to public repos/website etc.
     * informing customers about the new version (the CHANGELOG files are a great basis for this)
-    * pushing release commits and tags to relevant repos (HJP servers, GitHub) 
+    * pushing release commits and tags to relevant repos (secunet servers, GitHub) 
 
 
 <p style="page-break-after: always"/>

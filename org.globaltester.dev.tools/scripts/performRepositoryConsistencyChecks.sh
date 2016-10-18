@@ -17,7 +17,7 @@ BUNDLESYMBOLICNAMEIDENTIFIER="Bundle-SymbolicName"
 BUNDLEVENDORLINEIDENTIFIER="Bundle-Vendor"
 #</MANIFEST.MF-specific identifiers>
 
-EXPECTEDVENDORSTRING="HJP Consulting GmbH"
+EXPECTEDVENDORSTRING="secunet Security Networks AG"
 TESTSCRIPTSIDENTIFIER="testscripts"
 
 #<GIT-specific files>
@@ -26,12 +26,12 @@ GITATTRIBUTESFILE='.gitattributes'
 GITATTRIBUTESFILEMATCH='../org.globaltester.dev/.gitattributes'
 #</GIT-specific files>
 
-#<HJP-specific identifiers>
+#<secunet-specific identifiers>
 GTIDENTIFIER="GT"
 PERSOSIMIDENTIFIER="PersoSim"
 EXTENSIONSIDENTIFIER="Extensions to"
 TESTSPECIDENTIFIER="TestSpecification"
-#</HJP-specific identifiers>
+#</secunet-specific identifiers>
 
 BSN[0]="test"
 BSN[1]="ui"
@@ -69,7 +69,7 @@ do
 			echo -e "Usage:\n"
 			echo -e "`basename $0` <options> REPO\n"
 			echo -e "Perform some consistency checks on all projects in the given REPO."
-			echo -e "Must be called from the root of all checked out HJP repositories."
+			echo -e "Must be called from the root of all checked out secunet repositories."
 			echo -e "REPO needs to be the local folder name of the repository (which is expected to match the repository name."
 			echo
 			echo "-v | --verbose          output more progress information"
