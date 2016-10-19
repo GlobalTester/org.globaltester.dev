@@ -87,6 +87,11 @@ function eee {
 	ee
 }
 
+function eeee {
+	eee $1
+	exit
+}
+
 function clonelocal {
 
 	ls "$GT_MIRROR" | parallel "git clone $GT_MIRROR/{}"
