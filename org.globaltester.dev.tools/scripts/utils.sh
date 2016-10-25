@@ -40,7 +40,7 @@ alias cloneallarchive='ssh archive@git.globaltester.org | sed -e '\''/^ R/!d'\''
 
 alias cloneproduct="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/checkout.sh -s hjp -i -ni -r"
 
-alias fastmvn="mvn verify -DskipInstall=true -DskipZip=true"
+alias fastmvn="mvn verify --offline -DskipInstall=true -DskipZip=true"
 
 alias mergebasereset="forrepos 'git reset \`git merge-base HEAD origin/master\`'"
 alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEAD'"
