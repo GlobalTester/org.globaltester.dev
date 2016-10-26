@@ -44,7 +44,10 @@ alias fastmvn="mvn verify --offline -DskipInstall=true -DskipZip=true"
 
 alias mergebasereset="forrepos 'git reset \`git merge-base HEAD origin/master\`'"
 alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEAD'"
-alias mergebasediff="forrepos 'git diff \`git merge-base HEAD origin/master\`  HEAD'"
+
+function mergebasediff {
+	forrepos 'git diff --color '"$1"' `git merge-base HEAD origin/master`  HEAD' | less -F -r
+}
 
 function parallelBuild {
 	RESULTS=`mktemp -d`
