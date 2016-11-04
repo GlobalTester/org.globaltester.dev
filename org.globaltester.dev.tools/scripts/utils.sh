@@ -64,14 +64,28 @@ function parallelBuild {
 	then
 		SOURCE=$GT_MIRROR/
 	fi
-
+	
+	XEPHYR_PID=
+	ORIG_DISPLAY=$DISPLAY
+	if [ -n `which Xephyr` ]
+	then
+		DISPLAY_XEPHYR=:10
+		Xephyr $DISPLAY_XEPHYR &
+		XEPHYR_PID=$!
+		DISPLAY=$DISPLAY_XEPHYR
+		if [ 0 -eq $? ]
+		then
+			sleep 1
+			x-window-manager &
+		fi
+	fi
 
 	RESULTS=`mktemp -d`
 	echo "Storing results in $RESULTS"
 	DIR=`pwd`
 	cd "$REPOS_FOLDER/gitolite-admin/testuser/"
 	
-	echo -e "com.hjp.internal \n`ls`" | parallel --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive" 
+	echo -e "com.hjp.internal\n`ls`" | parallel --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive" 
 
 	cd "$DIR"
 }
