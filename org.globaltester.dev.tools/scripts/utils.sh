@@ -59,12 +59,15 @@ function parallelBuild {
 	fi
 
 	SOURCE=$2
-	
+
 	if [ -z $SOURCE ]
 	then
 		SOURCE=$GT_MIRROR/
 	fi
-	
+
+	RESULTS=`mktemp -d`
+	echo "Storing results in $RESULTS"
+
 	XEPHYR_PID=
 	ORIG_DISPLAY=$DISPLAY
 	if [ -n `which Xephyr` ]
@@ -80,11 +83,9 @@ function parallelBuild {
 		fi
 	fi
 
-	RESULTS=`mktemp -d`
-	echo "Storing results in $RESULTS"
 	DIR=`pwd`
 	cd "$REPOS_FOLDER/gitolite-admin/testuser/"
-	
+
 	echo -e "com.hjp.internal\n`ls`" | parallel --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive" 
 
 	cd "$DIR"
@@ -99,7 +100,7 @@ function watchBuild {
 
 	screen -S $NAME -X exec /bin/bash -c "while true; do clear; echo Build results:; grep -R -e \"BUILD\" $DIR; echo Failed during dependency resolution:; grep -R -e \"not successful\" $DIR; sleep 2; done;"
 	screen -S $NAME -X title "Build overview"
-	
+
 	for CURRENT in `ls $DIR`
 	do
 		for JOB in `ls $DIR/$CURRENT`
