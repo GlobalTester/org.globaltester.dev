@@ -46,27 +46,78 @@ alias mergebasereset="forrepos 'git reset \`git merge-base HEAD origin/master\`'
 alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEAD'"
 
 function mergebasediff {
-	forrepos 'git diff --color '"$1"' `git merge-base HEAD origin/master`  HEAD' | less -F -r
+	forrepos 'git diff --color '"$@"' `git merge-base HEAD origin/master`  HEAD' | less -F -r
 }
 
 function parallelBuild {
+
+	BRANCH=$1
+
+	if [ -z $BRANCH ]
+	then
+		BRANCH=master
+	fi
+
+	SOURCE=$2
+	
+	if [ -z $SOURCE ]
+	then
+		SOURCE=$GT_MIRROR/
+	fi
+
+
 	RESULTS=`mktemp -d`
 	echo "Storing results in $RESULTS"
 	DIR=`pwd`
 	cd "$REPOS_FOLDER/gitolite-admin/testuser/"
-	ls | parallel -j 2 -eta --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh -k {} -m \"clean verify -Dhjp.test.driver.port=200{#}\" $@"
-	rm "$RESULTS"
+	
+	echo -e "com.hjp.internal \n`ls`" | parallel --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive" 
+
 	cd "$DIR"
+}
+
+function watchBuild {
+	DIR=$1
+	NAME=pbuild
+	screen -S $NAME -m -d
+
+	screen -S $NAME -X defscrollback 50000
+
+	screen -S $NAME -X exec /bin/bash -c "while true; do clear; echo Build results:; grep -R -e \"BUILD\" $DIR; echo Failed during dependency resolution:; grep -R -e \"not successful\" $DIR; sleep 2; done;"
+	screen -S $NAME -X title "Build overview"
+	
+	for CURRENT in `ls $DIR`
+	do
+		for JOB in `ls $DIR/$CURRENT`
+		do
+			screen -S $NAME -X screen
+			screen -S $NAME -X title "$CURRENT/$JOB standard out"
+			screen -S $NAME -X exec /bin/bash -c "while true; do tail -fn +1 $DIR/$CURRENT/$JOB/stdout; sleep 2; done;"
+			screen -S $NAME -X screen
+			screen -S $NAME -X title "$CURRENT/$JOB standard err"
+			screen -S $NAME -X exec /bin/bash -c "while true; do tail -fn +1 $DIR/$CURRENT/$JOB/stderr; sleep 2; done;"
+		done
+	done
+
+	screen -S $NAME -X select 0
+	screen -r $NAME	
 }
 
 function ee {
 	ECLIPSE_EXECUTABLE="./eclipse/eclipse"
-	if [ -f "$ECLIPSE_EXECUTABLE" ]
-	then
-		setsid "$ECLIPSE_EXECUTABLE" -data ./workspace >& /dev/null & disown
-	else
-		echo "No eclipse executable found at $ECLIPSE_EXECUTABLE"
-	fi
+
+	CURRENT_DIR=`pwd`
+	while [ ! `pwd` = "/" ]
+	do
+		if [ -f "$ECLIPSE_EXECUTABLE" ]
+		then
+			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace >& /dev/null & disown
+			return
+		fi
+		cd ..
+	done
+	echo "No eclipse executable found at $ECLIPSE_EXECUTABLE in this or parent directories"
+	cd "$CURRENT_DIR"
 }
 
 function eee {
@@ -170,9 +221,6 @@ function mkeclipse {
 		return 1
 	fi
 
-	cd "$WU_PATH/$ENV_REPOS_FOLDER"
-	clonelocal
-
 	echo Copying eclipse...
 	rsync -a "$BASE_PATH/eclipse/" "$WU_PATH/eclipse"
 
@@ -187,6 +235,9 @@ function mkeclipse {
 		echo Running modification script...
 		"$BASE_PATH/modifications.sh" "$WU_PATH"
 	fi
+
+	cd "$WU_PATH/$ENV_REPOS_FOLDER"
+	clonelocal
 
 	cd "$WU_PATH"
 	echo
