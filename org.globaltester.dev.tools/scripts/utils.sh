@@ -26,11 +26,15 @@ then
 	IDE_FOLDER="$DEV_HOME/ide"
 fi
 
+if [ -z "PARALLEL_BUILD_PARAMS" ]
+then
+	PARALLEL_BUILD_PARAMS=
+fi
+
 ENV_REPOS_FOLDER=repos
 
 GT_MIRROR="$MIRROR_FOLDER/gt"
 GT_ARCHIVE_MIRROR="$MIRROR_FOLDER/archive"
-
 
 alias fordirs="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/fordirs"
 alias forrepos="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/fordirs -g"
@@ -70,7 +74,9 @@ function parallelBuild {
 
 	XEPHYR_PID=
 	ORIG_DISPLAY=$DISPLAY
-	if [ -n `which Xephyr` ]
+
+	which Xephyr
+	if [ 0 -eq `which Xephyr > /dev/null; echo $?` ]
 	then
 		DISPLAY_XEPHYR=:10
 		Xephyr $DISPLAY_XEPHYR &
@@ -86,7 +92,12 @@ function parallelBuild {
 	DIR=`pwd`
 	cd "$REPOS_FOLDER/gitolite-admin/testuser/"
 
-	echo -e "com.hjp.internal\n`ls`" | parallel --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive" 
+	echo -e "com.hjp.internal\n`ls`" | nice parallel $PARALLEL_BUILD_PARAMS --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive"
+
+	echo Build results:
+	grep -R -e "BUILD" $RESULTS
+	echo Failed during dependency resolution:
+	grep -R -e "not successful" $RESULTSl;
 
 	cd "$DIR"
 }
