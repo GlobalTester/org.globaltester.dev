@@ -41,8 +41,8 @@ function absoluteFilename {
 
 PARAMETER_NUMBER=0
 
-REPOSITORY=com.hjp.internal
-FOLDER=com.hjp.internal.releng
+REPOSITORY=com.secunet.globaltester.universe
+FOLDER=com.secunet.globaltester.universe.releng
 PATTERN='(\.releng|\.integrationtest)($|\/)'
 INSPECT_BUILD=0
 MAVEN="clean verify"

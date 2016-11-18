@@ -42,8 +42,8 @@ function createProductList {
 	echo -e 'xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"' >> $AGGREGATOR_POM
 	echo -e 'xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' >> $AGGREGATOR_POM
 	echo -e '  <modelVersion>4.0.0</modelVersion>' >> $AGGREGATOR_POM
-	echo -e '  <groupId>com.hjp</groupId>' >> $AGGREGATOR_POM
-	echo -e '  <artifactId>com.hjp.releng</artifactId>' >> $AGGREGATOR_POM
+	echo -e '  <groupId>com.secunet</groupId>' >> $AGGREGATOR_POM
+	echo -e '  <artifactId>com.secunet.releng</artifactId>' >> $AGGREGATOR_POM
 	echo -e '  <version>0.0.1</version>' >> $AGGREGATOR_POM
 	echo -e '  <packaging>pom</packaging>' >> $AGGREGATOR_POM
 	echo -e '  <modules>' >> $AGGREGATOR_POM

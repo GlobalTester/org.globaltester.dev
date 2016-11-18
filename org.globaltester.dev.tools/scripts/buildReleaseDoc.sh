@@ -28,7 +28,7 @@ echo -e "Java: \`" `java -version 2>&1 | grep build` "\`  " >> $MDFILE
 echo -e "\n" >> $MDFILE
 cat $VERSIONFILE >> $MDFILE
 find ./ -name releaseTests.md -exec cat {} >> $MDFILE \; 
-cat com.hjp.internal/com.hjp.internal.releng/samples/*.md >> $MDFILE
+cat com.secunet.globaltester.universe/com.secunet.globaltester.universe.releng/samples/*.md >> $MDFILE
 
 # generate printable html 
 HTMLFILE=`mktemp`

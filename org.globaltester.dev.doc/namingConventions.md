@@ -30,7 +30,7 @@ The name of a repository shall be reflected in the name of its directory in the 
 
 
 Example:  
-The repository `com.hjp.persosim.simulator.protocols.ca3` describes a closed source addition (`com.hjp`) to the open source _PersoSim_ project.
+The repository `com.secunet.persosim.simulator.protocols.ca3` describes a closed source addition (`com.secunet`) to the open source _PersoSim_ project.
 Furthermore it is part of PersoSim's `simulator` core adding a certain protocol named `ca3`.
 
 Affiliate projects
@@ -91,8 +91,8 @@ The `Bundle-Name` value must be a human readable representaion of the `Bundle-Sy
 
 * if `Bundle-SymbolicName` starts with `org.globaltester`, Bundle-Name is to start with "GT"
 * if `Bundle-SymbolicName` starts with `de.eprsosim`, Bundle-Name is to start with "PersoSim"
-* if `Bundle-SymbolicName` starts with `com.hjp.globaltester`, Bundle-Name is to start with "GT" or "Extensions to GT"
-* if `Bundle-SymbolicName` starts with `com.hjp.persosim`, Bundle-Name is to start with "PersoSim" or "Extensions to PersoSim"
+* if `Bundle-SymbolicName` starts with `com.secunet.globaltester`, Bundle-Name is to start with "GT" or "Extensions to GT"
+* if `Bundle-SymbolicName` starts with `com.secunet.persosim`, Bundle-Name is to start with "PersoSim" or "Extensions to PersoSim"
 * The suffix for affiliate projects shall be its human readable representation listed in [] behind it in the above listing.
 
 Project name within workspace

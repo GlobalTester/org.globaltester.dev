@@ -314,34 +314,34 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 																exit 1
 														fi
 													else
-														REGEXP="^(com.hjp)(.\w+)*"
+														REGEXP="^(com.secunet)(.\w+)*"
 														if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 															then
-																REGEXP="^(com.hjp.globaltester)(.\w+)*"
+																REGEXP="^(com.secunet.globaltester)(.\w+)*"
 																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																	then
 																		REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
 																		if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																			then
-																				$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.globaltester bundle
+																				$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.globaltester bundle
 																			else
-																				echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.globaltester bundle
+																				echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.globaltester bundle
 																				exit 1
 																		fi
 																	else
-																		REGEXP="^(com.hjp.persosim)(.\w+)*"
+																		REGEXP="^(com.secunet.persosim)(.\w+)*"
 																		if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
 																			then
 																				REGEXP="^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
 																				if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 																					then
-																						$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.hjp.persosim bundle
+																						$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.persosim bundle
 																					else
-																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.hjp.persosim bundle
+																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.persosim bundle
 																						exit 1
 																				fi
 																			else
-																				$VERBOSE && echo INFO: skipping prefix checks for com.hjp.* bundle
+																				$VERBOSE && echo INFO: skipping prefix checks for com.secunet.* bundle
 																		fi
 																fi
 															else

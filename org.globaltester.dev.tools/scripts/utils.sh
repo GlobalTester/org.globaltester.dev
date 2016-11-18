@@ -92,7 +92,7 @@ function parallelBuild {
 	DIR=`pwd`
 	cd "$REPOS_FOLDER/gitolite-admin/testuser/"
 
-	echo -e "com.hjp.internal\n`ls`" | nice parallel $PARALLEL_BUILD_PARAMS --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive"
+	echo -e "com.secunet.globaltester.universe\n`ls`" | nice parallel $PARALLEL_BUILD_PARAMS --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive"
 
 	echo Build results:
 	grep -R -e "BUILD" $RESULTS
