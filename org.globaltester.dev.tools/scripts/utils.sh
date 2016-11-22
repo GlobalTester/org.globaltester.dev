@@ -42,7 +42,7 @@ alias forrepos="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/sc
 alias cloneall='ssh git@git.globaltester.org | sed -e '\''/^ R/!d'\'' | sed "s/^[ RW\t]*//" | grep "\." | xargs -n 1 -iREPONAME git clone git@git.globaltester.org:REPONAME'
 alias cloneallarchive='ssh archive@git.globaltester.org | sed -e '\''/^ R/!d'\'' | sed "s/^[ RW\t]*//" | grep "\." | xargs -n 1 -iREPONAME git clone archive@git.globaltester.org:REPONAME'
 
-alias cloneproduct="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/checkout.sh -s hjp -i -ni -r"
+alias cloneproduct="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/checkout.sh -s secunet -i -ni -r"
 
 alias fastmvn="mvn verify --offline -DskipInstall=true -DskipZip=true"
 

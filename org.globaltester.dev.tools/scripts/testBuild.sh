@@ -171,7 +171,7 @@ fi
 DIR=`mktemp -d`
 cd $DIR
 
-CHECKOUT_SCRIPT_PARAMS="-f $FOLDER -r $REPOSITORY -s hjp -ni -d $DIR $@"
+CHECKOUT_SCRIPT_PARAMS="-f $FOLDER -r $REPOSITORY -s secunet -ni -d $DIR $@"
 echo "Calling checkout script with parameters: $CHECKOUT_SCRIPT_PARAMS"
 
 CLONERESULT=0
