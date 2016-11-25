@@ -1,6 +1,6 @@
 org.globaltester.dev
 ===
-This is the main starting point repository for all projects managed by HJP Consulting GmbH. It shall provide everything you need to understand the development process and actively participate in it.
+This is the main starting point repository for all projects managed by secunet Security Networks AG. It shall provide everything you need to understand the development process and actively participate in it.
 
 This repo grows constantly, so if you miss some information contact us and we will be glad to add further advice.
 
