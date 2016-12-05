@@ -17,8 +17,6 @@ function createProductList {
 
 	echo "Create product list"
 	echo -en "" > $PRODUCT_LIST
-	echo "# Modify the product list" >> $PRODUCT_LIST
-	echo "# Comments and empty lines are ignored" >> $PRODUCT_LIST
 
 	for CURRENT_REPO in */
 	do
@@ -30,10 +28,8 @@ function createProductList {
 		fi
 	done
 
-	$EDITOR  $PRODUCT_LIST
-	removeLeadingAndTrailingEmptyLines  $PRODUCT_LIST
-	removeComments  $PRODUCT_LIST
-	removeTrailingWhitespace  $PRODUCT_LIST
+	echo "Following products will be build:"
+	cat  $PRODUCT_LIST
 
 	# generate aggregator POM
 	# aggregator header
@@ -256,21 +252,31 @@ while true; do
 		;;
 		"3")
 			echo "Update repository changelogs"
-			for CURRENT_REPO in `cat $REPO_LIST`
-			do
-				CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
-				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
-			done
+			#for CURRENT_REPO in `cat $REPO_LIST`
+			#do
+			#	CURRENT_REPO=`echo $CURRENT_REPO | sed -e "s|/||"`
+			#	bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateRepositoryChangelog.sh $CURRENT_REPO
+			#done
 
-			commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
+			#commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
+
+			echo
+			echo "We don't keep repository changelogs anymore, thus nothing to do here"
+			echo "If you are interested in the changes of a specific repositry check the history of the corresponding version control system"
+			echo
 
 			((NEXT_STEP++))
 		;;
 		"4")
 			echo "updating all product changelogs"
+			PRODUCTCHANGELOGS=()
 			for CURRENT_LINE in `cat $PRODUCT_LIST`
 			do
-				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/updateProductChangelog.sh "$CURRENT_LINE"
+				PRODUCTCHANGELOGS+="`getChangeLogFileForRepo $CURRENT_LINE` "
+			done
+			for CURRENT_LINE in `echo $PRODUCTCHANGELOGS | tr " " "\n" | sort -u`
+			do
+				$EDITOR `getChangeLogFileForRepo $CURRENT_LINE`
 			done
 
 			commitChanges "Commit modified changelogs?" "Update the CHANGELOG" $CHANGELOG_FILE_NAME
@@ -280,13 +286,8 @@ while true; do
 			echo "Transfer version numbers"
 			for CURRENT_REPO in `cat $REPO_LIST`
 			do
-				if [ ! -e "$CURRENT_REPO/$CHANGELOG_FILE_NAME" ]
-				then
-					continue;
-				fi
-
-				CURRENT_DATE=`getCurrentDateFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
-				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO/$CHANGELOG_FILE_NAME`
+				CURRENT_DATE=`getCurrentDateFromChangeLog $CURRENT_REPO`
+				CURRENT_VERSION=`getCurrentVersionFromChangeLog $CURRENT_REPO`
 				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/stampFiles.sh "$CURRENT_REPO" "$CURRENT_VERSION" "$CURRENT_DATE"
 				
 				#update versions within POM files
@@ -306,28 +307,29 @@ while true; do
 					for ARTIFACT_ID in $ARTIFACT_IDS
 					do
 						#search for corresponding repository
-						for CURRENT_REPO in `cat $REPO_LIST | sort -r`
-						do
-							case "$ARTIFACT_ID" in 
-								"$CURRENT_REPO"*)
-								ARTIFACT_REPO=$ARTIFACT_ID
-								while [ "$ARTIFACT_REPO" != "$CURRENT_REPO" ]
-								do
-									ARTIFACT_REPO=`echo $ARTIFACT_REPO | sed -e "s|\(^.*\)\..*|\1|"`
-									if [[ ! $ARTIFACT_REPO =~ "." ]]
-									then
-										break;
-									fi
-								done
-								[ "$ARTIFACT_REPO" = "$CURRENT_REPO" ] && break
-								;;
-							esac
-						done
+						#for CURRENT_REPO in `cat $REPO_LIST | sort -r`
+						#do
+					#		case "$ARTIFACT_ID" in 
+					#			"$CURRENT_REPO"*)
+					#			ARTIFACT_REPO=$ARTIFACT_ID
+					#			while [ "$ARTIFACT_REPO" != "$CURRENT_REPO" ]
+					#			do
+					#				ARTIFACT_REPO=`echo $ARTIFACT_REPO | sed -e "s|\(^.*\)\..*|\1|"`
+					#				if [[ ! $ARTIFACT_REPO =~ "." ]]
+					#				then
+					#					break;
+					#				fi
+					#			done
+					#			[ "$ARTIFACT_REPO" = "$CURRENT_REPO" ] && break
+					#			;;
+					#		esac
+					#	done
 						
 						#update version corresponding to artifactId
-						if [ "$ARTIFACT_REPO" = "$CURRENT_REPO" ]
+							ARTIFACT_VERSION=`getCurrentVersionFromChangeLog $ARTIFACT_ID`
+						if [ "$ARTIFACT_VERSION" ]
 						then
-							ARTIFACT_VERSION=`getCurrentVersionFromChangeLog $ARTIFACT_REPO/$CHANGELOG_FILE_NAME`
+							ARTIFACT_VERSION=`getCurrentVersionFromChangeLog $ARTIFACT_ID`
 							xmlstarlet ed -P --inplace -u "/descendant::artifactId[$ARTIFACT_COUNTER]/parent::node()/version" -v "$ARTIFACT_VERSION-SNAPSHOT" "$CURRENT_PROJECT"/pom.xml
 						fi
 						((ARTIFACT_COUNTER++))
@@ -363,7 +365,7 @@ while true; do
 			mvn clean verify $MAVEN_QUALIFIER
 			if [ $? -ne 0 ]; then
 				echo
-				echo "Failed to create build all products"
+				echo "Failed to create build of all products"
 				echo "Fix the problem and try again"
 				((NEXT_STEP--))
 			fi
@@ -425,7 +427,7 @@ while true; do
 			echo -e "Products released\n-----------------">> "$MDFILE"
 			for CURRENT_REPO in `cat $PRODUCT_LIST`
 			do
-				VERSION=`getCurrentVersionFromChangeLog "$CURRENT_REPO/$CHANGELOG_FILE_NAME"`
+				VERSION=`getCurrentVersionFromChangeLog "$CURRENT_REPO"`
 				VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
 				HASH=`cd "$CURRENT_REPO"; git log -n1 --format=%H`
 				HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
@@ -436,12 +438,7 @@ while true; do
 			echo -e "Bundle versions\n-----------------" >> "$MDFILE"
 			for CURRENT_REPO in `cat $REPO_LIST`
 			do
-				if [ ! -e "$CURRENT_REPO/$CHANGELOG_FILE_NAME" ]
-				then
-					continue;
-				fi
-
-				VERSION=`getCurrentVersionFromChangeLog "$CURRENT_REPO/$CHANGELOG_FILE_NAME"`
+				VERSION=`getCurrentVersionFromChangeLog "$CURRENT_REPO"`
 				VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
 				HASH=`cd $CURRENT_REPO; git log -n1 --format=%H`
 				HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
@@ -484,7 +481,7 @@ while true; do
 				if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
 				then
 					TAG_MESSAGE="Version bump to $REPO_VERSION"
-					REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
+					REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY`
 					TAG_NAME="version/$REPO_VERSION"
 				elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
 				then
