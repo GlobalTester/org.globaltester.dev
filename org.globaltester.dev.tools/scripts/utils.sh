@@ -92,12 +92,22 @@ function parallelBuild {
 	DIR=`pwd`
 	cd "$REPOS_FOLDER/gitolite-admin/testuser/"
 
-	echo -e "com.secunet.globaltester.universe\n`ls`" | nice parallel $PARALLEL_BUILD_PARAMS --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive"
+	echo -e "com.secunet.globaltester.universe
+com.secunet.globaltester.prove.eidclient
+com.secunet.globaltester.prove.epa
+com.secunet.globaltester.prove.epa.poseidas
+com.secunet.globaltester.prove.epareader
+com.secunet.globaltester.prove.epp
+com.secunet.globaltester.prove.is
+com.secunet.persosim.profiletool
+com.secunet.poseidas
+de.persosim.rcp
+org.globaltester.platform" | nice parallel $PARALLEL_BUILD_PARAMS --progress --files --res "$RESULTS" "$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/testBuild.sh --repo {} -- --source $SOURCE --branch $BRANCH --non-interactive"
 
 	echo Build results:
 	grep -R -e "BUILD" $RESULTS
 	echo Failed during dependency resolution:
-	grep -R -e "not successful" $RESULTSl;
+	grep -R -e "not successful" $RESULTS;
 
 	cd "$DIR"
 }
