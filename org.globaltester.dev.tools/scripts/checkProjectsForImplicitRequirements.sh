@@ -103,7 +103,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						DEBUG=`echo "$CURRENT_REPO" | grep "$TESTSCRIPTSIDENTIFIER"`
 						GREPRESULT=$?
 						
-						IDENTIFY_REFERENCES='.*\(\(com\.hjp\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*'
+						IDENTIFY_REFERENCES='.*\(\(com\.secunet\|de\.persosim\|org\.globaltester\)\(\.\w\+\)\+\).*'
 						
 						
 						RAWDEPENDENCIES=""

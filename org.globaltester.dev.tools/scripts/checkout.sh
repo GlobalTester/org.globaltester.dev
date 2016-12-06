@@ -143,7 +143,7 @@ case "$SOURCE" in
 	GlobalTester|globaltester|gt|GT|GLOBALTESTER)
 		CLONE_URI=git@github.com:GlobalTester/
 	;;
-	HJP|hjp)
+	secunet)
 		CLONE_URI=git@git.globaltester.org:
 		FULLCLONE_ALLOWED=1
 	;;
