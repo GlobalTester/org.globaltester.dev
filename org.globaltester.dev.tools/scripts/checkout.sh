@@ -12,7 +12,7 @@ PARAMETER_NUMBER=0
 FULL_CLONE=0
 INTERACTIVE=1
 IGNORE_EXISTING=0
-
+MIRROR=""
 
 while [ $# -gt 0 ]
 do
@@ -26,6 +26,7 @@ do
 			echo "-s  | --source          the source to be used                                  defaults to $SOURCE"
 			echo "-i  | --ignore          ignores existing repository folders"
 			echo "-fc | --full            clone all accessible repositories"
+			echo "-m  | --mirror          setup mirror repositories, see git help clone for details"
 			echo "-ni | --non-interactive assume answers needed to proceed"
 			echo "-h  | --help            display this help"
 			exit 1
@@ -77,6 +78,10 @@ do
 		;;
 		"-i"|"--ignore")
 			IGNORE_EXISTING=1
+			shift 1
+		;;
+		"-m"|"--mirror")
+			MIRROR="--mirror"
 			shift 1
 		;;
 		"-ni"|"--non-interactive")
@@ -143,7 +148,10 @@ case "$SOURCE" in
 	GlobalTester|globaltester|gt|GT|GLOBALTESTER)
 		CLONE_URI=git@github.com:GlobalTester/
 	;;
-	secunet)
+	bitbucket)
+		CLONE_URI=ssh://git@bitbucket.secunet.de:7999/gt/
+	;;
+	gitolite)
 		CLONE_URI=git@git.globaltester.org:
 		FULLCLONE_ALLOWED=1
 	;;
@@ -167,40 +175,50 @@ then
 	#extract repo names from git
 	REPOS_TO_CLONE=`ssh git@git.globaltester.org | sed -e '/^ R/!d' | sed "s/^[ RW\t]*//" | grep "\."`
 else
+
+	REF="HEAD"
+	if [ ! -z "$BRANCH" ]
+	then
+		REF="$BRANCH"
+	fi
+	
+	REPOS_TO_CLONE=`git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml | tar -xO | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
+
 	#clone releng repo
-	if [ -d $REPOSITORY ]
-	then
-		if [ $IGNORE_EXISTING -eq 0 ]
-		then
-			echo Releng repository already existing
-			exit 1
-		else
-			CLONERESULT=0
-		fi
-	else
-		git clone ${CLONE_URI}${REPOSITORY}
-	fi
-		
-	CLONERESULT=$?
-	
-	if [ $CLONERESULT -eq 0 ]
-	then
-		ACTUALLY_CLONED=${ACTUALLY_CLONED}"$REPOSITORY\n"
-		if [ ! -z "$BRANCH" ]
-		then
-			cd "$REPOSITORY";git checkout "$BRANCH"; cd ..;
-		fi
-	fi
-	
-	
-	#extract repo names from pom
-	if [ -e $RELENG/pom.xml ]
-	then
-		REPOS_TO_CLONE=`cat $RELENG/pom.xml | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | grep -v "$REPOSITORY" | sort -u`
-	else
-		echo No releng pom file found to extract a file list from
-		exit 1
-	fi
+#	if [ -d $REPOSITORY ]
+#	then
+#		if [ $IGNORE_EXISTING -eq 0 ]
+#		then
+#			echo Releng repository already existing
+#			exit 1
+#		else
+#			CLONERESULT=0
+#		fi
+#	else
+#		git clone ${CLONE_URI}${REPOSITORY}
+#	fi
+#		
+#	CLONERESULT=$?
+#	
+#	if [ $CLONERESULT -eq 0 ]
+#	then
+#		ACTUALLY_CLONED=${ACTUALLY_CLONED}"$REPOSITORY\n"
+#		if [ ! -z "$BRANCH" ]
+#		then
+#			cd "$REPOSITORY";git checkout "$BRANCH"; cd ..;
+#		fi
+#	fi
+#	
+#	
+#	#extract repo names from pom
+#	if [ -e $RELENG/pom.xml ]
+#	then
+#		REPOS_TO_CLONE=`cat $RELENG/pom.xml | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
+#	else
+#		echo No releng pom file found to extract a file list from
+#		exit 1
+#	fi
+
 fi
 
 for currentRepo in $REPOS_TO_CLONE
@@ -209,7 +227,7 @@ do
 	then
 		continue
 	fi
-	git clone ${CLONE_URI}$currentRepo
+	git clone $MIRROR ${CLONE_URI}$currentRepo
 	CLONERESULT=$(( $CLONERESULT + $? ))
 	if [ $CLONERESULT -ne 0 ]
 	then

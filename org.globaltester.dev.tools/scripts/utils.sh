@@ -11,6 +11,11 @@ then
 fi
 
 
+if [ -z "$ORIGIN_SOURCE" ]
+then
+	ORIGIN_SOURCE="ssh://git@bitbucket.secunet.de:7999/gt/"
+fi
+
 if [ -z "$MIRROR_FOLDER" ]
 then
 	MIRROR_FOLDER="$DEV_HOME/mirror"
@@ -39,10 +44,9 @@ GT_ARCHIVE_MIRROR="$MIRROR_FOLDER/archive"
 alias fordirs="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/fordirs"
 alias forrepos="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/fordirs -g"
 
-alias cloneall='ssh git@git.globaltester.org | sed -e '\''/^ R/!d'\'' | sed "s/^[ RW\t]*//" | grep "\." | xargs -n 1 -iREPONAME git clone git@git.globaltester.org:REPONAME'
-alias cloneallarchive='ssh archive@git.globaltester.org | sed -e '\''/^ R/!d'\'' | sed "s/^[ RW\t]*//" | grep "\." | xargs -n 1 -iREPONAME git clone archive@git.globaltester.org:REPONAME'
+alias cloneproduct="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/checkout.sh -s $ORIGIN_SOURCE -i -ni -r"
 
-alias cloneproduct="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/checkout.sh -s secunet -i -ni -r"
+alias cloneall='cloneproduct com.secunet.globaltester.universe'
 
 alias fastmvn="mvn verify --offline -DskipInstall=true -DskipZip=true"
 
@@ -185,7 +189,9 @@ function eeee {
 function clonelocal {
 
 	ls "$GT_MIRROR" | parallel "git clone $GT_MIRROR/{}"
-	ls | parallel "cd {}; git remote set-url origin git@git.globaltester.org:{}; cd .."
+	ls | parallel "cd {}; git remote set-url origin ssh://git@bitbucket.secunet.de:7999/gt/{}; cd .."
+	ls | parallel "cd {}; git remote add bitbucket ssh://git@bitbucket.secunet.de:7999/gt/{}; cd .."
+	ls | parallel "cd {}; git remote add gitolite git@git.globaltester.org:{}; cd .."
 	ls | parallel "cd {}; git remote add local $GT_MIRROR/{}; cd .."
 
 	for REPO in `ls`
@@ -213,7 +219,7 @@ function mkdevenv {
 	mkdir -p "$REPOS_FOLDER"
 
 	cd "$REPOS_FOLDER"
-	git clone git@git.globaltester.org:org.globaltester.dev
+	git clone ${ORIGIN_SOURCE}org.globaltester.dev
 	
 	cd "$MIRROR_FOLDER"
 	
