@@ -53,6 +53,8 @@ alias fastmvn="mvn verify --offline -DskipInstall=true -DskipZip=true"
 alias mergebasereset="forrepos 'git reset \`git merge-base HEAD origin/master\`'"
 alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEAD'"
 
+alias getArtifacts='bash -c "if [ -d results ]; then echo \"results dir exists, aborting\"; exit; fi; mkdir results; find . \( -name *site*.zip -o -name *deploy*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip \) -exec cp {} results/ \;"'
+
 function mergebasediff {
 	forrepos 'git diff --color '"$@"' `git merge-base HEAD origin/master`  HEAD' | less -F -r
 }
