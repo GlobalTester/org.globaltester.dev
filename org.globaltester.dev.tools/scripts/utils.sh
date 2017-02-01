@@ -154,6 +154,7 @@ function ee {
 		if [ -f "$ECLIPSE_EXECUTABLE" ]
 		then
 			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace >& /dev/null & disown
+			cd "$CURRENT_DIR"
 			return
 		fi
 		cd ..
