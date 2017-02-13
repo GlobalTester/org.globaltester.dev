@@ -2,7 +2,6 @@
 #
 # Checkout all repos accessible with the given private key and build the product.
 #
-set -x
 #set default values
 REPOSITORY=org.globaltester.platform
 DESTINATION=.
