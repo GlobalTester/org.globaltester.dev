@@ -2,7 +2,7 @@
 #
 # Checkout all repos accessible with the given private key and build the product.
 #
-
+set -x
 #set default values
 REPOSITORY=org.globaltester.platform
 DESTINATION=.
@@ -223,7 +223,7 @@ fi
 
 for currentRepo in $REPOS_TO_CLONE
 do
-	if [ $IGNORE_EXISTING -eq 1 -a -d $currentRepo ]
+	if [ $IGNORE_EXISTING -eq 1 -a \( -d $currentRepo -o -d $currentRepo.git \) ]
 	then
 		continue
 	fi
