@@ -41,6 +41,10 @@ ENV_REPOS_FOLDER=repos
 GT_MIRROR="$MIRROR_FOLDER/gt"
 GT_ARCHIVE_MIRROR="$MIRROR_FOLDER/archive"
 
+XEPHYR_GENERAL_DISP=:20
+XEPHYR_LOCK_FILE=/tmp/XephyrGeneral.lock
+XEPHYR_GENERAL_PID=
+
 alias fordirs="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/fordirs"
 alias forrepos="$REPOS_FOLDER/org.globaltester.dev/org.globaltester.dev.tools/scripts/fordirs -g"
 
@@ -54,6 +58,18 @@ alias mergebasereset="forrepos 'git reset \`git merge-base HEAD origin/master\`'
 alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEAD'"
 
 alias getArtifacts='bash -c "if [ -d results ]; then echo \"results dir exists, aborting\"; exit; fi; mkdir results; find . \( -name *site*.zip -o -name *deploy*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip \) -exec cp {} results/ \;"'
+
+function inXephyr {
+	echo $@
+	if [ ! -f "$XEPHYR_LOCK_FILE" ]
+	then
+		setsid bash -c "touch $XEPHYR_LOCK_FILE; Xephyr $XEPHYR_GENERAL_DISP; rm $XEPHYR_LOCK_FILE" & disown
+		sleep 1
+		DISPLAY="$XEPHYR_GENERAL_DISP" setsid x-window-manager & disown
+	fi
+	sleep 1
+	DISPLAY="$XEPHYR_GENERAL_DISP" "$@"
+}
 
 function mergebasediff {
 	forrepos 'git diff --color '"$@"' `git merge-base HEAD origin/master`  HEAD' | less -F -r
