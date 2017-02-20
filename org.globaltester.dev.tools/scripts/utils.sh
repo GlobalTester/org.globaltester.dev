@@ -68,7 +68,7 @@ function inXephyr {
 		DISPLAY="$XEPHYR_GENERAL_DISP" setsid x-window-manager & disown
 	fi
 	sleep 1
-	DISPLAY="$XEPHYR_GENERAL_DISP" "$@"
+	DISPLAY="$XEPHYR_GENERAL_DISP" bash -i -c "$@"
 }
 
 function mergebasediff {
