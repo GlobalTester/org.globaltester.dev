@@ -60,7 +60,13 @@ alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEA
 alias getArtifacts='bash -c "if [ -d results ]; then echo \"results dir exists, aborting\"; exit; fi; mkdir results; find . \( -name *site*.zip -o -name *deploy*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip \) -exec cp {} results/ \;"'
 
 function inXephyr {
-	echo $@
+	COMMANDSTRING="";
+	
+	for CURRENT in "$@"
+	do
+		COMMANDSTRING="$COMMANDSTRING\"`printf %q "$CURRENT"`\" "
+	done
+	 
 	if [ ! -f "$XEPHYR_LOCK_FILE" ]
 	then
 		setsid bash -c "touch $XEPHYR_LOCK_FILE; Xephyr $XEPHYR_GENERAL_DISP; rm $XEPHYR_LOCK_FILE" & disown
@@ -68,7 +74,7 @@ function inXephyr {
 		DISPLAY="$XEPHYR_GENERAL_DISP" setsid x-window-manager & disown
 	fi
 	sleep 1
-	DISPLAY="$XEPHYR_GENERAL_DISP" bash -i -c "$@"
+	DISPLAY="$XEPHYR_GENERAL_DISP" bash -i -c "$COMMANDSTRING"
 }
 
 function mergebasediff {
