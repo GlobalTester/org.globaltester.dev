@@ -170,8 +170,8 @@ function watchBuild {
 function ee {
 	ECLIPSE_EXECUTABLE="./eclipse/eclipse"
 
-	CURRENT_DIR=`pwd`
-	while [ ! `pwd` = "/" ]
+	CURRENT_DIR="`pwd`"
+	while [ ! "`pwd`" = "/" ]
 	do
 		if [ -f "$ECLIPSE_EXECUTABLE" ]
 		then
