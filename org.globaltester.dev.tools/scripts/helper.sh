@@ -51,15 +51,13 @@ function getChangeLogFileForRepo {
 	elif [[ $1 =~ ^com\.secunet\.poseidas ]];
 	then
 		echo "com.secunet.poseidas/$CHANGELOG_FILE_NAME"
-	else
-		echo -e '\033[0;31m'
-		echo -e "CHANGELOG unknown for repo $1"
-		echo -e '\033[0m'
 	fi
 }
 
 function getCurrentDateFromChangeLog {
 	CHANGELOG_FILE=`getChangeLogFileForRepo $1`
+	if [ ! $CHANGELOG_FILE ] ; then return; fi
+
 	while read CURRENT_LINE; do
 		VERSION=`echo $CURRENT_LINE | sed -e 's|Version \([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\) (\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\))|\2|g'`
 		if [ ! -z "$VERSION" ]
@@ -72,6 +70,8 @@ function getCurrentDateFromChangeLog {
 
 function getCurrentVersionFromChangeLog {
 	CHANGELOG_FILE=`getChangeLogFileForRepo $1`
+	if [ ! $CHANGELOG_FILE ] ; then return; fi
+
 	while read CURRENT_LINE; do
 		VERSION=`echo $CURRENT_LINE | sed -e 's|Version \([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\) ([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\})|\1|g'`
 		if [ ! -z "$VERSION" ]
