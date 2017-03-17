@@ -238,14 +238,21 @@ while true; do
 			
 			for CURRENT_REPO in `cat $REPO_LIST`
 			do
-				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/performRepositoryConsistencyChecks.sh $CURRENT_REPO
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/performRepositoryConsistencyChecks.sh "$CURRENT_REPO"
+			done
+			
+			echo "Test script checks"
+			
+			for CURRENT_REPO in `cat $REPO_LIST`
+			do
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/checkTestScripts.sh "$CURRENT_REPO"
 			done
 			
 			echo "Dependency checks"
 			
 			for CURRENT_REPO in `cat $REPO_LIST`
 			do
-				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/checkProjectsForImplicitRequirements.sh $CURRENT_REPO
+				bash $BASH_OPTIONS org.globaltester.dev/org.globaltester.dev.tools/scripts/checkProjectsForImplicitRequirements.sh "$CURRENT_REPO"
 			done
 
 			((NEXT_STEP++))
