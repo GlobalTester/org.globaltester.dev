@@ -30,7 +30,10 @@ GITATTRIBUTESFILEMATCH='../org.globaltester.dev/.gitattributes'
 GTIDENTIFIER="GT"
 PERSOSIMIDENTIFIER="PersoSim"
 EXTENSIONSIDENTIFIER="Extensions to"
+PROTOCOLIDENTIFIER="Protocol"
 TESTSPECIDENTIFIER="TestSpecification"
+
+CROSSOVER_SUFFIX="crossover"
 #</secunet-specific identifiers>
 
 BSN[0]="test"
@@ -46,6 +49,12 @@ BSN[9]="doc"
 BSN[10]="scripts"
 BSN[11]="tools"
 BSN[12]="ui.integrationtest"
+BSN[13]="consumer"
+BSN[14]="provider"
+BSN[15]="$CROSSOVER_SUFFIX"
+BSN[16]="sampleconfigs"
+BSN[17]="perso"
+BSN[18]="ics"
 
 BN[0]="Test"
 BN[1]="UI"
@@ -60,6 +69,12 @@ BN[9]="Doc"
 BN[10]="Scripts"
 BN[11]="Tools"
 BN[12]="UI Integration Test"
+BN[13]="Consumer"
+BN[14]="Provider"
+BN[15]="Crossover Test"
+BN[16]="Sample Configurations"
+BN[17]="Personalizations"
+BN[18]="ICS"
 
 # parameter handling
 while [ $# -gt 0 ]
@@ -116,7 +131,7 @@ function extractValue(){
 	return 0
 }
 
-echo Checking repository: $CURRENT_REPO
+$VERBOSE && echo Checking repository: $CURRENT_REPO
 
 if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 	then
@@ -158,7 +173,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 			then
 				$VERBOSE && echo INFO: base project \"$CURRENT_REPO\" found
 			else
-				echo ERROR: missing base project \"$CURRENT_REPO\"
+				echo INFO: missing base project \"$CURRENT_REPO\"
 				exit 1
 		fi
 		
@@ -187,6 +202,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 						if [ -f $PROJECTFILE ]
 							then
 								NAMEFROMPROJECT=`grep -m 1 "<name>" .project | sed "s/\s*<name>//; s/<\/name>.*//"`
+								ISTESTSCRIPT=`grep "org.globaltester.testspecification.gtTestSpecNature" .project`
 							else
 								echo ERROR: project file $PROJECTFILE NOT found at $CURRENTDIR
 								exit 1
@@ -267,10 +283,8 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										
 										# check that Bundle-Name in MANIFEST.MF matches script project name from .project file
 										# check that Bundle-SymbolicName in MANIFEST.MF matches code project name from .project file
-										DEBUG=`echo "$CURRENT_PROJECT" | grep "$TESTSCRIPTSIDENTIFIER"`
-										GREPRESULT=$?
 										
-										if [[ $GREPRESULT == '0' ]]
+										if [ -n "$ISTESTSCRIPT" ]
 											then
 												# this is a script project
 												if [[ "$NAMEFROMPROJECT" != "$RECEIVEDNAMESTRING" ]]
@@ -290,73 +304,77 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 										# check that Bundle-Name correctly relates to Bundle-SymbolicName
 										
 										# check prefixes
-										REGEXP="^(org.globaltester)(.\w+)*"
-										if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+																				
+										if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^org.globaltester(.\w+)* ]]
+										then
+											if [[ "$RECEIVEDNAMESTRING" =~ ^$GTIDENTIFIER\ .+ ]]
 											then
-												REGEXP="^($GTIDENTIFIER) .+"
-												if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-													then
-														$VERBOSE && echo INFO: this is a $GTIDENTIFIER bundle
-													else
-														echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$GTIDENTIFIER\"
-														exit 1
-												fi
+												$VERBOSE && echo INFO: this is a $GTIDENTIFIER bundle
 											else
-												REGEXP="^(de.persosim)(.\w+)*"
-												if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+												echo ERROR: "Bundle-Name \"$RECEIVEDNAMESTRING\" of bundle $RECEIVEDSYMBOLICNAMESTRING is expected to start with: \"$GTIDENTIFIER\""
+												exit 1
+											fi
+										elif [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^de.persosim(.\w+)* ]]
+										then
+											if [[ "$RECEIVEDNAMESTRING" =~ ^$PERSOSIMIDENTIFIER\ .+ ]]
+											then
+												$VERBOSE && echo INFO: this is a $PERSOSIMIDENTIFIER bundle
+											else
+												echo ERROR: "Bundle-Name \"$RECEIVEDNAMESTRING\" of bundle $RECEIVEDSYMBOLICNAMESTRING is expected to start with: \"$PERSOSIMIDENTIFIER\""
+												exit 1
+											fi
+										elif [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^com.secunet(\.\w+)* ]]
+										then
+											if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^(com.secunet)(.\w+)* ]]
+											then
+												SHORTENEDRECEIVEDSYMBOLICNAMESTRING=${RECEIVEDSYMBOLICNAMESTRING#com.secunet}
+												if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^(globaltester)(.\w+)* ]]
+												then
+													SHORTENEDRECEIVEDSYMBOLICNAMESTRING=${SHORTENEDRECEIVEDSYMBOLICNAMESTRING#globaltester}
+													if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^(protocols)(.\w+)* ]]
 													then
-														REGEXP="^($PERSOSIMIDENTIFIER) .+"
-														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-															then
-																$VERBOSE && echo INFO: this is a $PERSOSIMIDENTIFIER bundle
-															else
-																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to start with: \"$PERSOSIMIDENTIFIER\"
-																exit 1
+														if [[ "$RECEIVEDNAMESTRING" =~ ^$PROTOCOLIDENTIFIER.* ]]
+														then
+															$VERBOSE && echo "INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.globaltester.protocols bundle"
+														else
+															echo "ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.globaltester.protocols bundle"
+															exit 1
 														fi
 													else
-														REGEXP="^(com.secunet)(.\w+)*"
-														if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
-															then
-																REGEXP="^(com.secunet.globaltester)(.\w+)*"
-																if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
-																	then
-																		REGEXP="^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
-																		if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-																			then
-																				$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.globaltester bundle
-																			else
-																				echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.globaltester bundle
-																				exit 1
-																		fi
-																	else
-																		REGEXP="^(com.secunet.persosim)(.\w+)*"
-																		if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
-																			then
-																				REGEXP="^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*)"
-																				if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-																					then
-																						$VERBOSE && echo INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.persosim bundle
-																					else
-																						echo ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.persosim bundle
-																						exit 1
-																				fi
-																			else
-																				$VERBOSE && echo INFO: skipping prefix checks for com.secunet.* bundle
-																		fi
-																fi
-															else
-																echo ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class
-																exit 1
+														if [[ "$RECEIVEDNAMESTRING" =~ ^(($GTIDENTIFIER|$EXTENSIONSIDENTIFIER $GTIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*) ]]
+														then
+															$VERBOSE && echo "INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.globaltester bundle"
+														else
+															echo "ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.globaltester bundle"
+															exit 1
 														fi
+													fi
+												elif [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ ^(persosim)(.\w+)* ]]
+												then
+													SHORTENEDRECEIVEDSYMBOLICNAMESTRING=${SHORTENEDRECEIVEDSYMBOLICNAMESTRING#persosim}
+													if [[ "$RECEIVEDNAMESTRING" =~ ^(($PERSOSIMIDENTIFIER|$EXTENSIONSIDENTIFIER $PERSOSIMIDENTIFIER) .+|.+ $TESTSPECIDENTIFIER.*) ]]
+													then
+														$VERBOSE && echo "INFO: $RECEIVEDNAMESTRING is a valid name for a com.secunet.persosim bundle"
+													else
+														echo "ERROR: $RECEIVEDNAMESTRING is NOT a valid name for a com.secunet.persosim bundle"
+														exit 1
+													fi
 												fi
+												
+											else
+												$VERBOSE && echo "INFO: skipping prefix checks for $RECEIVEDSYMBOLICNAMESTRING bundle"
+											fi
+										else
+											echo "ERROR: Bundle-Name \"$RECEIVEDNAMESTRING\" is of unknown class"
+											exit 1
 										fi
 										
 										# check suffixes
 										if [[ "$CURRENT_PROJECT" == "$CURRENT_REPO" ]]
 											then
-												$VERBOSE && echo INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\"
+												$VERBOSE && echo "INFO: skipping suffix check for base project CP: \"$CURRENT_PROJECT\", BSN: \"$RECEIVEDSYMBOLICNAMESTRING\""
 											else
-												$VERBOSE && echo INFO: commencing suffix check for non-base project
+												$VERBOSE && echo "INFO: commencing suffix check for non-base project"
 												MATCH=false
 												MATCHEDPATTERN=""
 												TARGETPATTERN=""
@@ -364,7 +382,7 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 													do
 														MATCHEDPATTERN=${BSN[i]}
 														REGEXP=".*\.$MATCHEDPATTERN$"
-														if [[ "$RECEIVEDSYMBOLICNAMESTRING" =~ $REGEXP ]]
+														if [[ $RECEIVEDSYMBOLICNAMESTRING =~ $REGEXP ]]
 															then
 																MATCH=true
 																TARGETPATTERN=${BN[i]}
@@ -375,18 +393,19 @@ if [[ -d $CURRENT_REPO && $CURRENT_REPO != '.' && $CURRENT_REPO != '..' ]]
 													done
 												
 												if [ $MATCH = true ]
+												then
+													$VERBOSE && echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
+													REGEXP=".* $TARGETPATTERN$"
+													if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
 													then
-														$VERBOSE && echo INFO: matched pattern is \"MATCHEDPATTERN\" \-\-\> \"$TARGETPATTERN\"
-														REGEXP=".* $TARGETPATTERN$"
-														if [[ "$RECEIVEDNAMESTRING" =~ $REGEXP ]]
-															then
-																$VERBOSE && echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
-															else
-																echo ERROR: Failed suffix match, Bundle-Name \"$RECEIVEDNAMESTRING\" is expected to end with \"$TARGETPATTERN\"
-																exit 1
-														fi
+														$VERBOSE && echo INFO: Successful suffix match according to category $MATCHEDPATTERN \-\-\> $TARGETPATTERN
 													else
-														echo WARNING: Failed suffix match according to valid categories, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
+														echo ERROR: Failed suffix match, Bundle-Name \"$RECEIVEDNAMESTRING\" of bundle $RECEIVEDSYMBOLICNAMESTRING is expected to end with \"$TARGETPATTERN\"
+														exit 1
+													fi
+												else
+													#$VERBOSE && echo INFO: No matching suffix found, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
+													echo INFO: No matching suffix found, BN \"$RECEIVEDNAMESTRING\", BSN \"$RECEIVEDSYMBOLICNAMESTRING\"
 												fi
 										fi
 										
