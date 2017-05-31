@@ -216,7 +216,7 @@ function clonelocal {
 	ls "$GT_MIRROR" | parallel "git clone $GT_MIRROR/{}"
 	ls | parallel "cd {}; git remote set-url origin ssh://git@bitbucket.secunet.de:7999/gt/{}; cd .."
 	ls | parallel "cd {}; git remote add bitbucket ssh://git@bitbucket.secunet.de:7999/gt/{}; cd .."
-	ls | parallel "cd {}; git remote add gitolite git@git.globaltester.org:{}; cd .."
+	ls | parallel "cd {}; git remote add gitolite ssh://git@globaltester-git.secunet.com:2021/{}; cd .."
 	ls | parallel "cd {}; git remote add local $GT_MIRROR/{}; cd .."
 
 	for REPO in `ls`

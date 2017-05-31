@@ -151,7 +151,7 @@ case "$SOURCE" in
 		CLONE_URI=ssh://git@bitbucket.secunet.de:7999/gt/
 	;;
 	gitolite)
-		CLONE_URI=git@git.globaltester.org:
+		CLONE_URI=ssh://git@globaltester-git.secunet.com:2021/
 		FULLCLONE_ALLOWED=1
 	;;
 	*)
