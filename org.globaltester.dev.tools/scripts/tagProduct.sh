@@ -82,17 +82,17 @@ case "$TYPE" in
 		TAG_NAME="$TYPE/$VERSION"
 	;;
 	"release")
-		
-		if [ ! -e "$REPOSITORY/$CHANGELOG_FILE_NAME" ]
+		if [ -z "$VERSION" ]
 		then
-			echo Did not tag product $REPOSITORY due to missing changelog file
+			VERSION=`getCurrentVersionFromChangeLog $REPOSITORY`
+		fi
+		
+		if [ -z "$VERSION" ]
+		then
+			echo Could not tag product $REPOSITORY due to missing version information
 			exit
 		fi
 	
-		if [ -z "$VERSION" ]
-		then
-			VERSION=`getCurrentVersionFromChangeLog $REPOSITORY/$CHANGELOG_FILE_NAME`
-		fi
 		TAG_MESSAGE="Product version bump to $VERSION"
 		TAG_NAME="$TYPE/$REPOSITORY/$VERSION"
 	;;
