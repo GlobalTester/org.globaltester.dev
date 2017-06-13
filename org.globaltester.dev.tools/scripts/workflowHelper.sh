@@ -465,58 +465,10 @@ while true; do
 		"12")
 			echo "Tag repositories"
 
-			if [ $BUILDTYPE = $BUILDTYPE_QA ]
-			then
-				read -p "Was QA successful? (y/N)" QA_SUCCESS
-				QA_STATE=""
-
-				case "$QA_SUCCESS" in
-					"y"|"Y")
-						QA_STATE="Passed"
-					;;
-					*)
-						QA_REASON_FILE=`mktemp`
-						echo -e "Problems found during quality assurance and according ticket numbers:" >> $QA_REASON_FILE
-						echo -e >> $QA_REASON_FILE
-						echo -e "xxxx	Ticket subject, this line has to be removed, the whitespace before this line is a tab" >> $QA_REASON_FILE
-						$EDITOR $QA_REASON_FILE
-					;;
-				esac
-			fi
-
-			for CURRENT_REPO in `cat $REPO_LIST`
-			do
-				if [ $BUILDTYPE = $BUILDTYPE_RELEASE ]
-				then
-					TAG_MESSAGE="Version bump to $REPO_VERSION"
-					REPO_VERSION=`getCurrentVersionFromChangeLog $REPOSITORY`
-					TAG_NAME="version/$REPO_VERSION"
-				elif [ $BUILDTYPE = $BUILDTYPE_HOTFIX ]
-				then
-					TAG_MESSAGE="Tag Hotfix version $HOTFIX"
-					TAG_NAME="hotfix/$HOTFIX"
-				elif [ $BUILDTYPE = $BUILDTYPE_QA ]
-				then
-					TAG_MESSAGE="Tag QA version $HOTFIX"
-
-					if [ ! -z "$QA_REASON_FILE" ]
-					then
-						TAG_MESSAGE=`echo -en "$TAG_MESSAGE\n\n$(cat $QA_REASON_FILE)"`
-					fi
-
-					TAG_NAME="qa$QA_STATE/`date +%Y%m%d`"
-				else
-					echo "Current buildtype is $BUILDTYPE"
-					echo "Can't tag repositories for this buildtype"
-					break
-				fi
-
-				cd "$CURRENT_REPO"
-				git tag -a -m "$TAG_MESSAGE" "$TAG_NAME"
-				cd ..
-			done
-
-			rm "$QA_REASON_FILE"
+			echo
+			echo "We don't keep repository specific versions anymore, thus nothing to do here"
+			echo "If you are interested in the changes of a specific repositry check the history of the corresponding version control system"
+			echo
 
 			((NEXT_STEP++))
 		;;
