@@ -36,8 +36,8 @@ grep "<module>" "$RELENG_POM" | while read -r MODULE ; do
 		continue
 	fi
 
-	#do not include coverage, site, product modules in coverage report
-	if [[ "$BUNDLE" =~ .*\.((coverage)|(site)|(product))$ ]]; then
+	#do not include coverage, site, product and deploy modules in coverage report
+	if [[ "$BUNDLE" =~ .*\.((coverage)|(site)|(product)|(deploy))$ ]]; then
 		continue
 	fi
 
