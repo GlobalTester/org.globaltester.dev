@@ -174,3 +174,27 @@ function getAbsolutePath {
 
 	echo "$ABS_PATH"
 }
+
+function getGroupIdForBundle {
+	if [[ $1 =~ ^org\.globaltester ]];
+	then
+		echo "org.globaltester"
+	elif [[ $1 =~ ^de\.persosim ]];
+	then
+		echo "de.persosim"
+	elif [[ $1 =~ ^com\.secunet\.globaltester ]];
+	then
+		echo "com.secunet.globaltester"
+	elif [[ $1 =~ ^com\.secunet\.persosim ]];
+	then
+		echo "com.secunet.persosim"
+	elif [[ $1 =~ ^com\.secunet\.poseidas ]];
+	then
+		echo "com.secunet.poseidas"
+	elif [[ $1 =~ ^com\.secunet ]];
+	then
+		echo "com.secunet"
+	else
+		echo "unkown"
+	fi
+}
