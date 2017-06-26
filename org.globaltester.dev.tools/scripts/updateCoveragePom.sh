@@ -49,7 +49,7 @@ grep "<module>" "$RELENG_POM" | while read -r MODULE ; do
 	
 	#define the scope
 	SCOPE="compile"
-	if [[ "$BUNDLE" =~ .*test$ ]]; then
+	if [[ "$BUNDLE" =~ .*\.((test)|(integrationtest)|(crossover))$ ]]; then
 		SCOPE="test"
 	fi
 
