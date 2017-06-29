@@ -175,7 +175,7 @@ function ee {
 	do
 		if [ -f "$ECLIPSE_EXECUTABLE" ]
 		then
-			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace >& /dev/null & disown
+			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace "$@" >& /dev/null & disown
 			cd "$CURRENT_DIR"
 			return
 		fi
@@ -195,6 +195,8 @@ function eee {
 		DIR="$ENVIRONMENTS_FOLDER/$1"
 	fi
 
+	shift
+
 	if [ ! -d $DIR ]
 	then
 		echo "$DIR does not exist"
@@ -203,7 +205,7 @@ function eee {
 	fi
 
 	cd $DIR
-	ee
+	ee "$@"
 }
 
 function eeee {
