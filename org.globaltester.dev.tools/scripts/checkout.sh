@@ -180,43 +180,51 @@ else
 	then
 		REF="$BRANCH"
 	fi
-	
-	REPOS_TO_CLONE=`git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml | tar -xO | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
+
+		
+	git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml
+	if [ $? -eq 0 ]
+	then
+		echo Retrieving releng POM via git archive command
+		REPOS_TO_CLONE=`git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml | tar -xO | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
+	else
+		echo Retrieving releng POM via git archive command failed, try cloning whole releng repository
 
 	#clone releng repo
-#	if [ -d $REPOSITORY ]
-#	then
-#		if [ $IGNORE_EXISTING -eq 0 ]
-#		then
-#			echo Releng repository already existing
-#			exit 1
-#		else
-#			CLONERESULT=0
-#		fi
-#	else
-#		git clone ${CLONE_URI}${REPOSITORY}
-#	fi
-#		
-#	CLONERESULT=$?
-#	
-#	if [ $CLONERESULT -eq 0 ]
-#	then
-#		ACTUALLY_CLONED=${ACTUALLY_CLONED}"$REPOSITORY\n"
-#		if [ ! -z "$BRANCH" ]
-#		then
-#			cd "$REPOSITORY";git checkout "$BRANCH"; cd ..;
-#		fi
-#	fi
-#	
-#	
-#	#extract repo names from pom
-#	if [ -e $RELENG/pom.xml ]
-#	then
-#		REPOS_TO_CLONE=`cat $RELENG/pom.xml | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
-#	else
-#		echo No releng pom file found to extract a file list from
-#		exit 1
-#	fi
+		if [ -d $REPOSITORY ]
+		then
+			if [ $IGNORE_EXISTING -eq 0 ]
+			then
+				echo Releng repository already existing
+				exit 1
+			else
+				CLONERESULT=0
+			fi
+		else
+			git clone ${CLONE_URI}${REPOSITORY}
+		fi
+		
+		CLONERESULT=$?
+
+		if [ $CLONERESULT -eq 0 ]
+		then
+			ACTUALLY_CLONED=${ACTUALLY_CLONED}"$REPOSITORY\n"
+			if [ ! -z "$BRANCH" ]
+			then
+				cd "$REPOSITORY";git checkout "$BRANCH"; cd ..;
+			fi
+		fi
+	
+	
+		#extract repo names from pom
+		if [ -e $RELENG/pom.xml ]
+		then
+			REPOS_TO_CLONE=`cat $RELENG/pom.xml | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
+		else
+			echo No releng pom file found to extract a file list from
+			exit 1
+		fi
+	fi
 
 fi
 
