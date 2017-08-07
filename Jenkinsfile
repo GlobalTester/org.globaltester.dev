@@ -6,7 +6,7 @@ node('GlobalTester') {
     checkout([$class: 'GitSCM', 
       branches: [[name: "${BRANCH_NAME}"]],
       doGenerateSubmoduleConfigurations: false,
-      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${PROJECT_NAME}"]],
+      extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${PROJECT_NAME}"],[$class: 'CleanCheckout']],
       submoduleCfg: [],
       userRemoteConfigs: [[credentialsId: '5d73c6ee-e61e-44b3-bce9-881b28a92d60', url: "ssh://git@bitbucket.secunet.de:7999/gt/${PROJECT_NAME}"]]
     ])
@@ -23,7 +23,7 @@ node('GlobalTester') {
       checkout([$class: 'GitSCM', 
         branches: [[name: "${BRANCH_NAME}"]],
         doGenerateSubmoduleConfigurations: false,
-        extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${curRepo}"]],
+        extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${curRepo}"],[$class: 'CleanCheckout']],
         submoduleCfg: [],
         userRemoteConfigs: [[credentialsId: '5d73c6ee-e61e-44b3-bce9-881b28a92d60', url: "ssh://git@bitbucket.secunet.de:7999/gt/${curRepo}"]]
       ])
