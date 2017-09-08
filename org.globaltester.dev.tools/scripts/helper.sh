@@ -143,6 +143,12 @@ function getRepositoriesFromAggregator {
 	cat $POM_FILE | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u
 }
 
+function getRepositoriesFromModules {
+	MODULES_FILE=$1
+
+	cat $MODULES_FILE | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*|\1|' | sort -u
+}
+
 function removeLeadingAndTrailingEmptyLines {
 	# Delete empty lines at begin of file
 	sed -i -e '/./,$!d' $1
