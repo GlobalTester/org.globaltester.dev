@@ -37,7 +37,7 @@ node('GlobalTester') {
   }
 
   stage ('Collect artifacts') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html'    
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html **/target/*site*.zip **/target/products/*product-*.zip **/target/products/*deploy*.zip **/target/**/*releasetests*.zip'    
     junit '**/TEST*.xml'
   }
 
