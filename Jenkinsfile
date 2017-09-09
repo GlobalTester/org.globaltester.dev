@@ -34,8 +34,10 @@ node('GlobalTester') {
     wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
       sh "cd ${PROJECT_NAME}/${PROJECT_NAME}.releng/ && ${MAVEN_HOME}/bin/mvn ${MAVEN_PARAMS} -Dmaven.test.failure.ignore clean verify"
     }
+  }
 
-    stage "Collect test results"
+  stage ('Collect artifacts') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html'    
     junit '**/TEST*.xml'
   }
 
