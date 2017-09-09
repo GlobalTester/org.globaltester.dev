@@ -86,6 +86,6 @@ do
 	VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
 	HASH=`cd $CURRENT_REPO; git log -n1 --format=%H`
 	HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
-	printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> $MDFILE
+	printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
 done
 
