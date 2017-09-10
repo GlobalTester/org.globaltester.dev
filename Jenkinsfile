@@ -37,7 +37,11 @@ node('GlobalTester') {
   }
 
   stage ('Collect artifacts') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html **/target/*site*.zip **/target/products/*product-*.zip **/target/products/*deploy*.zip **/target/**/*releasetests*.zip'    
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html'
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*site*.zip'
+//    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.zip'
+//    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*deploy*.zip'    
+//    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/**/*releasetests*.zip'    
     junit '**/TEST*.xml'
   }
 
