@@ -89,3 +89,26 @@ do
 	printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
 done
 
+
+# add release preparation checklist
+echo -e "<p style=\"page-break-after: always\"/>" >> "$MDFILE"
+echo -e "Release preparation checklist\n-----------------" >> "$MDFILE"
+echo -e "- [ ] Check open issues" >> "$MDFILE"
+echo -e "- [ ] Check Sonar quality gate" >> "$MDFILE"
+echo -e "- [ ] Check open branches" >> "$MDFILE"
+echo -e "- [ ] Perform consistency checks" >> "$MDFILE"
+echo -e "- [ ] Update changelogs" >> "$MDFILE"
+echo -e "- [ ] Transfer version numbers" >> "$MDFILE"
+echo -e "- [ ] Update checksums" >> "$MDFILE"
+echo -e "- [ ] Push required changes to master and go to sleep" >> "$MDFILE"
+
+# add release finalisation checklist
+echo -e "<p style=\"page-break-after: always\"/>" >> "$MDFILE"
+echo -e "Release preparation checklist\n-----------------" >> "$MDFILE"
+echo -e "- [ ] Perform release tests on final artifacts" >> "$MDFILE"
+echo -e "- [ ] Tag products" >> "$MDFILE"
+echo -e "- [ ] Push master/tags to repositories (bitbucket, gitolite, GitHub)" >> "$MDFILE"
+echo -e "- [ ] Upload artifacts to website" >> "$MDFILE"
+echo -e "- [ ] Inform customers about the new version (the CHANGELOG files are a great basis for this)" >> "$MDFILE"
+echo -e "- [ ] Celebrate" >> "$MDFILE"
+
