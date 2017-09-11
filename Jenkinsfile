@@ -41,7 +41,6 @@ node('GlobalTester') {
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*site*.zip'
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.zip'
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*deploy*.zip'
-    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/**/*releasetests*.zip'
     junit '**/TEST*.xml'
   }
 
