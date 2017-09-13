@@ -105,8 +105,9 @@ echo -e "- [ ] Push required changes to master and go to sleep" >> "$MDFILE"
 
 # add release finalisation checklist
 echo -e "<p style=\"page-break-after: always\"/>" >> "$MDFILE"
-echo -e "Release preparation checklist\n-----------------" >> "$MDFILE"
+echo -e "Release finalisation checklist\n-----------------" >> "$MDFILE"
 echo -e "- [ ] Perform release tests on final artifacts" >> "$MDFILE"
+echo -e "- [ ] Follow up on release test results (e.g. documentation changes, creation of issues and hotfixes)" >> "$MDFILE"
 echo -e "- [ ] Tag products" >> "$MDFILE"
 echo -e "- [ ] Push master/tags to repositories (bitbucket, gitolite, GitHub)" >> "$MDFILE"
 echo -e "- [ ] Upload artifacts to website" >> "$MDFILE"
