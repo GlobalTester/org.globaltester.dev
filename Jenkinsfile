@@ -37,6 +37,7 @@ node('GlobalTester') {
   }
 
   stage ('Collect artifacts') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/resource/*.list'
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html'
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*site*.zip'
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.zip'

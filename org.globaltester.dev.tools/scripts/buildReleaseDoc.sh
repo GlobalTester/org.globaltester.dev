@@ -41,12 +41,14 @@ PRODUCT_LIST=`mktemp`
 REPO_LIST=`mktemp`
 MODULE_LIST=`mktemp`
 
+DATE=`date +%Y%m%d`
+
 createProductList
 
 echo "Generate test documentation into $TARGET"
 
-# aggregate all releaseTest.md files and generate html
 MDFILE="$TARGET/TestDocumentation.md"
+MODULES_LIST_FILE="$TARGET/modules.list"
 echo -n > "$MDFILE"
 for CURRENT_REPO in `cat $REPO_LIST`
 do
@@ -61,7 +63,7 @@ echo -e "Release overview\n================" > "$MDFILE"
 
 # add environment information
 echo -e "Environment information\n-----------------" >> "$MDFILE"
-echo -e "Date: \`" `date  +%Y-%m-%d` "\`  " >> "$MDFILE"
+echo -e "Date: \` $DATE \`  " >> "$MDFILE"
 echo -e "Executed by: \`" `id -u -n` "\`  " >> "$MDFILE"
 echo -e "Machine: \`" `uname -a` "\`  " >> "$MDFILE"
 echo -e "Java: \`" `java -version 2>&1 | grep build` "\`  " >> "$MDFILE"
@@ -72,7 +74,7 @@ echo -e "Products released\n-----------------">> "$MDFILE"
 for CURRENT_REPO in `cat $PRODUCT_LIST`
 do
 	VERSION=`getCurrentVersionFromChangeLog "$CURRENT_REPO"`
-	VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
+	VERSION=`printf "%9s" "$VERSION" | sed -e 's/ /-/g'`
 	HASH=`cd "$CURRENT_REPO"; git log -n1 --format=%H`
 	HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
 	printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
@@ -82,11 +84,12 @@ done
 echo -e "Bundle versions\n-----------------" >> "$MDFILE"
 for CURRENT_REPO in `cat $REPO_LIST`
 do
-	VERSION=`getCurrentVersionFromChangeLog "$CURRENT_REPO"`
-	VERSION=`printf "%9s" "@$VERSION" | sed -e 's/ /-/g'`
-	HASH=`cd $CURRENT_REPO; git log -n1 --format=%H`
-	HASH=`printf "%42s" "$HASH" | sed -e 's/ /#/g'`
-	printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
+	VERSION_CLEAN=`getCurrentVersionFromChangeLog "$CURRENT_REPO"`
+	VERSION=`printf "%9s" "$VERSION_CLEAN" | sed -e 's/ /-/g'`
+	HASH_CLEAN=`cd "$CURRENT_REPO"; git log -n1 --format=%H`
+	HASH=`printf "%42s" "$HASH_CLEAN" | sed -e 's/ /#/g'`
+	printf "  %-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
+	echo "$CURRENT_REPO $HASH_CLEAN $VERSION_CLEAN $DATE" >> "$MODULES_LIST_FILE"
 done
 
 
