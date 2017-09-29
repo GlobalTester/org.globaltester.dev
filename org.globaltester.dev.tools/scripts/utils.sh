@@ -208,7 +208,7 @@ function eee {
 	ee "$@"
 }
 
-_eee()
+_existing_envs()
 {
     local cur prev opts
     COMPREPLY=()
@@ -217,7 +217,10 @@ _eee()
 
     COMPREPLY=( $(compgen -W "$( command ls ~/dev/env/ )" -- ${cur}) )
 }
-complete -F _eee eee
+
+complete -F _existing_envs eee
+complete -F _existing_envs gotorepos
+complete -F _existing_envs gotoenv
 
 
 function eeee {
