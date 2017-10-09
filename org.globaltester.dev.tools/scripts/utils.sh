@@ -221,6 +221,9 @@ _existing_envs()
 complete -F _existing_envs eee
 complete -F _existing_envs gotorepos
 complete -F _existing_envs gotoenv
+complete -F _existing_envs mkeclipse
+complete -F _existing_envs mkgtenv
+complete -F _existing_envs mkenv
 
 
 function eeee {
@@ -277,27 +280,49 @@ function mkenv {
 		return
 	fi
 
+	_createenv "$1"
+
+	cd "$WU_PATH"
+}
+
+function _createenv {
 	IDENTIFIER="$1"
 	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
 
 	mkdir -p "$WU_PATH"
 	mkdir -p "$WU_PATH/$ENV_REPOS_FOLDER"
-
-	cd "$WU_PATH"
+	
 }
 
-function mkeclipse {
-	if [ -z $1 ]
+function _copyfolder {
+	IDENTIFIER="$1"
+	SOURCE_FOLDER="$2"
+	TARGET_NAME="$3"
+	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
+
+	echo "Copying $TARGET_NAME..."
+
+	if [ ! -d "$SOURCE_FOLDER" ]
 	then
-		echo "An identifier is needed for eclipse dev environment creation"
+		echo "$SOURCE_FOLDER does not exist"
+		return 1
+	fi
+
+	rsync -a "$SOURCE_FOLDER/" "$WU_PATH/$TARGET_NAME"
+}
+
+function _copyeclipse {
+	BASE_LINK="currentBaseEclipse"
+
+	if [ -z "$2" ]
+	then
+		echo "Using $BASE_LINK as eclipse base"
 		return
 	fi
 
 	IDENTIFIER="$1"
 	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
-	BASE_PATH="$IDE_FOLDER/currentBaseEclipse"
-
-	mkenv "$IDENTIFIER"
+	BASE_PATH="$IDE_FOLDER/$BASE_LINK"
 
 	if [ ! -d "$BASE_PATH" ]
 	then
@@ -305,13 +330,11 @@ function mkeclipse {
 		return 1
 	fi
 
-	echo Copying eclipse...
-	rsync -a "$BASE_PATH/eclipse/" "$WU_PATH/eclipse"
+	_copyfolder $IDENTIFIER "$BASE_PATH/eclipse/" eclipse
 
 	if [ -d "$BASE_PATH/workspace" ]
 	then
-		echo Copying workspace...
-		rsync -a "$BASE_PATH/workspace/" "$WU_PATH/workspace"
+		_copyfolder $IDENTIFIER "$BASE_PATH/workspace/" workspace
 	fi
 
 	if [ -f "$BASE_PATH/modifications.sh" ]
@@ -320,14 +343,57 @@ function mkeclipse {
 		"$BASE_PATH/modifications.sh" "$WU_PATH"
 	fi
 
-	cd "$WU_PATH/$ENV_REPOS_FOLDER"
-	clonelocal
-
-	cd "$WU_PATH"
 	echo
 	echo "Completed, execute using the following commands"
 	echo " from this directory:  ee"
 	echo " from anywhere:        eee $IDENTIFIER"
+}
+
+function mkeclipse {
+	if [ -z "$1" ]
+	then
+		echo "An identifier is needed for eclipse dev environment creation"
+		return
+	fi
+
+	BASE_LINK="currentBaseEclipse"
+	IDENTIFIER="$1"
+	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
+	BASE_PATH="$IDE_FOLDER/$BASE_LINK"
+
+	_createenv "$IDENTIFIER"
+
+	_copyeclipse "$IDENTIFIER" "$BASE_LINK"
+
+	cd "$WU_PATH"
+}
+
+function mkgtenv {
+	if [ -z "$1" ]
+	then
+		echo "An identifier is needed for GlobalTester dev environment creation"
+		return
+	fi
+
+	BASE_LINK="currentBaseEclipseGlobalTester"
+	BASE_PATH="$IDE_FOLDER/$BASE_LINK"
+
+	IDENTIFIER="$1"
+	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
+
+	_createenv "$IDENTIFIER"
+
+	if [ -f "$BASE_PATH" ]
+	then
+		_copyeclipse "$IDENTIFIER" "$BASE_LINK"
+	else
+		_copyeclipse "$IDENTIFIER"
+	fi
+
+	cd "$WU_PATH/$ENV_REPOS_FOLDER"
+	clonelocal
+
+	cd "$WU_PATH"
 }
 
 function lsenv {
