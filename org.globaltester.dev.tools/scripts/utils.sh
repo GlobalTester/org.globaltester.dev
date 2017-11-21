@@ -314,11 +314,12 @@ function _copyfolder {
 function _copyeclipse {
 	BASE_LINK="currentBaseEclipse"
 
-	if [ -z "$2" ]
+	if [ -n "$2" ]
 	then
-		echo "Using $BASE_LINK as eclipse base"
-		return
+		BASE_LINK="$2"
 	fi
+
+	echo "Using $BASE_LINK as eclipse base"
 
 	IDENTIFIER="$1"
 	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
@@ -382,7 +383,7 @@ function mkgtenv {
 	WU_PATH="$ENVIRONMENTS_FOLDER/$IDENTIFIER"
 
 	_createenv "$IDENTIFIER"
-
+	
 	if [ -f "$BASE_PATH" ]
 	then
 		_copyeclipse "$IDENTIFIER" "$BASE_LINK"
@@ -438,10 +439,6 @@ function updatemirrors {
 	mkdir -p "$GT_MIRROR"
 	cd "$GT_MIRROR"
 	cloneall --mirror
-
-	mkdir -p "$GT_ARCHIVE_MIRROR"
-	cd "$GT_ARCHIVE_MIRROR"
-	cloneallarchive --mirror
 
 	for CURRENT in `find "$MIRROR_FOLDER" -mindepth 2 -maxdepth 2 -type d`
 	do
