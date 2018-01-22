@@ -11,6 +11,7 @@ PARAMETER_NUMBER=0
 FULL_CLONE=0
 INTERACTIVE=1
 IGNORE_EXISTING=0
+USE_LOCAL_POM=0
 MIRROR=""
 
 while [ $# -gt 0 ]
@@ -24,6 +25,7 @@ do
 			echo "-b  | --branch          the branch to be checked out"
 			echo "-s  | --source          the source to be used                                  defaults to $SOURCE"
 			echo "-i  | --ignore          ignores existing repository folders"
+			echo "-l  | --local           uses local pom file, implies --ignore"
 			echo "-fc | --full            clone all accessible repositories"
 			echo "-m  | --mirror          setup mirror repositories, see git help clone for details"
 			echo "-ni | --non-interactive assume answers needed to proceed"
@@ -79,6 +81,11 @@ do
 			IGNORE_EXISTING=1
 			shift 1
 		;;
+		"-l"|"--local")
+			USE_LOCAL_POM=1
+			IGNORE_EXISTING=1
+			shift 1
+		;;
 		"-m"|"--mirror")
 			MIRROR="--mirror"
 			shift 1
@@ -96,7 +103,7 @@ do
 			exit 1;
 		;;
 	esac
-	
+
 	PARAMETER_NUMBER=$(( $PARAMETER_NUMBER + 1 ))
 done
 
@@ -117,7 +124,7 @@ RELENG=$REPOSITORY/$FOLDER
 if [ -z $DESTINATION ]
 then
 	DIR=.
-else 
+else
 	DIR=$DESTINATION
 fi
 
@@ -181,16 +188,23 @@ else
 		REF="$BRANCH"
 	fi
 
-		
-	git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml
-	if [ $? -eq 0 ]
+	if [ $USE_LOCAL_POM -eq 0 ]
+	then
+		git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml
+		USE_ARCHIVE_RESULT=$?
+	else
+		USE_ARCHIVE_RESULT=1
+	fi
+
+
+	if [ $USE_ARCHIVE_RESULT -eq 0 ]
 	then
 		echo Retrieving releng POM via git archive command
 		REPOS_TO_CLONE=`git archive --remote=${CLONE_URI}${REPOSITORY} $REF:$FOLDER pom.xml | tar -xO | grep '<module>' | sed -e 's|.*\.\.\/\.\.\/\([^/]*\)\/.*<\/module>.*|\1|' | sort -u`
 	else
 		echo Retrieving releng POM via git archive command failed, try cloning whole releng repository
 
-	#clone releng repo
+		#clone releng repo
 		if [ -d $REPOSITORY ]
 		then
 			if [ $IGNORE_EXISTING -eq 0 ]
@@ -202,9 +216,9 @@ else
 			fi
 		else
 			git clone ${CLONE_URI}${REPOSITORY}
+			CLONERESULT=$?
 		fi
-		
-		CLONERESULT=$?
+
 
 		if [ $CLONERESULT -eq 0 ]
 		then
@@ -214,8 +228,7 @@ else
 				cd "$REPOSITORY";git checkout "$BRANCH"; cd ..;
 			fi
 		fi
-	
-	
+
 		#extract repo names from pom
 		if [ -e $RELENG/pom.xml ]
 		then
