@@ -59,6 +59,25 @@ alias mergebaselog="forrepos 'git log \`git merge-base HEAD origin/master\`..HEA
 
 alias getArtifacts='bash -c "if [ -d results ]; then echo \"results dir exists, aborting\"; exit; fi; mkdir results; find . \( -name *site*.zip -o -name *deploy*.zip -o -name *gt_scripts*.zip -o -name *product-*.zip \) -exec cp {} results/ \;"'
 
+function file2hex {
+	if [ -f "$1" ]
+	then
+		echo `xxd -p "$1"` | sed -e "s|\s||g" | tr '[:lower:]' '[:upper:]'
+	else
+		echo "Usage: file2hex <filename>"
+	fi
+}
+
+function hex2file {
+	if [ -z "$1" -o "$2" ]
+	then
+		echo "Usage: hex2file <hexstring> <filename>"
+	else
+		rm -f "$2"
+		echo "$1" | xxd -r -p - "$2" | sed -e "s|\s||g"
+	fi
+}
+
 function inXephyr {
 	COMMANDSTRING="";
 	
