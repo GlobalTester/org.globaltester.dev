@@ -69,7 +69,7 @@ function file2hex {
 }
 
 function hex2file {
-	if [ -z "$1" -o "$2" ]
+	if [ -z "$1" -o -z "$2" ]
 	then
 		echo "Usage: hex2file <hexstring> <filename>"
 	else
