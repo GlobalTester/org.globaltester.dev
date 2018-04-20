@@ -1,5 +1,11 @@
 node('GlobalTester') {
 
+  stage('Clean workspace') {
+    dir('jacoco'){
+      deleteDir()
+    }
+  }
+
   stage('Checkout project') {
     checkout([$class: 'GitSCM', 
       branches: [[name: "${BRANCH_NAME}"]],
