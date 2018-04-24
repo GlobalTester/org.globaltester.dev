@@ -88,13 +88,14 @@ do
 	VERSION=`printf "%9s" "$VERSION_CLEAN" | sed -e 's/ /-/g'`
 	HASH_CLEAN=`cd "$CURRENT_REPO"; git log -n1 --format=%H`
 	HASH=`printf "%42s" "$HASH_CLEAN" | sed -e 's/ /#/g'`
-	printf "  %-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
+	printf "\t\t%-75s%9s%s\n" "$CURRENT_REPO" "$VERSION" "$HASH"| sed -e 's/ /-/g' -e 's/@/ /g' -e 's/-/ /' -e 's/#/ /g'>> "$MDFILE"
 	echo "$CURRENT_REPO $HASH_CLEAN $VERSION_CLEAN $DATE" >> "$MODULES_LIST_FILE"
 done
 
 
 # add release preparation checklist
 echo -e "<p style=\"page-break-after: always\"/>" >> "$MDFILE"
+echo -e "" >> "$MDFILE"
 echo -e "Release preparation checklist\n-----------------" >> "$MDFILE"
 echo -e "- [ ] Check open issues" >> "$MDFILE"
 echo -e "- [ ] Check Sonar quality gate" >> "$MDFILE"
@@ -102,12 +103,15 @@ echo -e "- [ ] Check open branches" >> "$MDFILE"
 echo -e "- [ ] Perform consistency checks" >> "$MDFILE"
 echo -e "- [ ] Update changelogs" >> "$MDFILE"
 echo -e "- [ ] Update Whats's new (if needed)" >> "$MDFILE"
+echo -e "- [ ] Generate new test data for terminal tests" >> "$MDFILE"
+echo -e "- [ ] Update CfgDflt*.java classes" >> "$MDFILE"
 echo -e "- [ ] Transfer version numbers" >> "$MDFILE"
 echo -e "- [ ] Update checksums" >> "$MDFILE"
 echo -e "- [ ] Push required changes to master and go to sleep" >> "$MDFILE"
 
 # add release finalisation checklist
 echo -e "<p style=\"page-break-after: always\"/>" >> "$MDFILE"
+echo -e "" >> "$MDFILE"
 echo -e "Release finalisation checklist\n-----------------" >> "$MDFILE"
 echo -e "- [ ] Perform release tests on final artifacts" >> "$MDFILE"
 echo -e "- [ ] Follow up on release test results (e.g. documentation changes, creation of issues and hotfixes)" >> "$MDFILE"
