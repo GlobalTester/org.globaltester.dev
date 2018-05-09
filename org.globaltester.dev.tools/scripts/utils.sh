@@ -10,6 +10,10 @@ then
 	REPOS_FOLDER="$DEV_HOME/repos"
 fi
 
+if [ -z "$DATA_FOLDER" ]
+then
+	DATA_FOLDER="$DEV_HOME/data"
+fi
 
 if [ -z "$ORIGIN_SOURCE" ]
 then
@@ -34,6 +38,11 @@ fi
 if [ -z "PARALLEL_BUILD_PARAMS" ]
 then
 	PARALLEL_BUILD_PARAMS=
+fi
+
+if [ -z "USER_ID" ]
+then
+	USER_ID="$USER"
 fi
 
 ENV_REPOS_FOLDER=repos
@@ -94,6 +103,23 @@ function inXephyr {
 	fi
 	sleep 1
 	DISPLAY="$XEPHYR_GENERAL_DISP" bash -i -c "$COMMANDSTRING"
+}
+
+function gtbuild_staging {
+	if [ -n "$1" ]
+	then
+		DIR="$ENVIRONMENTS_FOLDER/$1/repos/com.secunet.globaltester.universe/com.secunet.globaltester.universe.releng/"
+
+		if [ ! -d "$DIR" ]
+		then
+			echo "$DIR does not exist"
+			lsenv
+			return
+		fi
+		cd "$DIR"
+	fi
+
+	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; inXephyr mvn -DskipZip -DfailIfNoTests=false -P-tycho-surefire clean verify sonar:sonar -D"sonar.branch=staging_${USER_ID}"
 }
 
 function mergebasediff {
@@ -243,6 +269,7 @@ complete -F _existing_envs gotoenv
 complete -F _existing_envs mkeclipse
 complete -F _existing_envs mkgtenv
 complete -F _existing_envs mkenv
+complete -F _existing_envs gtbuild_staging
 
 
 function eeee {
