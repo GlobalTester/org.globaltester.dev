@@ -88,7 +88,7 @@ function hex2file {
 }
 
 function inXephyr {
-	COMMANDSTRING="";
+	COMMANDSTRING="export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; ";
 	
 	for CURRENT in "$@"
 	do
