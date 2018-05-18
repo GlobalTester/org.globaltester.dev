@@ -35,12 +35,12 @@ then
 	IDE_FOLDER="$DEV_HOME/ide"
 fi
 
-if [ -z "PARALLEL_BUILD_PARAMS" ]
+if [ -z "$PARALLEL_BUILD_PARAMS" ]
 then
 	PARALLEL_BUILD_PARAMS=
 fi
 
-if [ -z "USER_ID" ]
+if [ -z "$USER_ID" ]
 then
 	USER_ID="$USER"
 fi
@@ -118,8 +118,9 @@ function gtbuild_staging {
 		fi
 		cd "$DIR"
 	fi
-
-	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; inXephyr mvn -DskipZip -DfailIfNoTests=false -P-tycho-surefire clean verify sonar:sonar -D"sonar.branch=staging_${USER_ID}"
+	SONARBRANCH="staging_${USER_ID}"
+	echo Staging build with branch \"$SONARBRANCH"\""
+	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; inXephyr mvn -DskipZip -DfailIfNoTests=false -P-tycho-surefire clean verify sonar:sonar -D"sonar.branch=$SONARBRANCH"
 }
 
 function mergebasediff {
