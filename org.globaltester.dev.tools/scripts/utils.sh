@@ -120,7 +120,7 @@ function gtbuild_staging {
 	fi
 	SONARBRANCH="staging_${USER_ID}"
 	echo Staging build with branch \"$SONARBRANCH"\""
-	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; inXephyr mvn -DskipZip -DfailIfNoTests=false -P-tycho-surefire clean verify sonar:sonar -D"sonar.branch=$SONARBRANCH"
+	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; inXephyr mvn -DskipZip -DskipInstall -DfailIfNoTests=false -P-tycho-surefire clean verify sonar:sonar -D"sonar.branch=$SONARBRANCH"
 }
 
 function mergebasediff {
