@@ -38,7 +38,7 @@ node('GlobalTester') {
 
   stage('Build') {
     wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
-      sh "cd ${PROJECT_NAME}/${PROJECT_NAME}.releng/ && ${MAVEN_HOME}/bin/mvn ${MAVEN_PARAMS} -DforceContextQualifier=`date +%Y%m%d` -Dmaven.test.failure.ignore ${MAVEN_TARGETS}"
+      sh "cd ${PROJECT_NAME}/${PROJECT_NAME}.releng/ && ${MAVEN_HOME}/bin/mvn ${MAVEN_PARAMS} -DforceContextQualifier=`date --date=tomorrow +%Y%m%d` -Dmaven.test.failure.ignore ${MAVEN_TARGETS}"
     }
   }
 
