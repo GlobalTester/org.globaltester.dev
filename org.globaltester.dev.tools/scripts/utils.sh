@@ -87,6 +87,12 @@ function hex2file {
 	fi
 }
 
+function gtlic {
+	[ -e ~/dev/data/gt_build.lic ] || echo Please store license file at ~/dev/data/gt_build.lic
+	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "--" ~/dev/data/gt_build.lic | dos2unix | base64 -d | xxd -p | tr -d "\\n"`;
+	echo Exported variable GLOBALTESTER_LICENSE_DATA with value $GLOBALTESTER_LICENSE_DATA
+}
+
 function inXephyr {
 	COMMANDSTRING="export GLOBALTESTER_LICENSE_DATA=`grep -v -e "---" "$DATA_FOLDER/license/gt_build.lic" | dos2unix | base64 -d | xxd -p | tr -d '\n'`; ";
 	
@@ -221,6 +227,7 @@ function ee {
 	do
 		if [ -f "$ECLIPSE_EXECUTABLE" ]
 		then
+			gtlic
 			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace "$@" >& /dev/null & disown
 			cd "$CURRENT_DIR"
 			return
