@@ -268,7 +268,7 @@ _existing_envs()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    COMPREPLY=( $(compgen -W "$( command ls ~/dev/env/ )" -- ${cur}) )
+    COMPREPLY=( $(compgen -W "$( command ls $ENVIRONMENTS_FOLDER )" -- ${cur}) )
 }
 
 complete -F _existing_envs eee
