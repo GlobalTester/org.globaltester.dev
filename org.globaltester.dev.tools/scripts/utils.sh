@@ -438,7 +438,7 @@ function mkgtenv {
 
 	_createenv "$IDENTIFIER"
 	
-	if [ -f "$BASE_PATH" ]
+	if [ -e "$BASE_PATH" ]
 	then
 		_copyeclipse "$IDENTIFIER" "$BASE_LINK"
 	else
