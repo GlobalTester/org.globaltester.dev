@@ -96,7 +96,6 @@ function gtlic {
 		export WSLENV="$WSL_ENV:GLOBALTESTER_LICENSE_DATA/w"
 	fi
 
-
 	echo "Exported variable GLOBALTESTER_LICENSE_DATA with value $GLOBALTESTER_LICENSE_DATA"
 }
 
@@ -235,12 +234,7 @@ function ee {
 		if [ -f "$ECLIPSE_EXECUTABLE" ]
 		then
 			gtlic
-			if [[ $(grep -i Microsoft /proc/version) ]]; then
-				echo "Shell is running on WSL"
-				WSLENV=GLOBALTESTER_LICENSE_DATA/w $CURRENT_DIR"/eclipse/eclipse" -data ./workspace "$@" >& /dev/null & disown
-			else
-				setsid "$ECLIPSE_EXECUTABLE" -data ./workspace "$@" >& /dev/null & disown
-			fi
+			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace "$@" >& /dev/null & disown
 			cd "$CURRENT_DIR"
 			return
 		fi
