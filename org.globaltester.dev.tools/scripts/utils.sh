@@ -228,7 +228,12 @@ function ee {
 		if [ -f "$ECLIPSE_EXECUTABLE" ]
 		then
 			gtlic
-			setsid "$ECLIPSE_EXECUTABLE" -data ./workspace "$@" >& /dev/null & disown
+			if [[ $(grep -i Microsoft /proc/version) ]]; then
+				echo "Shell is running on WSL"
+				WSLENV=GLOBALTESTER_LICENSE_DATA/w $CURRENT_DIR"/eclipse/eclipse" -data ./workspace "$@" >& /dev/null & disown
+			else
+				setsid "$ECLIPSE_EXECUTABLE" -data ./workspace "$@" >& /dev/null & disown
+			fi
 			cd "$CURRENT_DIR"
 			return
 		fi
