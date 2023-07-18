@@ -88,9 +88,16 @@ function hex2file {
 }
 
 function gtlic {
-	[ -e ~/dev/data/gt_build.lic ] || echo Please store license file at ~/dev/data/gt_build.lic
-	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "--" ~/dev/data/gt_build.lic | dos2unix | base64 -d | xxd -p | tr -d "\\n"`;
-	echo Exported variable GLOBALTESTER_LICENSE_DATA with value $GLOBALTESTER_LICENSE_DATA
+	[ -e "$DEV_HOME"/data/gt_build.lic ] || ( echo Please store license file at "$DEV_HOME"/data/gt_build.lic; return 1 )
+	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "--" "$DEV_HOME"/data/gt_build.lic | dos2unix | base64 -d | xxd -p | tr -d "\\n"`;
+
+	if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+		echo "Running in WSL"
+		export WSLENV="$WSL_ENV:GLOBALTESTER_LICENSE_DATA/w"
+	fi
+
+
+	echo "Exported variable GLOBALTESTER_LICENSE_DATA with value $GLOBALTESTER_LICENSE_DATA"
 }
 
 function inXephyr {
@@ -273,7 +280,7 @@ _existing_envs()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    COMPREPLY=( $(compgen -W "$( command ls ~/dev/env/ )" -- ${cur}) )
+    COMPREPLY=( $(compgen -W "$( command ls $ENVIRONMENTS_FOLDER )" -- ${cur}) )
 }
 
 complete -F _existing_envs eee
@@ -443,7 +450,7 @@ function mkgtenv {
 
 	_createenv "$IDENTIFIER"
 	
-	if [ -f "$BASE_PATH" ]
+	if [ -e "$BASE_PATH" ]
 	then
 		_copyeclipse "$IDENTIFIER" "$BASE_LINK"
 	else
