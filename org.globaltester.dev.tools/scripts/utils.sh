@@ -87,11 +87,15 @@ function hex2file {
 	fi
 }
 
+function isWSL {
+	grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null
+}
+
 function gtlic {
 	[ -e "$DEV_HOME"/data/gt_build.lic ] || ( echo Please store license file at "$DEV_HOME"/data/gt_build.lic; return 1 )
 	export GLOBALTESTER_LICENSE_DATA=`grep -v -e "--" "$DEV_HOME"/data/gt_build.lic | dos2unix | base64 -d | xxd -p | tr -d "\\n"`;
 
-	if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+	if isWSL ; then
 		echo "Running in WSL"
 		export WSLENV="$WSL_ENV:GLOBALTESTER_LICENSE_DATA/w"
 	fi
@@ -227,6 +231,7 @@ function watchBuild {
 
 function ee {
 	ECLIPSE_EXECUTABLE="./eclipse/eclipse"
+	isWSL  && ECLIPSE_EXECUTABLE="./eclipse/eclipse.exe"
 
 	CURRENT_DIR="`pwd`"
 	while [ ! "`pwd`" = "/" ]
