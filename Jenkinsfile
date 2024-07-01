@@ -31,7 +31,7 @@ node('GlobalTester') {
 		}
 	}
 
-	stage('Build') {	
+	stage('Build') {
 		wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
 			// Precondition: Install JDK as tool (https://hudson.e.secunet.de/hudson/configureTools/) with following JDK_HOME_ID as 'Name'; e.g. 'OpenJDK 17.0.8'
 			def JAVA_HOME = tool "${JDK_HOME_ID}"
@@ -45,12 +45,26 @@ node('GlobalTester') {
 	}
 
 	stage ('Collect artifacts') {
-		archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/resource/*.list'
-		archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html'
-		archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*site*.zip'
-		archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.zip'
-		archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*deploy*.zip'
-		archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*uiTests.zip'
-		junit '**/TEST*.xml'
+		def collectArtifacts = "${COLLECT_ARTIFACTS}"
+		echo "collectArtifacts: ${collectArtifacts}"
+		def productOnly = "product_only"
+		if ("${productOnly}".equals("${collectArtifacts}")) {
+			echo "Collect 'product only' artifacts"
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.zip'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.tar.gz'
+		} else {
+			echo "Collect all artifacts"
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/resource/*.list'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/html/*.html'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*site*.zip'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.zip'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*deploy*.zip'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*uiTests.zip'
+			archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*product-*.tar.gz'
+			// archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*site*.tar.gz'
+			// archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/products/*deploy*.tar.gz'
+			// archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/*uiTests.tar.gz'
+			junit '**/TEST*.xml'
+		}
 	}
 }
