@@ -23,8 +23,13 @@ do
 	TAG_MESSAGE="Version bump to $REPO_VERSION"
 	TAG_NAME="version/$REPO_VERSION"
 
-	cd "$REPO"
-		git tag -a -m "Released as version $VERSION" "version/$VERSION" "$HASH"
-		git tag -a -m "Release on $DATE as version $VERSION" "release/$DATE" "$HASH"
-	cd ..
+	if [ -d "$REPO" ]
+	then
+		cd "$REPO"
+			echo Tagging repo $REPO with \"version/$VERSION\" \(hash: $HASH\)
+			git tag -a -m "Released as version $VERSION" "version/$VERSION" "$HASH"
+			echo Tagging repo $REPO with \"release/$DATE\" \(version: $VERSION / hash: $HASH\)
+			git tag -a -m "Release on $DATE as version $VERSION" "release/$DATE" "$HASH"
+		cd ..
+	fi
 done
