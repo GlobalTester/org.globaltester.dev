@@ -6,11 +6,11 @@ It focuses on the relevant top level projects, describes their scope and develop
 GlobalTester
 ------------
 Product release engineering repositories:  
-`com.secunet.globaltester.prove.eidclient`  
 `com.secunet.globaltester.prove.epa`  
 `com.secunet.globaltester.prove.epa.poseidas`  
 `com.secunet.globaltester.prove.epareader`  
 `com.secunet.globaltester.prove.epp`  
+`com.secunet.globaltester.prove.idl`  
 `com.secunet.globaltester.prove.is`  
 
 GlobalTester is an Open Source test tool for conformance testing and analysis of smart cards, such as electronic identification cards (eID) and electronic passports (ePassports) as well as related document readers.
